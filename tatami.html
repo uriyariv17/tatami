@@ -939,7 +939,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-09-22 18:35';
+  var APP_VERSION = '2026-09-22 19:35';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1108,12 +1108,14 @@
   }
 
   var lastRefreshTime = 0;
+  var lastKnownServerContent = null; // what we last saw/wrote to the sheet — used to detect if someone else (another device/user) saved since then
   async function refreshFromStorage(showFeedback){
     try{
       var data;
       if (USE_SHEETS_BACKEND){
         var raw = await sheetsGet();
         data = raw ? JSON.parse(raw) : null;
+        lastKnownServerContent = raw || '{}';
       } else {
         var res = await window.storage.get(STORAGE_KEY, false);
         data = res && res.value ? JSON.parse(res.value) : null;
@@ -1234,6 +1236,7 @@
       var data;
       if (USE_SHEETS_BACKEND){
         data = (state.storageOk && rawValue) ? JSON.parse(rawValue) : null;
+        if (state.storageOk){ lastKnownServerContent = rawValue || '{}'; }
       } else {
         var res = await window.storage.get(STORAGE_KEY, false);
         data = res && res.value ? JSON.parse(res.value) : null;
@@ -1285,7 +1288,64 @@
   }
 
   var LOCAL_BACKUP_KEY = 'martial-arts-crm-local-backup';
-  async function saveData(){
+  function mergeArraysByID(baseline, local, server){
+    // baseline: what we last knew from the server (before either side's changes)
+    // local: our current in-memory version
+    // server: what's currently on the server right now (includes anyone else's changes)
+    var baselineIds = {}; (baseline||[]).forEach(function(item){ if (item && item.id) baselineIds[item.id]=item; });
+    var localIds = {}; (local||[]).forEach(function(item){ if (item && item.id) localIds[item.id]=item; });
+    var serverIds = {}; (server||[]).forEach(function(item){ if (item && item.id) serverIds[item.id]=item; });
+    var allIds = {};
+    Object.keys(baselineIds).forEach(function(id){ allIds[id]=true; });
+    Object.keys(localIds).forEach(function(id){ allIds[id]=true; });
+    Object.keys(serverIds).forEach(function(id){ allIds[id]=true; });
+
+    var merged = [];
+    Object.keys(allIds).forEach(function(id){
+      var inBaseline = baselineIds[id], inLocal = localIds[id], inServer = serverIds[id];
+      if (!inLocal && !inServer) return; // gone on both sides
+      if (!inLocal && inServer){
+        if (inBaseline) return; // we deleted it locally — respect that, don't resurrect it
+        merged.push(inServer); // brand new from the other side — pull it in
+        return;
+      }
+      if (inLocal && !inServer){
+        if (inBaseline) return; // the other side deleted it — respect that, don't keep a ghost copy
+        merged.push(inLocal); // brand new from us — keep it
+        return;
+      }
+      // exists on both sides
+      var localChanged = inBaseline ? JSON.stringify(inBaseline) !== JSON.stringify(inLocal) : true;
+      var serverChanged = inBaseline ? JSON.stringify(inBaseline) !== JSON.stringify(inServer) : true;
+      if (localChanged && !serverChanged){ merged.push(inLocal); }
+      else if (!localChanged && serverChanged){ merged.push(inServer); }
+      else { merged.push(inLocal); } // both changed (rare direct conflict) or neither — prefer our own active edit
+    });
+    return merged;
+  }
+  function mergePayloads(baselineStr, localPayload, serverStr){
+    var baseline = baselineStr ? JSON.parse(baselineStr) : {};
+    var server = serverStr ? JSON.parse(serverStr) : {};
+    return {
+      groups: mergeArraysByID(baseline.groups, localPayload.groups, server.groups),
+      students: mergeArraysByID(baseline.students, localPayload.students, server.students),
+      techCategories: mergeArraysByID(baseline.techCategories, localPayload.techCategories, server.techCategories),
+      techSubCategories: mergeArraysByID(baseline.techSubCategories, localPayload.techSubCategories, server.techSubCategories),
+      techniques: mergeArraysByID(baseline.techniques, localPayload.techniques, server.techniques),
+      campaigns: mergeArraysByID(baseline.campaigns, localPayload.campaigns, server.campaigns),
+      // yearArchives are append-only snapshots, never edited — just take the union, newest-safe
+      yearArchives: (function(){
+        var seen = {}; var out = [];
+        (server.yearArchives||[]).concat(localPayload.yearArchives||[]).forEach(function(a){
+          var key = a.savedAt + '|' + a.label;
+          if (!seen[key]){ seen[key]=true; out.push(a); }
+        });
+        return out;
+      })()
+    };
+  }
+
+  async function saveData(forceOverwrite){
     if (state.readOnly) return; // safety net: never write from the shared view-only link
     state.hasUnsavedChanges = true; // cleared only once a save is confirmed successful — guards refreshFromStorage from overwriting it
     state.isSaving = true;
@@ -1298,6 +1358,26 @@
     var payloadStr = JSON.stringify(payload);
     try{
       if (USE_SHEETS_BACKEND){
+        if (!forceOverwrite && lastKnownServerContent !== null){
+          // Someone else (another device/user) may have saved since we last
+          // synced. Rather than blocking you with a choice, automatically
+          // merge their changes with yours — new/changed records from each
+          // side are combined by ID, so both people's work survives.
+          var currentServer = null;
+          try{ currentServer = await sheetsGet(); }catch(eCheck){ /* if this check itself fails, don't block the save on it — fall through and try normally */ }
+          if (currentServer !== null && currentServer !== lastKnownServerContent){
+            var merged = mergePayloads(lastKnownServerContent, payload, currentServer);
+            payload = merged;
+            payloadStr = JSON.stringify(payload);
+            state.groups = payload.groups;
+            state.students = payload.students;
+            state.techCategories = payload.techCategories;
+            state.techSubCategories = payload.techSubCategories;
+            state.techniques = payload.techniques;
+            state.campaigns = payload.campaigns;
+            state.yearArchives = payload.yearArchives;
+          }
+        }
         await sheetsSet(payloadStr);
         // Real verification: re-read the sheet and confirm the write actually
         // landed, rather than optimistically assuming success. This matters
@@ -1307,6 +1387,7 @@
         if (verifyRaw !== payloadStr){
           throw new Error('האימות נכשל — מה שנשמר בגיליון לא תואם למה שניסינו לשמור. יכול לקרות אם השמירה נקטעה. נסה שוב, ואם זה חוזר עם ייבוא גדול, נסה לפצל לקבוצות קטנות יותר.');
         }
+        lastKnownServerContent = payloadStr;
         state.sheetsSaveError = null;
         state.lastSavedAt = Date.now();
         state.hasUnsavedChanges = false;
