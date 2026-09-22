@@ -939,7 +939,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-09-22 19:35';
+  var APP_VERSION = '2026-09-22 22:35';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1345,6 +1345,32 @@
     };
   }
 
+  var saveDebounceTimer = null;
+  var pendingSaveSince = null; // when the current unsaved streak started — used for the max-wait cap below
+  function scheduleSave(){
+    // Batches rapid successive changes (e.g. marking attendance for many
+    // students in quick succession) into a single save, instead of firing a
+    // full network round-trip (conflict-check + write + verify) per click —
+    // which can flood Apps Script with overlapping requests and trigger its
+    // own rate limiting.
+    state.hasUnsavedChanges = true;
+    state.isSaving = true;
+    render();
+    if (pendingSaveSince === null){ pendingSaveSince = Date.now(); }
+    if (saveDebounceTimer){ clearTimeout(saveDebounceTimer); }
+    // Max-wait cap: if changes keep coming in faster than the 900ms quiet
+    // window (e.g. marking attendance for 30+ students back-to-back with no
+    // pause), don't let the save get pushed out indefinitely — force it
+    // through at least every 5 seconds, so a long uninterrupted burst still
+    // gets persisted along the way instead of only once you finally stop.
+    var elapsed = Date.now() - pendingSaveSince;
+    var delay = elapsed >= 5000 ? 0 : 900;
+    saveDebounceTimer = setTimeout(function(){
+      saveDebounceTimer = null;
+      pendingSaveSince = null;
+      saveData();
+    }, delay);
+  }
   async function saveData(forceOverwrite){
     if (state.readOnly) return; // safety net: never write from the shared view-only link
     state.hasUnsavedChanges = true; // cleared only once a save is confirmed successful — guards refreshFromStorage from overwriting it
@@ -1429,8 +1455,7 @@
     state.techCategories.forEach(function(c){ if (!c.subject){ c.subject = 'היאבקות'; } });
     state.modal = null;
     if (state.groups.length && !state.selectedGroupId){ state.selectedGroupId = state.groups[0].id; }
-    saveData();
-    render();
+    scheduleSave();
     showToast('הנתונים שוחזרו מהגיבוי המקומי בדפדפן.');
   }
   function dismissLocalBackupPrompt(){
@@ -1462,11 +1487,11 @@
     var g = {id: uid('g'), name: name, days: days || [], sessions: []};
     state.groups.push(g);
     state.selectedGroupId = g.id;
-    saveData(); render();
+    scheduleSave();
   }
   function renameGroup(id, name, days){
     var g = state.groups.find(function(x){return x.id===id;});
-    if (g){ g.name = name; g.days = days || []; delete g.day; saveData(); render(); }
+    if (g){ g.name = name; g.days = days || []; delete g.day; scheduleSave(); }
   }
   function deleteGroup(id){
     var count = state.students.filter(function(s){return s.groupId===id && !s.archived;}).length;
@@ -1477,7 +1502,7 @@
       state.groups = state.groups.filter(function(x){return x.id!==id;});
       state.students.forEach(function(s){ if (s.groupId===id){ s.archived = true; } });
       if (state.selectedGroupId === id){ state.selectedGroupId = state.groups.length ? state.groups[0].id : null; }
-      saveData(); render();
+      scheduleSave();
     }, 'מחיקה');
   }
   function buildYearCsv(students, groups){
@@ -1542,7 +1567,7 @@
           }
         });
 
-        saveData(); render();
+        scheduleSave();
         showToast('שנה חדשה נפתחה. הקובץ ירד, ותמונת המצב הקודמת זמינה תחת "שנים קודמות".');
       },
       'פתיחת שנה חדשה'
@@ -1563,7 +1588,7 @@
             state.students = [];
             state.selectedGroupId = null;
             state.view = 'group';
-            saveData(); render();
+            scheduleSave();
             showToast('כל הקבוצות והמתאמנים נמחקו. אפשר עכשיו לייבא רשימות מסודרות.');
           },
           'מחיקה סופית'
@@ -1594,7 +1619,7 @@
             state.techSearch = '';
             state.techFilterColumn = null;
             state.techFilterState = 'all';
-            saveData(); render();
+            scheduleSave();
             showToast('כל קטגוריות הטכניקות נמחקו. אפשר עכשיו לייבא רשימה חדשה.');
           },
           'מחיקה סופית'
@@ -1609,7 +1634,7 @@
     if (g.sessions.indexOf(dateISO) !== -1){ showToast('כבר קיים מפגש בתאריך זה.'); return; }
     g.sessions.push(dateISO);
     g.sessions.sort();
-    saveData(); render();
+    scheduleSave();
   }
   function removeSession(groupId, dateISO){
     openConfirm('להסיר את המפגש מ-'+shortDate(dateISO)+'? הנוכחות שנרשמה עבורו תימחק.', function(){
@@ -1619,7 +1644,7 @@
       state.students.forEach(function(s){
         if (s.groupId===groupId){ s.attendance = s.attendance.filter(function(d){return d!==dateISO;}); }
       });
-      saveData(); render();
+      scheduleSave();
     }, 'הסרה');
   }
   function freshMonthlyPayments(){
@@ -1696,18 +1721,18 @@
   function addCampaign(data){
     var c = { id: uid('camp'), name: data.name, cost: Number(data.cost)||0, startDate: data.startDate, endDate: data.endDate || null };
     state.campaigns.push(c);
-    saveData(); render();
+    scheduleSave();
   }
   function updateCampaign(id, patch){
     var c = state.campaigns.find(function(x){return x.id===id;});
     if (!c) return;
     Object.assign(c, patch);
-    saveData(); render();
+    scheduleSave();
   }
   function deleteCampaign(id){
     openConfirm('למחוק את הקמפיין הזה? זה לא ימחק אף תלמיד, רק את רשומת הקמפיין עצמה.', function(){
       state.campaigns = state.campaigns.filter(function(c){return c.id!==id;});
-      saveData(); render();
+      scheduleSave();
     }, 'מחיקה');
   }
 
@@ -1740,7 +1765,7 @@
     };
     if (s.status === 'joined'){ fillScheduledPayments(s); }
     state.students.unshift(s);
-    saveData(); render();
+    scheduleSave();
   }
   function updateStudent(id, patch){
     var s = state.students.find(function(x){return x.id===id;});
@@ -1756,14 +1781,14 @@
     }
     if (becomingOut){ s.outDate = todayISO(); }
     if (noteChanged){ s.noteUpdatedDate = s.note ? todayISO() : null; } // clear the date if the note was emptied out
-    saveData(); render();
+    scheduleSave();
   }
   function archiveStudent(id){
     var s = state.students.find(function(x){return x.id===id;});
     if (!s) return;
     openConfirm('להעביר את "'+s.name+'" לארכיון?\n\nההיסטוריה שלו — כולל טבלת התשלומים החודשית, נוכחות והערות — תישמר במלואה. הוא פשוט לא יופיע יותר ברשימות הפעילות, ותוכל למצוא ולשחזר אותו בכל עת דרך "ארכיון".', function(){
       s.archived = true;
-      saveData(); render();
+      scheduleSave();
       showToast('"'+s.name+'" הועבר לארכיון.');
     }, 'ארכוב');
   }
@@ -1774,7 +1799,7 @@
       s.trashed = true;
       s.dateTrashed = todayISO();
       if (!s.isLead){ s.isLead = true; s.leadMarkedDate = s.leadMarkedDate || s.dateAdded || todayISO(); }
-      saveData(); render();
+      scheduleSave();
       showToast('"'+s.name+'" הועבר לפח הלידים.');
     }, 'העברה לפח');
   }
@@ -1783,7 +1808,7 @@
     if (!s) return;
     s.trashed = false;
     s.dateTrashed = null;
-    saveData(); render();
+    scheduleSave();
     showToast('"'+s.name+'" שוחזר לרשימת הלידים הפעילה.');
   }
   function hardDeleteTrashedLead(id){
@@ -1791,7 +1816,7 @@
     if (!s) return;
     openConfirm('למחוק את "'+s.name+'" לצמיתות מהפח?\n\nאי אפשר לשחזר את זה.', function(){
       state.students = state.students.filter(function(x){return x.id!==id;});
-      saveData(); render();
+      scheduleSave();
       showToast('נמחק לצמיתות.');
     }, 'מחיקה סופית');
   }
@@ -1810,7 +1835,7 @@
       });
       added++;
     });
-    saveData(); render();
+    scheduleSave();
     return added;
   }
   function restoreStudent(id){
@@ -1826,14 +1851,14 @@
       s.archived = false;
       state.view = 'group';
       state.selectedGroupId = s.groupId;
-      saveData(); render();
+      scheduleSave();
       showToast('"'+s.name+'" שוחזר, ושויך לקבוצה "'+state.groups[0].name+'" (הקבוצה המקורית שלו נמחקה).');
       return;
     }
     s.archived = false;
     state.view = 'group';
     state.selectedGroupId = s.groupId;
-    saveData(); render();
+    scheduleSave();
     showToast('"'+s.name+'" שוחזר לרשימה הפעילה.');
   }
   function hardDeleteStudent(id){
@@ -1841,7 +1866,7 @@
     if (!s) return;
     openConfirm('למחוק את "'+s.name+'" לצמיתות מהארכיון?\n\nזה כולל מחיקת כל היסטוריית התשלומים שלו. אי אפשר לשחזר את זה.', function(){
       state.students = state.students.filter(function(x){return x.id!==id;});
-      saveData(); render();
+      scheduleSave();
       showToast('המתאמן נמחק לצמיתות.');
     }, 'מחיקה סופית');
   }
@@ -1850,7 +1875,7 @@
     if (!s) return;
     var idx = s.attendance.indexOf(dateISO);
     if (idx === -1) s.attendance.push(dateISO); else s.attendance.splice(idx,1);
-    saveData(); render();
+    scheduleSave();
   }
 
   // ---- technique mutations ----
@@ -1858,14 +1883,14 @@
     var c = {id: uid('tc'), name: name, subject: (subject||'').trim() || 'כללי'};
     state.techCategories.push(c);
     state.selectedCategoryId = c.id;
-    saveData(); render();
+    scheduleSave();
   }
   function renameTechCategory(id, name, subject){
     var c = state.techCategories.find(function(x){return x.id===id;});
     if (c){
       c.name = name;
       if (subject !== undefined){ c.subject = (subject||'').trim() || 'כללי'; }
-      saveData(); render();
+      scheduleSave();
     }
   }
   function deleteTechCategory(id){
@@ -1878,7 +1903,7 @@
       state.techSubCategories = state.techSubCategories.filter(function(x){return x.categoryId!==id;});
       state.techniques = state.techniques.filter(function(t){return t.categoryId!==id;});
       if (state.selectedCategoryId === id){ state.selectedCategoryId = state.techCategories.length ? state.techCategories[0].id : null; }
-      saveData(); render();
+      scheduleSave();
     }, 'מחיקה');
   }
   function addTechnique(data){
@@ -1888,21 +1913,21 @@
       subCategoryId: data.subCategoryId || null
     };
     state.techniques.unshift(t);
-    saveData(); render();
+    scheduleSave();
   }
   function addTechSubCategory(categoryId, name, color){
     var sc = {id: uid('tsc'), categoryId: categoryId, name: name, color: color || ''};
     state.techSubCategories.push(sc);
-    saveData(); render();
+    scheduleSave();
     return sc;
   }
   function renameTechSubCategory(id, newName){
     var sc = state.techSubCategories.find(function(x){return x.id===id;});
-    if (sc){ sc.name = newName; saveData(); render(); }
+    if (sc){ sc.name = newName; scheduleSave(); }
   }
   function setTechSubCategoryColor(id, color){
     var sc = state.techSubCategories.find(function(x){return x.id===id;});
-    if (sc){ sc.color = color || ''; saveData(); render(); }
+    if (sc){ sc.color = color || ''; scheduleSave(); }
   }
   function deleteTechSubCategory(id){
     var count = state.techniques.filter(function(t){return t.subCategoryId===id;}).length;
@@ -1912,7 +1937,7 @@
     openConfirm(msg, function(){
       state.techSubCategories = state.techSubCategories.filter(function(x){return x.id!==id;});
       state.techniques.forEach(function(t){ if (t.subCategoryId===id){ t.subCategoryId=null; } });
-      saveData(); render();
+      scheduleSave();
     }, 'מחיקה');
   }
   function importTechniquesFromText(text){
@@ -1974,26 +1999,26 @@
       techniquesAdded++;
     });
 
-    saveData();
+    scheduleSave();
     return {categoriesAdded:categoriesAdded, techniquesAdded:techniquesAdded, skipped:skipped};
   }
   function updateTechnique(id, patch){
     var t = state.techniques.find(function(x){return x.id===id;});
     if (!t) return;
     Object.assign(t, patch);
-    saveData(); render();
+    scheduleSave();
   }
   function deleteTechnique(id){
     openConfirm('למחוק את הטכניקה?', function(){
       state.techniques = state.techniques.filter(function(x){return x.id!==id;});
-      saveData(); render();
+      scheduleSave();
     }, 'מחיקה');
   }
   function toggleTechCheck(techId, idx){
     var t = state.techniques.find(function(x){return x.id===techId;});
     if (!t) return;
     t.checks[idx] = !t.checks[idx];
-    saveData(); render();
+    scheduleSave();
   }
 
   // ---- dom helper ----
@@ -2177,7 +2202,7 @@
       if (matches1.length > 1) return { description: 'נמצאו כמה מתאמנים בשם "'+archName+'" — נסח בצורה מדויקת יותר', execute: null };
       return {
         description: 'העברת "'+matches1[0].name+'" לארכיון',
-        execute: function(){ matches1[0].archived = true; saveData(); }
+        execute: function(){ matches1[0].archived = true; scheduleSave(); }
       };
     }
 
@@ -2190,7 +2215,7 @@
       if (matches2.length > 1) return { description: 'נמצאו כמה מתאמנים בשם "'+advName+'" — נסח בצורה מדויקת יותר', execute: null };
       return {
         description: 'סימון "'+matches2[0].name+'" כמועמד למתקדמים',
-        execute: function(){ matches2[0].advanced = true; saveData(); }
+        execute: function(){ matches2[0].advanced = true; scheduleSave(); }
       };
     }
 
@@ -2206,7 +2231,7 @@
         execute: function(){
           matches3[0].isLead = true;
           if (!matches3[0].leadMarkedDate){ matches3[0].leadMarkedDate = todayISO(); }
-          saveData();
+          scheduleSave();
         }
       };
     }
@@ -3487,7 +3512,7 @@
     state.techSubCategories = state.techSubCategories.filter(function(s){return s.id!==draggedId;});
     var idx = state.techSubCategories.findIndex(function(s){return s.id===targetId;});
     state.techSubCategories.splice(idx, 0, dragged);
-    saveData(); render();
+    scheduleSave();
   }
   function moveSubCategoryToFront(categoryId, draggedId){
     var dragged = state.techSubCategories.find(function(x){return x.id===draggedId;});
@@ -3496,7 +3521,7 @@
     var firstIdx = state.techSubCategories.findIndex(function(s){return s.categoryId===categoryId;});
     if (firstIdx === -1){ state.techSubCategories.push(dragged); }
     else { state.techSubCategories.splice(firstIdx, 0, dragged); }
-    saveData(); render();
+    scheduleSave();
   }
   function makeCategoryDropHandlers(categoryId){
     return {
@@ -3533,7 +3558,7 @@
     var idx = state.groups.findIndex(function(g){return g.id===targetId;});
     state.groups.splice(idx, 0, dragged);
     recomputeOrderForDay(targetDay);
-    saveData(); render();
+    scheduleSave();
   }
   function moveGroupToDayEnd(draggedId, day){
     var dragged = state.groups.find(function(x){return x.id===draggedId;});
@@ -3543,7 +3568,7 @@
     state.groups = state.groups.filter(function(g){return g.id!==draggedId;});
     state.groups.push(dragged);
     recomputeOrderForDay(day);
-    saveData(); render();
+    scheduleSave();
   }
   function recomputeOrderForDay(day){
     var idx = 0;
@@ -3678,7 +3703,7 @@
       studentsAdded++;
     });
 
-    saveData();
+    scheduleSave();
     return {groupsAdded:groupsAdded, studentsAdded:studentsAdded, skipped:skipped, sessionsAdded:sessionsAdded};
   }
 
@@ -3717,7 +3742,7 @@
     state.techCategories.forEach(function(c){ if (!c.subject){ c.subject = 'היאבקות'; } });
     state.selectedGroupId = state.groups.length ? state.groups[0].id : null;
     state.selectedCategoryId = state.techCategories.length ? state.techCategories[0].id : null;
-    saveData();
+    scheduleSave();
     return { ok:true, groups: state.groups.length, students: state.students.length };
   }
 
@@ -3725,26 +3750,26 @@
     var s = state.students.find(function(x){return x.id===studentId;});
     if (!s) return;
     s.advanced = !s.advanced;
-    saveData(); render();
+    scheduleSave();
   }
   function toggleLead(studentId){
     var s = state.students.find(function(x){return x.id===studentId;});
     if (!s) return;
     s.isLead = !s.isLead;
     if (s.isLead && !s.leadMarkedDate){ s.leadMarkedDate = todayISO(); }
-    saveData(); render();
+    scheduleSave();
   }
   function toggleDaycare(studentId){
     var s = state.students.find(function(x){return x.id===studentId;});
     if (!s) return;
     s.daycare = !s.daycare;
-    saveData(); render();
+    scheduleSave();
   }
   function toggleShirtReceived(studentId){
     var s = state.students.find(function(x){return x.id===studentId;});
     if (!s) return;
     s.shirtReceived = !s.shirtReceived;
-    saveData(); render();
+    scheduleSave();
   }
 
   var CHECK_LABELS = ['נוער', 'ד-ו', 'א-ג'];
@@ -3774,7 +3799,7 @@
     var cur = s.monthlyPayments[monthIdx] || 'none';
     var nextIdx = (PAYMENT_CYCLE.indexOf(cur) + 1) % PAYMENT_CYCLE.length;
     s.monthlyPayments[monthIdx] = PAYMENT_CYCLE[nextIdx];
-    saveData(); render();
+    scheduleSave();
   }
 
   function togglePaySelection(studentId, monthIdx){
@@ -3813,14 +3838,14 @@
     var initialStatus = (s.monthlyPayments && s.monthlyPayments[start]) || 'none';
     s.paymentMerges.push({ start: start, span: span, text: text, status: initialStatus });
     clearPaySelection();
-    saveData(); render();
+    scheduleSave();
   }
   function unmergePaymentCells(studentId, mergeStart){
     var s = state.students.find(function(x){return x.id===studentId;});
     if (!s || !s.paymentMerges) return;
     openConfirm('לבטל את המיזוג ולחזור לתאים נפרדים?', function(){
       s.paymentMerges = s.paymentMerges.filter(function(m){ return m.start !== mergeStart; });
-      saveData(); render();
+      scheduleSave();
     }, 'ביטול מיזוג');
   }
   function toggleMergedCellStatus(studentId, mergeStart){
@@ -3831,7 +3856,7 @@
     var cur = m.status || 'none';
     var nextIdx = (PAYMENT_CYCLE.indexOf(cur) + 1) % PAYMENT_CYCLE.length;
     m.status = PAYMENT_CYCLE[nextIdx];
-    saveData(); render();
+    scheduleSave();
   }
 
   var GRADE_LETTERS = 'אבגדהוזחטי';
@@ -3936,7 +3961,7 @@
           s.monthlyPayments[monthIdx] = 'problem'; markedProblem++;
         }
       });
-      saveData();
+      scheduleSave();
       showToast('סומנו '+markedPaid+' כשולם, '+markedProblem+' כבעיה, '+skipped+' דולגו (אין מס\' חיוב).');
       render();
     }},['עדכון סטטוס תשלומים ל'+ACADEMIC_MONTHS[monthIdx].label]));
