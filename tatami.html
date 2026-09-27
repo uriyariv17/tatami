@@ -186,6 +186,23 @@
   }
   .tab-add:hover{color:var(--ink);border-color:var(--ink);}
 
+  .tech-subject-tabs{
+    background:#1A1A1A;
+    padding:0 28px;
+    display:flex;
+    gap:2px;
+    flex-wrap:wrap;
+  }
+  .tech-subject-tab{
+    padding:11px 20px;
+    background:transparent;
+    color:#9A9A9A;
+    font-size:13.5px;
+    font-weight:600;
+    border-bottom:3px solid transparent;
+  }
+  .tech-subject-tab:hover{ color:#fff; }
+  .tech-subject-tab.active{ color:#fff; border-bottom-color:var(--accent); }
   .tech-nav{
     background:var(--paper);
     border-bottom:1px solid var(--line);
@@ -939,7 +956,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-09-22 22:35';
+  var APP_VERSION = '2026-09-27 12:45';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -954,15 +971,16 @@
       var timeoutId = setTimeout(function(){
         if (settled) return;
         settled = true;
-        // Don't delete window[callbackName] yet — Apps Script can occasionally
-        // take longer than this to respond (cold start, larger chunked reads).
-        // If that slow response arrives after we've already given up, calling
-        // a deleted callback throws "is not defined" and crashes the page.
-        // Detach the <script> tag now (so it doesn't linger in the DOM) but
-        // leave the callback itself in place a while longer as a safety net,
-        // then clean it up quietly.
+        // Detach the <script> tag so it doesn't linger in the DOM, but
+        // deliberately do NOT delete window[callbackName] here. Apps Script
+        // can occasionally take far longer than this timeout to respond
+        // (cold starts, rate limiting, large chunked reads) — if that late
+        // response arrives after we've already given up and the callback
+        // had been deleted, calling it throws "is not defined" and crashes
+        // the page. Leaving a few harmless, unused function references on
+        // window costs nothing meaningful and fully avoids that crash no
+        // matter how late a response shows up.
         if (script.parentNode){ script.parentNode.removeChild(script); }
-        setTimeout(function(){ delete window[callbackName]; }, 30000);
         reject(new Error('תם הזמן להמתנה לתגובה מהגיליון (timeout אחרי 30 שניות)'));
       }, 30000);
       function cleanup(){
@@ -1064,6 +1082,8 @@
     lastSavedAt: null, // timestamp (ms) of the last confirmed successful save
     hasUnsavedChanges: false, // true while a save is in-flight or has failed and not yet retried successfully
     isSaving: false, // true only while a save request is actively in flight (not yet resolved)
+    leadRevenueStatusFilter: null, // status key to filter the lead revenue breakdown by, or null for all
+    selectedTechSubject: null, // which technique subject (e.g. היאבקות) is currently shown — set on first render
     showCampaignAnalysis: false,
     showLeadRevenueDetail: false,
     paymentsSelectedMonth: null, // ACADEMIC_MONTHS index (0-11); set on first render to the current month
@@ -1883,6 +1903,8 @@
     var c = {id: uid('tc'), name: name, subject: (subject||'').trim() || 'כללי'};
     state.techCategories.push(c);
     state.selectedCategoryId = c.id;
+    state.selectedTechSubject = c.subject;
+    state.expandedTechCats[c.id] = true;
     scheduleSave();
   }
   function renameTechCategory(id, name, subject){
@@ -1890,6 +1912,7 @@
     if (c){
       c.name = name;
       if (subject !== undefined){ c.subject = (subject||'').trim() || 'כללי'; }
+      state.selectedTechSubject = c.subject;
       scheduleSave();
     }
   }
@@ -3004,7 +3027,7 @@
   }
 
   function renderLeadRevenueDetail(){
-    var leadsWithValue = state.students
+    var allLeadsWithValue = state.students
       .filter(function(s){ return s.isLead; })
       .map(function(s){
         return {
@@ -3018,20 +3041,43 @@
       })
       .sort(function(a,b){ return b.value - a.value; });
 
+    var wrap = el('div',{});
+
+    var filterBar = el('div',{class:'tech-filter-bar'});
+    filterBar.appendChild(el('span',{class:'tech-filter-label'},['סינון לפי סטטוס:']));
+    filterBar.appendChild(el('button',{
+      class:'tech-filter-pill'+(state.leadRevenueStatusFilter===null?' active':''),
+      onclick:function(){ state.leadRevenueStatusFilter=null; render(); }
+    },['הצג הכל']));
+    STATUSES.forEach(function(st){
+      filterBar.appendChild(el('button',{
+        class:'tech-filter-pill'+(state.leadRevenueStatusFilter===st.key?' active':''),
+        onclick:function(){ state.leadRevenueStatusFilter=st.key; render(); }
+      },[st.label]));
+    });
+    wrap.appendChild(filterBar);
+
+    var leadsWithValue = state.leadRevenueStatusFilter
+      ? allLeadsWithValue.filter(function(row){ return row.student.status === state.leadRevenueStatusFilter; })
+      : allLeadsWithValue;
+
     if (!leadsWithValue.length){
-      return el('p',{style:'color:var(--muted);font-size:13px;'},['אין עדיין אף אחד שמסומן כליד.']);
+      wrap.appendChild(el('p',{style:'color:var(--muted);font-size:13px;margin-top:10px;'},['אין לידים שתואמים לסינון הזה.']));
+      return wrap;
     }
 
-    var wrap = el('div',{class:'table-wrap'});
+    var tableWrap = el('div',{class:'table-wrap'});
     var thead = el('thead',{},[ el('tr',{},[
-      el('th',{},['שם']), el('th',{},['קבוצה']), el('th',{},['תאריך הצטרפות']), el('th',{class:'col-narrow'},['חודשים פעיל']), el('th',{class:'col-narrow'},['תעריף לחודש']), el('th',{},['סה"כ תמורה'])
+      el('th',{},['שם']), el('th',{},['סטטוס']), el('th',{},['קבוצה']), el('th',{},['תאריך הצטרפות']), el('th',{class:'col-narrow'},['חודשים פעיל']), el('th',{class:'col-narrow'},['תעריף לחודש']), el('th',{},['סה"כ תמורה'])
     ])]);
     var tbody = el('tbody',{});
     var grandTotal = 0;
     leadsWithValue.forEach(function(row){
       grandTotal += row.value;
+      var st = statusInfo(row.student.status);
       tbody.appendChild(el('tr',{},[
         el('td',{class:'name-cell'+(row.student.isFemale?' name-female':'')},[row.student.name]),
+        el('td',{},[ el('span',{class:'status-dot', style:'display:inline-block;background:'+st.color+';margin-inline-end:6px;'}), st.label ]),
         el('td',{},[row.group ? row.group.name : '—']),
         el('td',{},[row.joinDate ? formatDateFull(row.joinDate) : '— (טרם הצטרף)']),
         el('td',{},[row.months ? String(row.months) : '—']),
@@ -3040,10 +3086,11 @@
       ]));
     });
     tbody.appendChild(el('tr',{style:'font-weight:700;border-top:2px solid var(--ink);'},[
-      el('td',{},['סה"כ']), el('td',{}), el('td',{}), el('td',{}), el('td',{}),
+      el('td',{},['סה"כ']), el('td',{}), el('td',{}), el('td',{}), el('td',{}), el('td',{}),
       el('td',{class:'good'},['₪'+grandTotal.toLocaleString()])
     ]));
-    wrap.appendChild(el('table',{},[thead, tbody]));
+    tableWrap.appendChild(el('table',{},[thead, tbody]));
+    wrap.appendChild(tableWrap);
     return wrap;
   }
 
@@ -4039,7 +4086,20 @@
       if (!(subj in bySubject)){ bySubject[subj] = []; subjectOrder.push(subj); }
       bySubject[subj].push(c);
     });
+    if (state.selectedTechSubject === null || subjectOrder.indexOf(state.selectedTechSubject) === -1){
+      state.selectedTechSubject = subjectOrder.length ? subjectOrder[0] : null;
+    }
+
+    var subjectTabsBar = el('div',{class:'tech-subject-tabs'});
     subjectOrder.forEach(function(subj){
+      subjectTabsBar.appendChild(el('button',{
+        class:'tech-subject-tab'+(state.selectedTechSubject===subj?' active':''),
+        onclick:function(){ state.selectedTechSubject = subj; render(); }
+      },[subj+' ('+bySubject[subj].length+')']));
+    });
+
+    subjectOrder.forEach(function(subj){
+      if (subj !== state.selectedTechSubject) return;
       tabsBar.appendChild(el('div',{class:'tech-nav-subject'},[subj]));
       var itemsRow = el('div',{class:'tech-nav-items'});
       bySubject[subj].forEach(function(c){
@@ -4123,7 +4183,9 @@
     } else {
       var filterActive = !!(query || (state.techFilterColumn !== null && state.techFilterState !== 'all'));
       var catGrid = el('div',{class:'tech-cat-grid'});
-      state.techCategories.forEach(function(cat){
+      state.techCategories.filter(function(cat){
+        return query ? true : (cat.subject || 'כללי') === state.selectedTechSubject;
+      }).forEach(function(cat){
         var catDropHandlers = makeCategoryDropHandlers(cat.id);
         var section = el('div',{
           id:'techcat-'+cat.id, class:'tech-cat-section',
@@ -4163,6 +4225,7 @@
 
     app.appendChild(header);
     app.appendChild(actionsRow2);
+    app.appendChild(subjectTabsBar);
     app.appendChild(tabsBar);
     app.appendChild(searchBar);
     app.appendChild(filterBar);
@@ -4554,6 +4617,8 @@
         return el('option',{value:g.id},[g.name]);
       })));
 
+      var eLeadDateInput = el('input',{type:'date', value: editS.leadMarkedDate || ''});
+
       content = el('div',{class:'modal'},[
         el('h2',{},['עריכת פרטי מתאמן']),
         eErr,
@@ -4573,6 +4638,7 @@
           el('label',{class:'day-check-label'},[eLeadCheck, 'ליד']),
           el('label',{class:'day-check-label'},[eFemaleCheck, 'נקבה (ברירת מחדל: זכר)'])
         ]),
+        el('div',{class:'field'},[el('label',{},['תאריך סימון כליד']), eLeadDateInput]),
         el('div',{class:'field', style:'border-top:1px solid var(--line);padding-top:12px;margin-top:4px;'},[
           el('label',{},['שכפול גם לקבוצה נוספת']),
           el('div',{style:'display:flex;gap:8px;'},[
@@ -4612,7 +4678,7 @@
               advanced: eAdvancedCheck.checked,
               isLead: eLeadCheck.checked,
               isFemale: eFemaleCheck.checked,
-              leadMarkedDate: (eLeadCheck.checked && !editS.leadMarkedDate) ? todayISO() : editS.leadMarkedDate
+              leadMarkedDate: eLeadDateInput.value || (eLeadCheck.checked ? todayISO() : null)
             });
             closeModal();
           }},['שמירה'])
