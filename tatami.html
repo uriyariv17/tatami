@@ -64,74 +64,6 @@
     text-align:center;
   }
 
-  .voice-widget{
-    position:fixed;
-    bottom:24px;
-    right:24px;
-    z-index:200;
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    gap:10px;
-  }
-  .voice-mic-btn{
-    width:54px;
-    height:54px;
-    border-radius:50%;
-    border:none;
-    background:var(--ink);
-    color:#fff;
-    font-size:22px;
-    cursor:pointer;
-    box-shadow:0 4px 14px rgba(0,0,0,0.3);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .voice-mic-btn:hover{ background:#000; }
-  .voice-mic-btn.listening{
-    background:var(--accent);
-    animation:voice-pulse 1.3s infinite;
-  }
-  @keyframes voice-pulse{
-    0%{ box-shadow:0 4px 14px rgba(185,23,23,0.4), 0 0 0 0 rgba(185,23,23,0.5); }
-    70%{ box-shadow:0 4px 14px rgba(185,23,23,0.4), 0 0 0 14px rgba(185,23,23,0); }
-    100%{ box-shadow:0 4px 14px rgba(185,23,23,0.4), 0 0 0 0 rgba(185,23,23,0); }
-  }
-  .voice-transcript{
-    max-width:300px;
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:10px 14px;
-    font-size:13px;
-    box-shadow:0 4px 14px rgba(0,0,0,0.15);
-  }
-  .voice-confirm{
-    max-width:300px;
-    background:var(--paper);
-    border:1px solid var(--accent);
-    border-radius:8px;
-    padding:12px 14px;
-    font-size:13px;
-    box-shadow:0 4px 14px rgba(0,0,0,0.2);
-  }
-  .voice-confirm-actions{
-    display:flex;
-    gap:8px;
-    margin-top:10px;
-    justify-content:flex-end;
-  }
-  .voice-message{
-    max-width:300px;
-    background:var(--paper);
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:10px 14px;
-    font-size:12.5px;
-    color:var(--muted);
-    box-shadow:0 4px 14px rgba(0,0,0,0.15);
-  }
 
   header{
     background:var(--ink);
@@ -443,6 +375,21 @@
     display:flex;
     gap:2px;
   }
+  .section-nav{ position:relative; }
+  .activity-hub-wrap{ display:flex; align-items:stretch; }
+  .activity-badge{ background:var(--accent); color:#fff; border-radius:10px; font-size:11px; padding:1px 7px; margin-inline-start:6px; font-weight:700; }
+  .activity-panel{
+    position:absolute; top:100%; inset-inline-start:12px;
+    width:min(430px, calc(100vw - 24px)); max-height:72vh; overflow:auto;
+    background:var(--paper); color:var(--ink); border:1px solid var(--line); border-radius:6px;
+    box-shadow:0 10px 28px rgba(0,0,0,.28); z-index:80; text-align:right;
+  }
+  .activity-panel-head{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 14px; border-bottom:1px solid var(--line); position:sticky; top:0; background:var(--paper); font-size:14px; }
+  .activity-day{ background:var(--canvas); padding:5px 14px; font-size:12px; font-weight:700; color:var(--muted); }
+  .activity-item{ display:flex; gap:10px; align-items:flex-start; padding:8px 14px; border-bottom:1px solid var(--line); font-size:13px; line-height:1.45; }
+  .activity-item.new{ background:#FFF6E0; }
+  .activity-time{ color:var(--muted); font-size:11.5px; min-width:38px; padding-top:1px; }
+  .activity-new-tag{ background:var(--accent); color:#fff; border-radius:3px; font-size:10.5px; padding:1px 6px; font-weight:700; white-space:nowrap; }
   .refresh-btn{ margin-inline-start:auto; }
   .last-saved-indicator{
     align-self:center;
@@ -453,6 +400,8 @@
   }
   .last-saved-indicator.error{ color:#E08080; font-weight:700; }
   .last-saved-indicator.saving{ color:#D0D0A0; }
+  .undo-btn:disabled{ opacity:.35; cursor:default; }
+  .undo-btn:not(:disabled){ color:#fff; }
   .version-tag{
     align-self:center;
     font-size:10.5px;
@@ -917,9 +866,6 @@
     .modal-actions{ flex-wrap:wrap; }
     .modal-actions button{ flex:1; min-width:100px; }
 
-    .voice-widget{ bottom:14px; right:14px; }
-    .voice-mic-btn{ width:46px; height:46px; font-size:18px; }
-    .voice-transcript, .voice-confirm, .voice-message{ max-width:min(280px, 80vw); font-size:12px; }
 
     .day-checks{ gap:6px; }
     .day-check-label{ padding:5px 9px; font-size:12.5px; }
@@ -956,7 +902,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-09-27 12:45';
+  var APP_VERSION = '2026-10-08 11:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1047,14 +993,20 @@
         setTimeout(function(){ if (iframe.parentNode){ iframe.parentNode.removeChild(iframe); } }, 1000);
       }
 
+      // Some browsers also fire a "load" event for the iframe's initial blank
+      // page. If that were treated as "the write finished", verification would
+      // read the old data and falsely report a failed save. So only count a
+      // load that happens after the form was actually submitted.
+      var armed = false;
       iframe.onload = function(){
-        if (settled){ return; }
+        if (settled || !armed){ return; }
         settled = true;
         cleanup();
         resolve();
       };
 
       form.submit();
+      setTimeout(function(){ armed = true; }, 0);
     });
   }
 
@@ -1084,6 +1036,9 @@
     isSaving: false, // true only while a save request is actively in flight (not yet resolved)
     leadRevenueStatusFilter: null, // status key to filter the lead revenue breakdown by, or null for all
     selectedTechSubject: null, // which technique subject (e.g. היאבקות) is currently shown — set on first render
+    activityLog: [],            // shared log of changes made (by anyone) — shown in the updates hub
+    showActivityHub: false,
+    activityShowWeek: false,
     showCampaignAnalysis: false,
     showLeadRevenueDetail: false,
     paymentsSelectedMonth: null, // ACADEMIC_MONTHS index (0-11); set on first render to the current month
@@ -1092,7 +1047,6 @@
     techFilterState: 'all',   // 'all' | 'yes' | 'no'
     addingSubcatFor: null,    // categoryId currently showing the inline "new subcategory" input, or null
     paySelection: { studentId: null, indices: [] },
-    voice: { listening: false, transcript: '', pending: null, message: '' },
     leadsStatusFilter: null, // null = all, or a status key
     loaded: false,
     modal: null,      // {type, ...payload}
@@ -1118,6 +1072,16 @@
   }
   function uid(p){ return p+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8); }
   function todayISO(){ return new Date().toISOString().slice(0,10); }
+  // "17.9 14:32" — date and time a note was last changed. Older notes that
+  // were saved before times were recorded show the date only.
+  function noteStamp(s){
+    if (s.noteUpdatedAt){
+      var d = new Date(s.noteUpdatedAt);
+      var hh = ('0'+d.getHours()).slice(-2), mm = ('0'+d.getMinutes()).slice(-2);
+      return d.getDate()+'.'+(d.getMonth()+1)+' '+hh+':'+mm;
+    }
+    return s.noteUpdatedDate ? shortDate(s.noteUpdatedDate) : '';
+  }
   function shortDate(iso){
     var d = new Date(iso+'T00:00:00');
     return d.toLocaleDateString('he-IL',{day:'numeric',month:'numeric'});
@@ -1134,6 +1098,12 @@
       var data;
       if (USE_SHEETS_BACKEND){
         var raw = await sheetsGet();
+        if (!showFeedback && lastKnownServerContent !== null && (raw || '{}') === lastKnownServerContent){
+          // Nothing changed since we last looked — don't touch the screen at all.
+          lastRefreshTime = Date.now();
+          return;
+        }
+        if (state.hasUnsavedChanges && !showFeedback){ return; } // a save started while we were fetching — keep local changes
         data = raw ? JSON.parse(raw) : null;
         lastKnownServerContent = raw || '{}';
       } else {
@@ -1148,6 +1118,7 @@
         state.techniques = data.techniques || [];
         state.campaigns = data.campaigns || [];
         state.yearArchives = data.yearArchives || [];
+        state.activityLog = data.activityLog || [];
         state.students.forEach(function(s){
           if (s.classGrade){ s.classGrade = normalizeClassGrade(s.classGrade); }
           if (s.status === 'new'){ s.status = 'follow'; }
@@ -1155,6 +1126,7 @@
         state.techCategories.forEach(function(c){ if (!c.subject){ c.subject = 'היאבקות'; } });
       }
       lastRefreshTime = Date.now();
+      resetUndoHistory();
       if (showFeedback){ showToast('הנתונים עודכנו.'); }
       render();
     }catch(e){
@@ -1164,6 +1136,8 @@
   function maybeAutoRefresh(){
     if (!state.loaded || state.modal) return; // don't yank data from under an open modal
     if (state.hasUnsavedChanges) return; // never silently overwrite changes that haven't been confirmed saved yet
+    var ae = document.activeElement;
+    if (ae && (ae.tagName==='INPUT' || ae.tagName==='TEXTAREA' || ae.tagName==='SELECT')) return; // don't rebuild the page while you're in the middle of typing
     if (Date.now() - lastRefreshTime < 4000) return; // debounce
     refreshFromStorage(false);
   }
@@ -1269,6 +1243,7 @@
         state.techniques = data.techniques || [];
         state.campaigns = data.campaigns || [];
         state.yearArchives = data.yearArchives || [];
+        state.activityLog = data.activityLog || [];
 
         var fixedAny = false;
         state.students.forEach(function(s){
@@ -1285,6 +1260,7 @@
       }
     }catch(e){ /* no data yet */ }
     state.loaded = true;
+    resetUndoHistory();
     if (state.storageOk){ state.lastSavedAt = Date.now(); } // confirms a healthy connection right on load, not just after your first change
     lastRefreshTime = Date.now();
     if (state.groups.length && !state.selectedGroupId){ state.selectedGroupId = state.groups[0].id; }
@@ -1354,6 +1330,7 @@
       techniques: mergeArraysByID(baseline.techniques, localPayload.techniques, server.techniques),
       campaigns: mergeArraysByID(baseline.campaigns, localPayload.campaigns, server.campaigns),
       // yearArchives are append-only snapshots, never edited — just take the union, newest-safe
+      activityLog: mergeArraysByID(baseline.activityLog, localPayload.activityLog, server.activityLog),
       yearArchives: (function(){
         var seen = {}; var out = [];
         (server.yearArchives||[]).concat(localPayload.yearArchives||[]).forEach(function(a){
@@ -1365,24 +1342,232 @@
     };
   }
 
+  // ---------------------------------------------------------------
+  // Saving pipeline
+  //  - scheduleSave(): called after every user change. Batches rapid changes
+  //    (900ms quiet window, 5s max wait) and records an undo point.
+  //  - saveData(): serialized — only ONE save runs at a time; a request that
+  //    arrives meanwhile is queued and runs right after (it will include
+  //    everything changed in the meantime).
+  //  - saveOnce(): conflict check + auto-merge + write + verify.
+  //  - Transient failures are retried automatically (3 attempts) before an
+  //    error is shown.
+  //  - Status changes only touch the small "saved" indicator in place — they
+  //    never re-render the whole page, so nothing you're typing gets wiped.
+  // ---------------------------------------------------------------
   var saveDebounceTimer = null;
-  var pendingSaveSince = null; // when the current unsaved streak started — used for the max-wait cap below
-  function scheduleSave(){
-    // Batches rapid successive changes (e.g. marking attendance for many
-    // students in quick succession) into a single save, instead of firing a
-    // full network round-trip (conflict-check + write + verify) per click —
-    // which can flood Apps Script with overlapping requests and trigger its
-    // own rate limiting.
+  var pendingSaveSince = null;
+  var savingInFlight = false;
+  var saveQueued = false;
+
+  // ---- undo history ----
+  var undoStack = [];
+  var undoBaseline = null; // serialized state as of the last recorded point
+  function serializeState(){
+    return JSON.stringify({
+      groups:state.groups, students:state.students,
+      techCategories:state.techCategories, techSubCategories:state.techSubCategories, techniques:state.techniques,
+      campaigns:state.campaigns, yearArchives:state.yearArchives
+    });
+  }
+  function resetUndoHistory(){ undoStack = []; undoBaseline = serializeState(); activityBaseline = undoBaseline; }
+  function recordUndoPoint(){
+    var cur = serializeState();
+    if (undoBaseline !== null && undoBaseline !== cur){
+      undoStack.push(undoBaseline);
+      if (undoStack.length > 20){ undoStack.shift(); }
+    }
+    undoBaseline = cur;
+  }
+  function performUndo(){
+    if (!undoStack.length){ showToast('אין מה לבטל.'); return; }
+    var prev = JSON.parse(undoStack.pop());
+    state.groups = prev.groups || [];
+    state.students = prev.students || [];
+    state.techCategories = prev.techCategories || [];
+    state.techSubCategories = prev.techSubCategories || [];
+    state.techniques = prev.techniques || [];
+    state.campaigns = prev.campaigns || [];
+    state.yearArchives = prev.yearArchives || [];
+    undoBaseline = serializeState();
+    scheduleSave(true);
+    showToast('↩ הפעולה האחרונה בוטלה.');
+  }
+
+  // ---------------------------------------------------------------
+  // Updates hub: a shared log of what changed, built automatically by
+  // comparing the data before/after each save (so every kind of change is
+  // captured without touching each place in the code that edits data).
+  // ---------------------------------------------------------------
+  var activityBaseline = null; // serialized data as of the last point we logged up to
+  function getDeviceId(){
+    try{
+      var d = window.localStorage.getItem('tatami-device-id');
+      if (!d){ d = 'd' + Math.random().toString(36).slice(2,10); window.localStorage.setItem('tatami-device-id', d); }
+      return d;
+    }catch(e){ return 'd-unknown'; }
+  }
+  function getActivitySeenAt(){ try{ return Number(window.localStorage.getItem('tatami-activity-seen-at') || 0); }catch(e){ return 0; } }
+  function setActivitySeenAt(ms){ try{ window.localStorage.setItem('tatami-activity-seen-at', String(ms)); }catch(e){} }
+
+  function computeActivityEntries(baselineStr){
+    if (!baselineStr) return [];
+    var base; try{ base = JSON.parse(baselineStr); }catch(e){ return []; }
+    var found = []; // {kind, text}
+    function add(kind, text){ found.push({kind:kind, text:text}); }
+    function byId(arr){ var m = {}; (arr||[]).forEach(function(x){ if (x && x.id) m[x.id] = x; }); return m; }
+    var bG = byId(base.groups), cG = byId(state.groups);
+    var bS = byId(base.students), cS = byId(state.students);
+    function gName(id){ var g = cG[id] || bG[id]; return g ? g.name : 'ללא קבוצה'; }
+    function snippet(t){ t = (t||'').replace(/\s+/g,' ').trim(); return t.length > 45 ? t.slice(0,45)+'…' : t; }
+    var payLabel = {paid:'שולם', problem:'בעיה', scheduled:'מתוכנן'};
+
+    // ---- groups ----
+    Object.keys(cG).forEach(function(id){
+      var c = cG[id], b = bG[id];
+      if (!b){ add('gAdd', '➕ נוצרה קבוצה: '+c.name); return; }
+      if (b.name !== c.name){ add('gEdit', '✏️ שם קבוצה שונה: '+b.name+' ← '+c.name); }
+      var bs = b.sessions || [], cs = c.sessions || [];
+      var newS = cs.filter(function(d){ return bs.indexOf(d) === -1; });
+      var goneS = bs.filter(function(d){ return cs.indexOf(d) === -1; });
+      if (newS.length){ add('session', '📅 נוסף מפגש ל'+c.name+': '+newS.map(shortDate).join(', ')); }
+      if (goneS.length){ add('session', '📅 נמחק מפגש מ'+c.name+': '+goneS.map(shortDate).join(', ')); }
+    });
+    Object.keys(bG).forEach(function(id){ if (!cG[id]){ add('gDel', '🗑 נמחקה קבוצה: '+bG[id].name); } });
+
+    // ---- students ----
+    var attGroups = {}; // groupId|date -> {added:[names], removed:[names]}
+    Object.keys(cS).forEach(function(id){
+      var c = cS[id], b = bS[id];
+      if (!b){ add('sAdd', '➕ נוסף תלמיד: '+c.name+' ('+gName(c.groupId)+' · '+statusInfo(c.status).label+')'); return; }
+      var statusChanged = b.status !== c.status;
+      if (!!b.trashed !== !!c.trashed){ add('sTrash', c.trashed ? '🗑 הועבר לפח: '+c.name : '♻️ שוחזר מהפח: '+c.name); }
+      if (!!b.archived !== !!c.archived){ add('sTrash', c.archived ? '🗄 הועבר לארכיון: '+c.name : '📤 הוצא מהארכיון: '+c.name); }
+      if (statusChanged){ add('sStatus', '🔄 '+c.name+': '+statusInfo(b.status).label+' ← '+statusInfo(c.status).label); }
+      if (b.groupId !== c.groupId){ add('sMove', '↔ '+c.name+' הועבר: '+gName(b.groupId)+' ← '+gName(c.groupId)); }
+      if ((b.note||'') !== (c.note||'')){
+        add('sNote', c.note ? ('📝 '+c.name+': הערה — "'+snippet(c.note)+'"') : ('📝 '+c.name+': ההערה נמחקה'));
+      }
+      if (!!b.advanced !== !!c.advanced){ add('sFlag', c.advanced ? '★ '+c.name+' סומן כמועמד למתקדמים' : '★ '+c.name+' הוסר ממועמדים למתקדמים'); }
+      if (!!b.isLead !== !!c.isLead){ add('sFlag', c.isLead ? '📈 '+c.name+' סומן כליד' : '📈 '+c.name+' הוסר מסימון ליד'); }
+      var edits = [];
+      if (b.name !== c.name){ add('sEdit', '✏️ שם תלמיד שונה: '+b.name+' ← '+c.name); }
+      if ((b.phone||'') !== (c.phone||'')){ edits.push('טלפון'); }
+      if ((b.classGrade||'') !== (c.classGrade||'')){ edits.push('כיתה'); }
+      if ((b.shirtSize||'') !== (c.shirtSize||'')){ edits.push('מידת חולצה'); }
+      if ((b.billingNumber||'') !== (c.billingNumber||'')){ edits.push('מס\' חיוב'); }
+      if (!!b.daycare !== !!c.daycare){ edits.push('צהרון'); }
+      if (!!b.isFemale !== !!c.isFemale){ edits.push('מגדר'); }
+      if (edits.length){ add('sEdit', '✏️ '+c.name+': עודכנו '+edits.join(', ')); }
+      // payments (skipped when the status changed — that auto-fills payments and would be noise)
+      if (!statusChanged){
+        var bp = b.monthlyPayments || [], cp = c.monthlyPayments || [];
+        for (var m=0; m<12; m++){
+          if ((bp[m]||'none') !== (cp[m]||'none') && ACADEMIC_MONTHS[m]){
+            add('pay', '💳 '+c.name+': '+ACADEMIC_MONTHS[m].label+' ← '+(payLabel[cp[m]] || 'ריק'));
+          }
+        }
+      }
+      // attendance
+      var ba = b.attendance || [], ca = c.attendance || [];
+      ca.forEach(function(d){ if (ba.indexOf(d) === -1){ var k=c.groupId+'|'+d; (attGroups[k]=attGroups[k]||{added:[],removed:[]}).added.push(c.name); } });
+      ba.forEach(function(d){ if (ca.indexOf(d) === -1){ var k=c.groupId+'|'+d; (attGroups[k]=attGroups[k]||{added:[],removed:[]}).removed.push(c.name); } });
+    });
+    Object.keys(bS).forEach(function(id){ if (!cS[id]){ add('sDel', '🗑 נמחק לצמיתות: '+bS[id].name); } });
+
+    Object.keys(attGroups).forEach(function(k){
+      var parts = k.split('|'), g = gName(parts[0]), d = shortDate(parts[1]), a = attGroups[k];
+      function who(list){ return list.length <= 3 ? list.join(', ') : (list.length+' תלמידים'); }
+      if (a.added.length){ add('att', '✅ נוכחות '+g+' ('+d+'): סומנו '+who(a.added)); }
+      if (a.removed.length){ add('att', '↩ נוכחות '+g+' ('+d+'): בוטל סימון ל'+who(a.removed)); }
+    });
+
+    // ---- techniques ----
+    var bT = byId(base.techniques), cT = byId(state.techniques);
+    var tAdd = 0, tDel = 0, tChg = 0;
+    Object.keys(cT).forEach(function(id){
+      if (!bT[id]){ tAdd++; }
+      else if (JSON.stringify(bT[id]) !== JSON.stringify(cT[id])){ tChg++; }
+    });
+    Object.keys(bT).forEach(function(id){ if (!cT[id]){ tDel++; } });
+    if (tAdd){ add('tech', '📚 נוספו '+tAdd+' טכניקות'); }
+    if (tDel){ add('tech', '📚 נמחקו '+tDel+' טכניקות'); }
+    if (tChg){ add('tech', '📚 עודכנו '+tChg+' טכניקות'); }
+    var bC = byId(base.techCategories), cC = byId(state.techCategories);
+    Object.keys(cC).forEach(function(id){ if (!bC[id]){ add('tech', '📚 נוספה קטגוריה: '+cC[id].name); } });
+    Object.keys(bC).forEach(function(id){ if (!cC[id]){ add('tech', '📚 נמחקה קטגוריה: '+bC[id].name); } });
+
+    // ---- new school year ----
+    if ((state.yearArchives||[]).length > (base.yearArchives||[]).length){ add('year', '🎓 נפתחה שנה חדשה'); }
+
+    // ---- collapse floods (imports, new-year reset, payment reconciliation...) into one line ----
+    var summaries = {
+      sAdd:'➕ נוספו {n} תלמידים', sDel:'🗑 נמחקו {n} תלמידים', sStatus:'🔄 שונה סטטוס ל-{n} תלמידים',
+      sMove:'↔ הועברו {n} תלמידים בין קבוצות', sNote:'📝 עודכנו הערות ל-{n} תלמידים', sFlag:'★ עודכנו סימונים ל-{n} תלמידים',
+      sEdit:'✏️ עודכנו פרטים של {n} תלמידים', sTrash:'🗄 {n} תלמידים הועברו/שוחזרו (ארכיון/פח)',
+      pay:'💳 עודכנו תשלומים ({n} שינויים)', att:'✅ עודכנה נוכחות ({n} שינויים)', session:'📅 עודכנו מפגשים ({n} שינויים)',
+      tech:'📚 עודכנו טכניקות/קטגוריות ({n} שינויים)'
+    };
+    var counts = {};
+    found.forEach(function(f){ counts[f.kind] = (counts[f.kind]||0) + 1; });
+    var out = [], summarized = {};
+    found.forEach(function(f){
+      if (counts[f.kind] > 6 && summaries[f.kind]){
+        if (!summarized[f.kind]){ summarized[f.kind] = true; out.push(summaries[f.kind].replace('{n}', counts[f.kind])); }
+      } else { out.push(f.text); }
+    });
+    return out;
+  }
+
+  function pruneActivityLog(){
+    var cutoff = Date.now() - 7*24*60*60*1000;
+    state.activityLog = (state.activityLog||[]).filter(function(e){ return e.at > cutoff; });
+    if (state.activityLog.length > 300){
+      state.activityLog.sort(function(a,b){ return a.at - b.at; });
+      state.activityLog = state.activityLog.slice(state.activityLog.length - 300);
+    }
+  }
+  function logPendingChanges(){
+    var texts = computeActivityEntries(activityBaseline);
+    if (texts.length){
+      var now = Date.now(), dev = getDeviceId();
+      texts.forEach(function(t, i){ (state.activityLog = state.activityLog || []).push({ id: uid('act'), at: now + i, d: dev, t: t }); });
+      pruneActivityLog();
+    }
+    activityBaseline = serializeState();
+  }
+  function isToday(ms){ return new Date(ms).toDateString() === new Date().toDateString(); }
+  function newActivityCount(){
+    var seen = getActivitySeenAt(), dev = getDeviceId();
+    return (state.activityLog||[]).filter(function(e){ return e.d !== dev && e.at > seen && isToday(e.at); }).length;
+  }
+
+  function saveIndicatorText(){
+    if (state.isSaving) return state.sheetsSaveError ? '⏳ מנסה שוב לשמור...' : '⏳ שומר...';
+    if (state.sheetsSaveError) return '⚠ השמירה האחרונה נכשלה';
+    if (state.lastSavedAt) return '✓ נשמר לאחרונה: '+new Date(state.lastSavedAt).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+    return '';
+  }
+  function saveIndicatorClass(){
+    return 'last-saved-indicator'+(state.isSaving?' saving':(state.sheetsSaveError?' error':''));
+  }
+  function updateSaveIndicator(){
+    // Update just the small indicator (and the undo button) in place — no full re-render.
+    var ind = document.querySelector('.last-saved-indicator');
+    if (ind){ ind.className = saveIndicatorClass(); ind.textContent = saveIndicatorText(); }
+    var ub = document.querySelector('.undo-btn');
+    if (ub){ ub.disabled = !undoStack.length; ub.title = undoStack.length ? ('ביטול הפעולה האחרונה ('+undoStack.length+' בהיסטוריה)') : 'אין מה לבטל'; }
+  }
+
+  function scheduleSave(skipUndoPoint){
+    if (skipUndoPoint !== true){ recordUndoPoint(); }
     state.hasUnsavedChanges = true;
     state.isSaving = true;
-    render();
+    render(); // re-render for the user's own change (form fields are preserved across renders)
     if (pendingSaveSince === null){ pendingSaveSince = Date.now(); }
     if (saveDebounceTimer){ clearTimeout(saveDebounceTimer); }
-    // Max-wait cap: if changes keep coming in faster than the 900ms quiet
-    // window (e.g. marking attendance for 30+ students back-to-back with no
-    // pause), don't let the save get pushed out indefinitely — force it
-    // through at least every 5 seconds, so a long uninterrupted burst still
-    // gets persisted along the way instead of only once you finally stop.
+    // Max-wait cap: a long uninterrupted burst of changes is still saved at
+    // least every 5 seconds instead of only once you finally stop.
     var elapsed = Date.now() - pendingSaveSince;
     var delay = elapsed >= 5000 ? 0 : 900;
     saveDebounceTimer = setTimeout(function(){
@@ -1391,74 +1576,108 @@
       saveData();
     }, delay);
   }
-  async function saveData(forceOverwrite){
+
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  async function saveData(){
     if (state.readOnly) return; // safety net: never write from the shared view-only link
-    state.hasUnsavedChanges = true; // cleared only once a save is confirmed successful — guards refreshFromStorage from overwriting it
+    if (savingInFlight){ saveQueued = true; return; }
+    savingInFlight = true;
+    state.hasUnsavedChanges = true;
     state.isSaving = true;
-    render();
-    var payload = {
-      groups:state.groups, students:state.students,
-      techCategories:state.techCategories, techSubCategories:state.techSubCategories, techniques:state.techniques,
-      campaigns:state.campaigns, yearArchives:state.yearArchives
-    };
-    var payloadStr = JSON.stringify(payload);
+    logPendingChanges(); // record what this save changes, so it shows up in the updates hub
+    updateSaveIndicator();
+    var needsFullRender = false;
     try{
       if (USE_SHEETS_BACKEND){
-        if (!forceOverwrite && lastKnownServerContent !== null){
-          // Someone else (another device/user) may have saved since we last
-          // synced. Rather than blocking you with a choice, automatically
-          // merge their changes with yours — new/changed records from each
-          // side are combined by ID, so both people's work survives.
-          var currentServer = null;
-          try{ currentServer = await sheetsGet(); }catch(eCheck){ /* if this check itself fails, don't block the save on it — fall through and try normally */ }
-          if (currentServer !== null && currentServer !== lastKnownServerContent){
-            var merged = mergePayloads(lastKnownServerContent, payload, currentServer);
-            payload = merged;
-            payloadStr = JSON.stringify(payload);
-            state.groups = payload.groups;
-            state.students = payload.students;
-            state.techCategories = payload.techCategories;
-            state.techSubCategories = payload.techSubCategories;
-            state.techniques = payload.techniques;
-            state.campaigns = payload.campaigns;
-            state.yearArchives = payload.yearArchives;
+        var maxAttempts = 3, lastErr = null, ok = false;
+        for (var attempt=1; attempt<=maxAttempts && !ok; attempt++){
+          try{
+            var res = await saveOnce();
+            if (res && res.mergedExternal){ needsFullRender = true; }
+            ok = true;
+          }catch(e){
+            lastErr = e;
+            console.error('ניסיון שמירה '+attempt+' נכשל', e);
+            if (attempt < maxAttempts){
+              state.sheetsSaveError = (e && e.message) ? e.message : String(e);
+              updateSaveIndicator();
+              await sleep(attempt * 1500);
+            }
           }
         }
-        await sheetsSet(payloadStr);
-        // Real verification: re-read the sheet and confirm the write actually
-        // landed, rather than optimistically assuming success. This matters
-        // most for large payloads (e.g. bulk imports) where the write can take
-        // longer than expected.
-        var verifyRaw = await sheetsGet();
-        if (verifyRaw !== payloadStr){
-          throw new Error('האימות נכשל — מה שנשמר בגיליון לא תואם למה שניסינו לשמור. יכול לקרות אם השמירה נקטעה. נסה שוב, ואם זה חוזר עם ייבוא גדול, נסה לפצל לקבוצות קטנות יותר.');
+        if (ok){
+          state.sheetsSaveError = null;
+          state.lastSavedAt = Date.now();
+        } else {
+          state.sheetsSaveError = (lastErr && lastErr.message) ? lastErr.message : String(lastErr);
+          needsFullRender = true; // show the error banner
         }
-        lastKnownServerContent = payloadStr;
-        state.sheetsSaveError = null;
-        state.lastSavedAt = Date.now();
-        state.hasUnsavedChanges = false;
-        state.isSaving = false;
-        render();
       } else {
-        await window.storage.set(STORAGE_KEY, payloadStr, false);
+        var payloadStr2 = serializeState();
+        await window.storage.set(STORAGE_KEY, payloadStr2, false);
         state.lastSavedAt = Date.now();
-        state.hasUnsavedChanges = false;
-        state.isSaving = false;
-        render();
+        state.sheetsSaveError = null;
       }
-    }catch(e){
-      console.error('שמירה נכשלה', e);
-      state.isSaving = false;
-      if (USE_SHEETS_BACKEND){
-        state.sheetsSaveError = (e && e.message) ? e.message : String(e);
-      }
-      render();
+    }catch(eOuter){
+      console.error('שמירה נכשלה', eOuter);
+      state.sheetsSaveError = (eOuter && eOuter.message) ? eOuter.message : String(eOuter);
+      needsFullRender = true;
     }
+
+    state.isSaving = false;
+    savingInFlight = false;
+    var stillPending = !!saveDebounceTimer || saveQueued;
+    if (!state.sheetsSaveError){ state.hasUnsavedChanges = stillPending; }
+
     try{
       if (window.localStorage && (state.groups.length || state.students.length)){
-        window.localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify({ data: payload, savedAt: new Date().toISOString() }));
+        window.localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify({ data: JSON.parse(serializeState()), savedAt: new Date().toISOString() }));
       }
     }catch(e2){ /* localStorage unavailable or blocked - ignore, cloud save already attempted */ }
+
+    if (needsFullRender){ render(); } else { updateSaveIndicator(); }
+
+    if (saveQueued){ saveQueued = false; saveData(); }
+  }
+
+  // One full attempt: conflict check + merge + write + verify. Throws on failure.
+  async function saveOnce(){
+    var mergedExternal = false;
+    var payload = JSON.parse(serializeState());
+    payload.activityLog = state.activityLog || [];
+    var payloadStr = JSON.stringify(payload);
+    if (lastKnownServerContent !== null){
+      // Someone else (another device/user) may have saved since we last
+      // synced — merge their changes with ours by record ID so both survive.
+      var currentServer = null;
+      try{ currentServer = await sheetsGet(); }catch(eCheck){ /* if this check itself fails, don't block the save on it */ }
+      if (currentServer !== null && currentServer !== lastKnownServerContent){
+        var merged = mergePayloads(lastKnownServerContent, payload, currentServer);
+        payload = merged;
+        payloadStr = JSON.stringify(payload);
+        state.groups = payload.groups;
+        state.students = payload.students;
+        state.techCategories = payload.techCategories;
+        state.techSubCategories = payload.techSubCategories;
+        state.techniques = payload.techniques;
+        state.campaigns = payload.campaigns;
+        state.yearArchives = payload.yearArchives;
+        state.activityLog = payload.activityLog || [];
+        activityBaseline = serializeState(); // other people's changes are now part of our baseline — don't count them as ours
+        mergedExternal = true;
+      }
+    }
+    await sheetsSet(payloadStr);
+    // Verify the write really landed (guards against truncated writes).
+    var verifyRaw = await sheetsGet();
+    if (verifyRaw !== payloadStr){ await sleep(1500); verifyRaw = await sheetsGet(); }  // give a slow write a moment to land
+    if (verifyRaw !== payloadStr){ await sleep(3000); verifyRaw = await sheetsGet(); }
+    if (verifyRaw !== payloadStr){
+      throw new Error('האימות נכשל — מה שנשמר בגיליון לא תואם למה שניסינו לשמור (ייתכן שמישהו אחר שמר באותו רגע). מנסה שוב.');
+    }
+    lastKnownServerContent = payloadStr;
+    return { mergedExternal: mergedExternal };
   }
 
   function restoreFromLocalBackup(backup){
@@ -1800,7 +2019,10 @@
       s.outDate = null;
     }
     if (becomingOut){ s.outDate = todayISO(); }
-    if (noteChanged){ s.noteUpdatedDate = s.note ? todayISO() : null; } // clear the date if the note was emptied out
+    if (noteChanged){
+      s.noteUpdatedDate = s.note ? todayISO() : null; // clear the date if the note was emptied out
+      s.noteUpdatedAt = s.note ? Date.now() : null;   // exact moment (date + time) the note was last changed
+    }
     scheduleSave();
   }
   function archiveStudent(id){
@@ -2075,243 +2297,60 @@
     });
     if (field === 'note'){
       var container = el('div',{class:'note-field-wrap'},[inp]);
-      if (s.noteUpdatedDate){
-        container.appendChild(el('div',{class:'note-date-tag'},['עודכן: '+shortDate(s.noteUpdatedDate)]));
+      if (s.noteUpdatedDate || s.noteUpdatedAt){
+        container.appendChild(el('div',{class:'note-date-tag'},['עודכן: '+noteStamp(s)]));
       }
       return container;
     }
     return inp;
   }
 
-  // ---- voice commands ----
-  var voiceRecognition = null;
-  var voiceSupported = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
-
-  function initVoiceRecognition(){
-    if (voiceRecognition || !voiceSupported) return voiceRecognition;
-    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    voiceRecognition = new SR();
-    voiceRecognition.lang = 'he-IL';
-    voiceRecognition.continuous = false;
-    voiceRecognition.interimResults = true;
-    voiceRecognition.maxAlternatives = 1;
-
-    voiceRecognition.onresult = function(e){
-      var text = '';
-      for (var i=0;i<e.results.length;i++){ text += e.results[i][0].transcript; }
-      state.voice.transcript = text;
-      if (e.results[e.results.length-1].isFinal){
-        var cmd = parseVoiceCommand(text.trim());
-        state.voice.pending = cmd;
-        state.voice.message = cmd ? '' : 'לא זיהיתי פקודה מתאימה מתוך: "'+text.trim()+'"';
-      }
-      render();
-    };
-    voiceRecognition.onerror = function(e){
-      state.voice.listening = false;
-      if (e.error === 'not-allowed' || e.error === 'service-not-allowed'){
-        state.voice.message = 'הדפדפן חסם את הגישה למיקרופון. יכול להיות שנדרש לאשר הרשאה בהגדרות הדפדפן/האתר, או שהדף מוצג כרגע בתוך תצוגה משובצת (כמו תצוגה מקדימה) שחוסמת גישה למיקרופון מטעמי אבטחה — נסה לפתוח את הדף בלשונית דפדפן רגילה.';
-      } else if (e.error === 'no-speech'){
-        state.voice.message = 'לא נקלט דיבור. נסה שוב.';
-      } else if (e.error === 'network'){
-        state.voice.message = 'הדפדפן לא הצליח להתחבר לשירות זיהוי הדיבור של גוגל (שגיאת רשת). זה קורה בעיקר בשלושה מקרים: (1) אין חיבור אינטרנט פעיל כרגע, (2) רשת/VPN/חומת אש חוסמים גישה לשירות של גוגל, או (3) הדפדפן הוא גרסת Chromium שאינה כרום הרשמי של גוגל (כמו כמה גרסאות לינוקס) שאין לה גישה לשירות הזיהוי בכלל. נסה שוב, נסה רשת אחרת, או ודא שאתה משתמש בכרום הרשמי.';
-      } else {
-        state.voice.message = 'שגיאה בזיהוי קולי: '+e.error;
-      }
-      render();
-    };
-    voiceRecognition.onend = function(){
-      state.voice.listening = false;
-      render();
-    };
-    return voiceRecognition;
-  }
-
-  function toggleVoiceListening(){
-    if (!voiceSupported){
-      state.voice.message = 'הדפדפן הזה לא תומך בזיהוי קולי. נסה בכרום עדכני.';
-      render();
-      return;
-    }
-    var rec = initVoiceRecognition();
-    if (state.voice.listening){
-      rec.stop();
-      return;
-    }
-    state.voice.transcript = '';
-    state.voice.pending = null;
-    state.voice.message = '';
-    state.voice.listening = true;
-    render();
-    try{ rec.start(); }catch(e){ state.voice.listening = false; render(); return; }
-    setTimeout(function(){
-      if (state.voice.listening && !state.voice.transcript){
-        try{ rec.stop(); }catch(e2){}
-        state.voice.listening = false;
-        state.voice.message = 'לא הצלחתי לקבל גישה למיקרופון (אין תגובה מהדפדפן). זה קורה בעיקר כשהדף מוצג בתוך תצוגה מקדימה משובצת (כמו ארטיפקט) שחוסמת גישה למיקרופון מטעמי אבטחה. נסה לפתוח את הקובץ בלשונית דפדפן רגילה במקום בתצוגה המקדימה.';
+  function renderActivityHub(){
+    var wrap = el('div',{class:'activity-hub-wrap'});
+    var newCount = newActivityCount();
+    var btn = el('button',{
+      class:'section-btn activity-hub-btn'+(state.showActivityHub?' active':''),
+      title:'כל מה שבוצע באפליקציה היום (על ידך ועל ידי כל מי שעובד איתך)',
+      onclick:function(){
+        if (state.showActivityHub){ setActivitySeenAt(Date.now()); }
+        state.showActivityHub = !state.showActivityHub;
         render();
       }
-    }, 6000);
-  }
-
-  function findGroupByFuzzyName(spoken){
-    spoken = (spoken||'').trim();
-    if (!spoken) return null;
-    var exact = state.groups.find(function(g){ return g.name.indexOf(spoken)!==-1 || spoken.indexOf(g.name)!==-1; });
-    return exact || null;
-  }
-  function findStudentsByFuzzyName(spoken){
-    spoken = (spoken||'').trim();
-    if (!spoken) return [];
-    return state.students.filter(function(s){
-      return !s.archived && !s.trashed && (s.name.indexOf(spoken)!==-1 || spoken.indexOf(s.name)!==-1);
-    });
-  }
-
-  function parseVoiceCommand(text){
-    text = (text||'').trim().replace(/[.,!?]+$/,'');
-    var m;
-
-    // הוסף [תלמיד/מתאמן/ליד] <name> לקבוצה/לקבוצת <group>
-    m = text.match(/^הוסף\s+(?:תלמיד(?:ה)?|מתאמן(?:ת)?|ליד)?\s*(.+?)\s+לקבוצ(?:ה|ת)\s+(.+)$/);
-    if (m){
-      var name1 = m[1].trim(), groupSpoken = m[2].trim();
-      var g = findGroupByFuzzyName(groupSpoken);
-      if (!g){
-        return { description: 'לא נמצאה קבוצה בשם "'+groupSpoken+'"', execute: null };
-      }
-      return {
-        description: 'הוספת "'+name1+'" לקבוצה "'+g.name+'"',
-        execute: function(){ addStudent({name:name1, groupId:g.id, status:'follow'}); }
-      };
-    }
-
-    // הוסף ליד <name>
-    m = text.match(/^הוסף\s+ליד\s+(.+)$/);
-    if (m){
-      var leadName = m[1].trim();
-      return {
-        description: 'הוספת ליד חדש: "'+leadName+'" (ללא שיוך לקבוצה)',
-        execute: function(){ addStudent({name:leadName, groupId:'', status:'follow'}); }
-      };
-    }
-
-    // צור קבוצה [חדשה] <name>
-    m = text.match(/^צור\s+קבוצה(?:\s+חדשה)?\s+(.+)$/);
-    if (m){
-      var newGroupName = m[1].trim();
-      return {
-        description: 'יצירת קבוצה חדשה: "'+newGroupName+'"',
-        execute: function(){ addGroup(newGroupName, []); }
-      };
-    }
-
-    // חפש <name>
-    m = text.match(/^חפש\s+(.+)$/);
-    if (m){
-      var searchTerm = m[1].trim();
-      return {
-        description: 'חיפוש: "'+searchTerm+'"',
-        execute: function(){ state.section='students'; state.search=searchTerm; }
-      };
-    }
-
-    // העבר את <name> לארכיון
-    m = text.match(/^העבר\s+את\s+(.+?)\s+לארכיון$/);
-    if (m){
-      var archName = m[1].trim();
-      var matches1 = findStudentsByFuzzyName(archName);
-      if (matches1.length === 0) return { description: 'לא נמצא מתאמן בשם "'+archName+'"', execute: null };
-      if (matches1.length > 1) return { description: 'נמצאו כמה מתאמנים בשם "'+archName+'" — נסח בצורה מדויקת יותר', execute: null };
-      return {
-        description: 'העברת "'+matches1[0].name+'" לארכיון',
-        execute: function(){ matches1[0].archived = true; scheduleSave(); }
-      };
-    }
-
-    // סמן את <name> כמועמד למתקדמים / כמתקדם
-    m = text.match(/^סמן\s+את\s+(.+?)\s+כ(?:מועמד למתקדמים|מתקדם)$/);
-    if (m){
-      var advName = m[1].trim();
-      var matches2 = findStudentsByFuzzyName(advName);
-      if (matches2.length === 0) return { description: 'לא נמצא מתאמן בשם "'+advName+'"', execute: null };
-      if (matches2.length > 1) return { description: 'נמצאו כמה מתאמנים בשם "'+advName+'" — נסח בצורה מדויקת יותר', execute: null };
-      return {
-        description: 'סימון "'+matches2[0].name+'" כמועמד למתקדמים',
-        execute: function(){ matches2[0].advanced = true; scheduleSave(); }
-      };
-    }
-
-    // סמן את <name> כליד
-    m = text.match(/^סמן\s+את\s+(.+?)\s+כליד$/);
-    if (m){
-      var leadMarkName = m[1].trim();
-      var matches3 = findStudentsByFuzzyName(leadMarkName);
-      if (matches3.length === 0) return { description: 'לא נמצא מתאמן בשם "'+leadMarkName+'"', execute: null };
-      if (matches3.length > 1) return { description: 'נמצאו כמה מתאמנים בשם "'+leadMarkName+'" — נסח בצורה מדויקת יותר', execute: null };
-      return {
-        description: 'סימון "'+matches3[0].name+'" כליד',
-        execute: function(){
-          matches3[0].isLead = true;
-          if (!matches3[0].leadMarkedDate){ matches3[0].leadMarkedDate = todayISO(); }
-          scheduleSave();
-        }
-      };
-    }
-
-    return null;
-  }
-
-  function runPendingVoiceCommand(){
-    var cmd = state.voice.pending;
-    if (!cmd || !cmd.execute) return;
-    cmd.execute();
-    state.voice.pending = null;
-    state.voice.transcript = '';
-    state.voice.message = '✓ בוצע: '+cmd.description;
-    render();
-  }
-  function cancelPendingVoiceCommand(){
-    state.voice.pending = null;
-    state.voice.message = '';
-    render();
-  }
-
-  function renderVoiceWidget(){
-    var wrap = el('div',{class:'voice-widget'});
-    var btn = el('button',{
-      class:'voice-mic-btn'+(state.voice.listening?' listening':''),
-      title: voiceSupported ? 'הוראה קולית' : 'זיהוי קולי לא נתמך בדפדפן זה',
-      onclick: toggleVoiceListening
-    },['🎤']);
+    },['🔔 עדכונים'].concat(newCount ? [el('span',{class:'activity-badge'},[String(newCount)])] : []));
     wrap.appendChild(btn);
 
-    if (state.voice.listening || state.voice.transcript){
-      wrap.appendChild(el('div',{class:'voice-transcript'},[
-        state.voice.listening ? '🔴 מקשיב… ' : '',
-        state.voice.transcript || 'אמור פקודה, למשל: "הוסף תלמיד דניאל לקבוצת שני 18:00"'
+    if (state.showActivityHub){
+      var seen = getActivitySeenAt(), dev = getDeviceId();
+      var all = (state.activityLog||[]).slice().sort(function(a,b){ return b.at - a.at; });
+      var shown = state.activityShowWeek ? all : all.filter(function(e){ return isToday(e.at); });
+      var panel = el('div',{class:'activity-panel'});
+      panel.appendChild(el('div',{class:'activity-panel-head'},[
+        el('b',{},[state.activityShowWeek ? 'עדכונים ב-7 הימים האחרונים' : 'עדכונים מהיום']),
+        el('span',{style:'display:flex;gap:6px;'},[
+          el('button',{class:'btn-ghost', style:'padding:4px 10px;font-size:12px;', onclick:function(){ state.activityShowWeek = !state.activityShowWeek; render(); }},[state.activityShowWeek ? 'רק היום' : '7 ימים']),
+          el('button',{class:'btn-ghost', style:'padding:4px 10px;font-size:12px;', onclick:function(){ setActivitySeenAt(Date.now()); state.showActivityHub = false; render(); }},['סמן כנקרא וסגור'])
+        ])
       ]));
-    }
-
-    if (state.voice.pending){
-      var p = state.voice.pending;
-      var bubble = el('div',{class:'voice-confirm'});
-      bubble.appendChild(el('div',{},[p.execute ? ('זיהיתי: '+p.description) : p.description]));
-      if (p.execute){
-        bubble.appendChild(el('div',{class:'voice-confirm-actions'},[
-          el('button',{class:'btn-primary', style:'padding:6px 14px;font-size:12.5px;', onclick:runPendingVoiceCommand},['✓ בצע']),
-          el('button',{class:'btn-ghost', style:'padding:6px 14px;font-size:12.5px;', onclick:cancelPendingVoiceCommand},['ביטול'])
-        ]));
-      } else {
-        bubble.appendChild(el('div',{class:'voice-confirm-actions'},[
-          el('button',{class:'btn-ghost', style:'padding:6px 14px;font-size:12.5px;', onclick:cancelPendingVoiceCommand},['סגירה'])
-        ]));
+      if (!shown.length){
+        panel.appendChild(el('div',{style:'padding:18px 14px;color:var(--muted);font-size:13px;'},[state.activityShowWeek ? 'אין עדכונים שנרשמו.' : 'עדיין לא בוצעו עדכונים היום.']));
       }
-      wrap.appendChild(bubble);
-    } else if (state.voice.message){
-      wrap.appendChild(el('div',{class:'voice-message'},[state.voice.message]));
+      var lastDay = null;
+      shown.slice(0,200).forEach(function(e){
+        var d = new Date(e.at);
+        var dayLabel = isToday(e.at) ? 'היום' : (d.getDate()+'.'+(d.getMonth()+1));
+        if (state.activityShowWeek && dayLabel !== lastDay){
+          lastDay = dayLabel;
+          panel.appendChild(el('div',{class:'activity-day'},[dayLabel]));
+        }
+        var isNew = e.d !== dev && e.at > seen;
+        panel.appendChild(el('div',{class:'activity-item'+(isNew?' new':'')},[
+          el('span',{class:'activity-time'},[('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)]),
+          el('span',{style:'flex:1;'},[e.t]),
+          isNew ? el('span',{class:'activity-new-tag'},['חדש']) : null
+        ]));
+      });
+      wrap.appendChild(panel);
     }
-
     return wrap;
   }
 
@@ -2360,6 +2399,7 @@
         class:'section-btn'+(state.section==='payments'?' active':''),
         onclick:function(){ state.section='payments'; render(); }
       },['💳 ניהול תשלומים']),
+      renderActivityHub(),
       el('button',{
         class:'section-btn refresh-btn', title:'משיכת עדכונים אחרונים (למשל אם עדכנת ממכשיר אחר)',
         onclick:function(){
@@ -2370,19 +2410,20 @@
           }
         }
       },['🔄 רענון נתונים']),
-      el('span',{class:'last-saved-indicator'+(state.isSaving?' saving':(state.sheetsSaveError?' error':''))},[
-        state.isSaving ? '⏳ שומר...' :
-        state.sheetsSaveError ? '⚠ השמירה האחרונה נכשלה' :
-        (state.lastSavedAt ? ('✓ נשמר לאחרונה: '+new Date(state.lastSavedAt).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})) : '')
-      ]),
+      (function(){
+        var ub = el('button',{
+          class:'section-btn undo-btn',
+          title: undoStack.length ? ('ביטול הפעולה האחרונה ('+undoStack.length+' בהיסטוריה) — Ctrl+Z') : 'אין מה לבטל',
+          onclick:function(){ performUndo(); }
+        },['↩ בטל']);
+        if (!undoStack.length){ ub.disabled = true; }
+        return ub;
+      })(),
+      el('span',{class:saveIndicatorClass()},[ saveIndicatorText() ]),
       el('span',{class:'version-tag', title:'גרסת הקובץ — השווה למה שקלוד אומר שהוא נתן לך'},['גרסה: '+APP_VERSION])
     ]);
     app.appendChild(sectionNav);
-    if (!state.readOnly){ app.appendChild(renderVoiceWidget()); }
 
-    if (state.toast){
-      app.appendChild(el('div',{class:'toast'},[state.toast]));
-    }
 
     if (state.section === 'techniques' || state.readOnly){
       renderTechniquesSection(app);
@@ -2499,33 +2540,88 @@
     var oldWraps = document.querySelectorAll('.table-wrap');
     var wrapScrolls = [];
     for (var i=0;i<oldWraps.length;i++){ wrapScrolls.push(oldWraps[i].scrollLeft); }
-    var activeEl = document.activeElement;
-    var activeId = activeEl ? activeEl.id : null;
 
-    // If the user is mid-typing inside an open modal, capture that field's
-    // value + cursor position + position-within-the-modal. Any modal input
-    // is a plain uncontrolled DOM element (not synced to `state` until save),
-    // so if something else triggers a render() while it's open (e.g. a
-    // delayed save-error banner), rebuilding the modal from the original
-    // data would otherwise silently wipe out whatever was just typed.
-    var modalFieldInfo = null;
-    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')){
-      var modalEl = activeEl.closest('.modal');
-      if (modalEl){
-        var modalFields = Array.prototype.slice.call(modalEl.querySelectorAll('input, textarea'));
-        var idx = modalFields.indexOf(activeEl);
-        if (idx !== -1){
-          modalFieldInfo = {
-            index: idx,
-            value: activeEl.value,
-            selStart: (typeof activeEl.selectionStart === 'number') ? activeEl.selectionStart : null,
-            selEnd: (typeof activeEl.selectionEnd === 'number') ? activeEl.selectionEnd : null
-          };
-        }
+    // ---- Capture what the user has typed but not yet saved ----
+    // Form fields are plain DOM elements; rebuilding the page from `state`
+    // would otherwise silently reset them. Two cases:
+    //  (1) an open modal: capture EVERY field in it (not just the focused one)
+    //  (2) typing directly in a table/inline field: capture that field
+    var activeEl = document.activeElement;
+    var formCapture = null;
+    var modalEl = document.querySelector('.modal');
+    if (modalEl){
+      var mFields = Array.prototype.slice.call(modalEl.querySelectorAll('input, textarea, select'));
+      formCapture = {
+        kind: 'modal',
+        sig: mFields.map(function(f){ return f.tagName+':'+(f.type||''); }).join('|'),
+        values: mFields.map(function(f){ return (f.type==='checkbox'||f.type==='radio') ? f.checked : f.value; }),
+        focusIdx: mFields.indexOf(activeEl),
+        selStart: (activeEl && typeof activeEl.selectionStart==='number') ? activeEl.selectionStart : null,
+        selEnd: (activeEl && typeof activeEl.selectionEnd==='number') ? activeEl.selectionEnd : null
+      };
+    } else if (activeEl && (activeEl.tagName==='INPUT' || activeEl.tagName==='TEXTAREA') &&
+               activeEl.id!=='studentSearchBox' && activeEl.id!=='techSearchBox' &&
+               activeEl.type!=='checkbox' && activeEl.type!=='radio' && activeEl.type!=='date'){
+      var allInline = Array.prototype.slice.call(document.querySelectorAll('#app input, #app textarea'));
+      var iIdx = allInline.indexOf(activeEl);
+      if (iIdx !== -1){
+        formCapture = {
+          kind: 'inline', idx: iIdx, count: allInline.length,
+          placeholder: activeEl.getAttribute('placeholder') || '', className: activeEl.className || '',
+          value: activeEl.value,
+          original: activeEl.defaultValue,
+          selStart: (typeof activeEl.selectionStart==='number') ? activeEl.selectionStart : null,
+          selEnd: (typeof activeEl.selectionEnd==='number') ? activeEl.selectionEnd : null
+        };
       }
     }
+    var activeId = activeEl ? activeEl.id : null;
 
     renderInner();
+
+    // ---- Restore captured form state immediately (before the browser paints) ----
+    if (formCapture){
+      try{
+        if (formCapture.kind === 'modal'){
+          var newModal = document.querySelector('.modal');
+          if (newModal){
+            var nFields = Array.prototype.slice.call(newModal.querySelectorAll('input, textarea, select'));
+            var nSig = nFields.map(function(f){ return f.tagName+':'+(f.type||''); }).join('|');
+            if (nSig === formCapture.sig){
+              var isImportModal = newModal.classList.contains('import-modal');
+              nFields.forEach(function(f, k){
+                if (isImportModal && f.tagName === 'SELECT'){ return; } // import modals re-detect their column choices on purpose
+                if (f.type==='checkbox' || f.type==='radio'){ f.checked = formCapture.values[k]; }
+                else if (f.value !== formCapture.values[k]){ f.value = formCapture.values[k]; }
+              });
+            }
+            // Focus goes back to the same field either way (even if the modal's
+            // layout changed, e.g. the Excel import showing its column mapping).
+            if (formCapture.focusIdx > -1 && nFields[formCapture.focusIdx]){
+              var tf = nFields[formCapture.focusIdx];
+              tf.focus();
+              if (formCapture.selStart !== null){ try{ tf.setSelectionRange(formCapture.selStart, formCapture.selEnd); }catch(eS){} }
+            }
+          }
+        } else if (formCapture.kind === 'inline'){
+          var nInline = Array.prototype.slice.call(document.querySelectorAll('#app input, #app textarea'));
+          var cand = nInline[formCapture.idx];
+          if (cand && nInline.length === formCapture.count &&
+              (cand.getAttribute('placeholder')||'') === formCapture.placeholder &&
+              (cand.className||'') === formCapture.className){
+            if (cand.value !== formCapture.value){
+              cand.value = formCapture.value;
+              // A value set by script doesn't fire a "change" event on blur, so
+              // the text you typed would show on screen but never get saved.
+              // Fire it ourselves when you leave the field.
+              cand.addEventListener('blur', function(){ cand.dispatchEvent(new Event('change', {bubbles:true})); }, {once:true});
+            }
+            cand.focus();
+            if (formCapture.selStart !== null){ try{ cand.setSelectionRange(formCapture.selStart, formCapture.selEnd); }catch(eS2){} }
+          }
+        }
+      }catch(eRestore){ console.error('form restore failed', eRestore); }
+    }
 
     function restoreScroll(){
       window.scrollTo(0, pageScrollY);
@@ -2533,33 +2629,16 @@
       for (var j=0;j<newWraps.length && j<wrapScrolls.length;j++){
         newWraps[j].scrollLeft = wrapScrolls[j];
       }
-      if (modalFieldInfo){
-        var newModalEl = document.querySelector('.modal');
-        if (newModalEl){
-          var newFields = newModalEl.querySelectorAll('input, textarea');
-          var target = newFields[modalFieldInfo.index];
-          if (target){
-            target.value = modalFieldInfo.value;
-            target.focus();
-            if (modalFieldInfo.selStart !== null){
-              try{ target.setSelectionRange(modalFieldInfo.selStart, modalFieldInfo.selEnd); }catch(errSel){}
-            }
-          }
-        }
-        return; // modal field restore takes priority over the generic by-id restore below
-      }
-      // Search boxes restore their own focus + cursor position precisely
-      // (see their 'input' handlers) — restoring focus generically here too
-      // would race with that and cause the cursor to visibly jump on every
-      // keystroke, so skip those specific inputs.
+      if (formCapture) return; // focus was already restored above
+      // Search boxes restore their own focus + cursor position in their own
+      // 'input' handlers, so skip those here.
       if (activeId && activeId !== 'studentSearchBox' && activeId !== 'techSearchBox'){
         var toFocus = document.getElementById(activeId);
         if (toFocus && typeof toFocus.focus === 'function'){ toFocus.focus(); }
       }
     }
-    // Wait for the browser to actually finish laying out the rebuilt DOM before
-    // restoring scroll — on some mobile browsers this happens a frame later than
-    // on desktop, so restoring immediately can silently clamp to the wrong position.
+    // Wait for layout before restoring scroll — on some mobile browsers it
+    // lands a frame later than on desktop.
     requestAnimationFrame(function(){
       requestAnimationFrame(restoreScroll);
     });
@@ -3782,6 +3861,7 @@
     state.techniques = data.techniques || [];
         state.campaigns = data.campaigns || [];
         state.yearArchives = data.yearArchives || [];
+        state.activityLog = data.activityLog || [];
     state.students.forEach(function(s){
       if (s.classGrade){ s.classGrade = normalizeClassGrade(s.classGrade); }
       if (s.status === 'new'){ s.status = 'follow'; }
@@ -3956,12 +4036,19 @@
 
   var toastTimer = null;
   function showToast(message){
-    state.toast = message;
-    render();
+    // Shown directly on the page, outside the app container — NOT via
+    // render(). Re-rendering the whole page just to show or hide a message
+    // wiped out anything you were in the middle of typing.
+    var existing = document.getElementById('toast-live');
+    if (existing && existing.parentNode){ existing.parentNode.removeChild(existing); }
+    var t = document.createElement('div');
+    t.id = 'toast-live';
+    t.className = 'toast';
+    t.textContent = message;
+    document.body.appendChild(t);
     if (toastTimer) clearTimeout(toastTimer);
     toastTimer = setTimeout(function(){
-      state.toast = null;
-      render();
+      if (t.parentNode){ t.parentNode.removeChild(t); }
     }, 3500);
   }
 
@@ -4630,7 +4717,7 @@
         el('div',{class:'field'},[el('label',{},['מידת חולצה']), eShirtInput]),
         el('div',{class:'field'},[el('label',{},['מס\' חיוב']), eBillingInput]),
         el('div',{class:'field'},[
-          el('label',{},['הערה'+(editS.noteUpdatedDate ? ' (עודכן: '+shortDate(editS.noteUpdatedDate)+')' : '')]),
+          el('label',{},['הערה'+((editS.noteUpdatedDate || editS.noteUpdatedAt) ? ' (עודכן: '+noteStamp(editS)+')' : '')]),
           eNoteInput
         ]),
         el('div',{class:'field', style:'display:flex;gap:18px;flex-wrap:wrap;'},[
@@ -5252,6 +5339,16 @@
       state.section = 'techniques';
     }
   }catch(eUrl){ /* URLSearchParams unavailable — ignore, defaults to normal mode */ }
+
+  document.addEventListener('keydown', function(e){
+    if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z')){
+      var ae = document.activeElement;
+      if (ae && (ae.tagName==='INPUT' || ae.tagName==='TEXTAREA' || ae.tagName==='SELECT')) return; // let normal text undo work inside fields
+      if (state.readOnly || state.modal) return;
+      e.preventDefault();
+      performUndo();
+    }
+  });
 
   loadData();
 })();
