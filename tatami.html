@@ -118,6 +118,39 @@
   }
   .tab-add:hover{color:var(--ink);border-color:var(--ink);}
 
+  .group-note-box{ margin:0 0 14px; background:#FFFBEA; border:1px solid #E8DCA8; border-radius:6px; padding:8px 12px; }
+  .group-note-label{ font-size:12px; font-weight:700; color:#7A6A1F; margin-bottom:4px; }
+  .group-note-input{ width:100%; min-height:48px; border:1px solid #E1D6A0; border-radius:4px; padding:8px 10px; font-family:inherit; font-size:14px; line-height:1.5; background:#FFFEF7; resize:vertical; box-sizing:border-box; }
+  .tech-mode-bar{ background:var(--paper); border-bottom:1px solid var(--line); padding:8px 28px; display:flex; gap:8px; flex-wrap:wrap; }
+  .tech-mode-btn{ padding:7px 16px; border-radius:18px; border:1px solid var(--line); background:var(--canvas); font-size:13.5px; font-weight:600; color:var(--muted); }
+  .tech-mode-btn.active{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .lessons-view{ padding:18px 28px 60px; max-width:980px; margin:0 auto; }
+  .lesson-topbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .lesson-topbar select{ padding:6px 10px; border:1px solid var(--line); border-radius:4px; font-family:inherit; font-size:14px; }
+  .lesson-card{ background:var(--paper); border:1px solid var(--line); border-radius:8px; padding:14px 16px; margin-bottom:14px; }
+  .lesson-card.current{ border-color:#4B7F52; box-shadow:0 0 0 1px #4B7F5233; }
+  .lesson-card h3{ margin:0; font-size:15px; }
+  .lesson-card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .lesson-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:7px 4px; border-bottom:1px solid var(--line); font-size:14px; }
+  .lesson-row-name{ font-weight:600; }
+  .lesson-chip{ background:var(--canvas); border:1px solid var(--line); border-radius:10px; font-size:11.5px; padding:1px 8px; color:var(--muted); }
+  .lesson-chip.free{ background:#F3EEFA; border-color:#D9CBEE; color:#6B4C9A; }
+  .lesson-meta{ font-size:12px; color:var(--muted); margin-inline-start:auto; }
+  .lesson-empty{ color:var(--muted); font-size:13.5px; margin:6px 0; }
+  .lesson-add-free{ display:flex; gap:8px; margin:10px 0; }
+  .lesson-add-free input, .lesson-search-input{ flex:1; padding:8px 10px; border:1px solid var(--line); border-radius:4px; font-family:inherit; font-size:14px; }
+  .lesson-picker{ margin-top:12px; }
+  .lesson-picker-head{ display:flex; gap:8px; flex-wrap:wrap; }
+  .lesson-picker-head select{ padding:8px; border:1px solid var(--line); border-radius:4px; font-family:inherit; font-size:13.5px; }
+  .lesson-picker-list{ border:1px solid var(--line); border-radius:6px; margin-top:8px; max-height:330px; overflow:auto; background:var(--canvas); }
+  .lesson-picker-title{ position:sticky; top:0; background:var(--canvas); font-size:12px; font-weight:700; color:var(--muted); padding:7px 12px; border-bottom:1px solid var(--line); }
+  .lesson-pick{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; width:100%; text-align:right; padding:8px 12px; border:none; border-bottom:1px solid var(--line); background:transparent; font-size:14px; cursor:pointer; }
+  .lesson-pick:hover{ background:#fff; }
+  .lesson-pick-plus{ color:var(--accent); font-weight:800; }
+  .lesson-note-input{ width:100%; border:1px solid var(--line); border-radius:4px; padding:8px 10px; font-family:inherit; font-size:14px; box-sizing:border-box; }
+  .lesson-note-view{ margin-top:8px; font-size:13.5px; color:#5A5030; background:#FFFBEA; border-radius:4px; padding:6px 10px; }
+  .lesson-history-item{ display:flex; gap:10px; align-items:center; padding:7px 2px; border-bottom:1px solid var(--line); font-size:13.5px; }
+  .lessons-view summary{ cursor:pointer; font-weight:700; font-size:14.5px; }
   .tech-subject-tabs{
     background:#1A1A1A;
     padding:0 28px;
@@ -776,6 +809,13 @@
   .inline-input:focus{ border-color:var(--muted); background:var(--paper); outline:none; }
   .inline-input-narrow{ width:56px; }
   .inline-input-wide{ min-width:160px; }
+  .adv-note-cell{ min-width:230px; }
+  .adv-target-select{ min-width:130px; max-width:170px; }
+  .adv-stage-select{ min-width:150px; max-width:190px; }
+  .note-area{ display:block; resize:none; overflow:hidden; line-height:1.4; white-space:pre-wrap; word-break:break-word; box-sizing:border-box; min-height:0; }
+  .note-area:not(:focus){ cursor:pointer; }
+  .note-more-btn{ display:none; background:none; border:none; color:var(--accent); font-size:11px; font-weight:600; padding:0 4px; cursor:pointer; text-align:right; font-family:inherit; }
+  .note-field-wrap.has-more .note-more-btn{ display:block; }
 
   .shirt-cell{ display:flex; align-items:center; gap:4px; padding:2px 4px; border-radius:3px; }
   .shirt-cell.needs-shirt{ background:#FBE2E0; }
@@ -902,13 +942,14 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-10-08 11:00';
+  var APP_VERSION = '2026-10-14 13:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
   var SHEETS_API_KEY = '1791992';
 
-  function sheetsGet(){
+  var lastGetVersion = null; // write-counter reported by the v4 Apps Script (null with the older script)
+  function sheetsCall(extraQuery){
     // JSONP: loading a <script> tag is never subject to CORS, unlike fetch().
     return new Promise(function(resolve, reject){
       var callbackName = '__sheetsCb' + Date.now() + Math.floor(Math.random()*100000);
@@ -939,18 +980,20 @@
       window[callbackName] = function(data){
         cleanup();
         if (data && data.error){ reject(new Error(data.error)); return; }
-        resolve(data.value);
+        if (data && data.version !== undefined){ lastGetVersion = data.version; }
+        resolve(data);
       };
       script.onerror = function(){
         cleanup();
         reject(new Error('נכשלה טעינת הנתונים מהגיליון (בדוק שה-URL תקין ופרוס כ-Web app)'));
       };
-      script.src = SHEETS_API_URL + '?key=' + encodeURIComponent(SHEETS_API_KEY) + '&callback=' + callbackName;
+      script.src = SHEETS_API_URL + '?key=' + encodeURIComponent(SHEETS_API_KEY) + '&callback=' + callbackName + (extraQuery || '');
       document.head.appendChild(script);
     });
   }
+  function sheetsGet(){ return sheetsCall('').then(function(d){ return d.value; }); }
 
-  function sheetsSet(value){
+  function sheetsSet(value, expectedVersion){
     // Classic hidden form + iframe POST: like JSONP, form submissions are not
     // subject to CORS. We can't read the response this way, so we just wait
     // briefly for the iframe to finish loading and treat that as success.
@@ -976,6 +1019,14 @@
       valueInput.name = 'value';
       valueInput.value = value;
       form.appendChild(valueInput);
+
+      if (expectedVersion !== null && expectedVersion !== undefined){
+        // v4 script: the server refuses the write if someone else saved since we last read.
+        var expectedInput = document.createElement('input');
+        expectedInput.name = 'expected';
+        expectedInput.value = String(expectedVersion);
+        form.appendChild(expectedInput);
+      }
 
       document.body.appendChild(form);
 
@@ -1037,6 +1088,15 @@
     leadRevenueStatusFilter: null, // status key to filter the lead revenue breakdown by, or null for all
     selectedTechSubject: null, // which technique subject (e.g. היאבקות) is currently shown — set on first render
     activityLog: [],            // shared log of changes made (by anyone) — shown in the updates hub
+    lessons: [],                // lesson log: [{id, groupId, date, techniqueIds[], extras[], note, done}]
+    techMode: 'library',        // 'library' | 'lessons' inside the techniques section
+    lessonGroupId: null,
+    lessonPickerQuery: '',
+    lessonPickerCat: 'all',
+    lessonShowHistory: false,
+    advStatusFilter: null,   // candidacy-stage filter on the advanced-candidates page
+    tombstones: [],             // ids of records that were explicitly deleted ({id, at}) — so a merely-missing record is never mistaken for a deletion
+    saveBlocked: null,          // {type} while saving is deliberately disabled to protect data (stale app version / unreadable sheet / mass delete)
     showActivityHub: false,
     activityShowWeek: false,
     showCampaignAnalysis: false,
@@ -1074,6 +1134,19 @@
   function todayISO(){ return new Date().toISOString().slice(0,10); }
   // "17.9 14:32" — date and time a note was last changed. Older notes that
   // were saved before times were recorded show the date only.
+  function stampOf(ms){
+    var d = new Date(ms);
+    return d.getDate()+'.'+(d.getMonth()+1)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);
+  }
+  function updateGroupNote(groupId, text){
+    var g = state.groups.find(function(x){ return x.id === groupId; });
+    if (!g) return;
+    text = (text || '').replace(/\s+$/,'');
+    if ((g.note || '') === text) return;
+    g.note = text;
+    g.noteUpdatedAt = text ? Date.now() : null;
+    scheduleSave();
+  }
   function noteStamp(s){
     if (s.noteUpdatedAt){
       var d = new Date(s.noteUpdatedAt);
@@ -1093,42 +1166,58 @@
 
   var lastRefreshTime = 0;
   var lastKnownServerContent = null; // what we last saw/wrote to the sheet — used to detect if someone else (another device/user) saved since then
-  async function refreshFromStorage(showFeedback){
+  async function refreshFromStorage(showFeedback, forceReplace){
     try{
-      var data;
+      var data, raw = null, merged = false, healNeeded = false;
       if (USE_SHEETS_BACKEND){
-        var raw = await sheetsGet();
+        var r = await readServerSane(serverHadData());
+        if (r.corrupt){
+          if (showFeedback){ showToast('נתוני הגיליון אינם קריאים כרגע — השארתי את המסך כמו שהוא.'); }
+          return;
+        }
+        raw = r.raw;
+        if (r.suspicious && r.empty && serverHadData() && !forceReplace){
+          // The sheet looks empty but we have data: that is almost certainly someone
+          // mid-save (or a glitch) — never wipe the screen because of it.
+          lastRefreshTime = Date.now();
+          if (showFeedback){ showToast('הגיליון נראה ריק כרגע — השארתי את הנתונים שבמסך (הם יישמרו מחדש).'); }
+          return;
+        }
         if (!showFeedback && lastKnownServerContent !== null && (raw || '{}') === lastKnownServerContent){
           // Nothing changed since we last looked — don't touch the screen at all.
           lastRefreshTime = Date.now();
           return;
         }
         if (state.hasUnsavedChanges && !showFeedback){ return; } // a save started while we were fetching — keep local changes
-        data = raw ? JSON.parse(raw) : null;
-        lastKnownServerContent = raw || '{}';
+        if (checkServerMeta(raw)){ render(); return; }
+        knownServerVersion = r.version;
+        if (!forceReplace && localHasData() && lastKnownServerContent !== null){
+          // Merge the sheet's changes INTO what we have (instead of replacing it): our
+          // unsaved edits survive, and anything the sheet lost that we still have is written back.
+          if (state.hasUnsavedChanges){ logPendingChanges(); }
+          var mp = mergePayloads(lastKnownServerContent, livePayload(), raw);
+          healNeeded = lastMergeStats.resurrected > 0;
+          applyPayloadToState(mp);
+          lastKnownServerContent = raw || '{}';
+          merged = true;
+        } else {
+          data = raw ? JSON.parse(raw) : null;
+          lastKnownServerContent = raw || '{}';
+        }
       } else {
         var res = await window.storage.get(STORAGE_KEY, false);
         data = res && res.value ? JSON.parse(res.value) : null;
       }
-      if (data){
-        state.groups = data.groups || [];
-        state.students = data.students || [];
-        state.techCategories = data.techCategories || [];
-        state.techSubCategories = data.techSubCategories || [];
-        state.techniques = data.techniques || [];
-        state.campaigns = data.campaigns || [];
-        state.yearArchives = data.yearArchives || [];
-        state.activityLog = data.activityLog || [];
-        state.students.forEach(function(s){
-          if (s.classGrade){ s.classGrade = normalizeClassGrade(s.classGrade); }
-          if (s.status === 'new'){ s.status = 'follow'; }
-        });
-        state.techCategories.forEach(function(c){ if (!c.subject){ c.subject = 'היאבקות'; } });
+      if (!merged && data){
+        applyPayloadToState(data);
       }
+      normalizeLoadedData();
       lastRefreshTime = Date.now();
       resetUndoHistory();
+      if (raw){ saveSnapshot(raw, 'refresh'); }
       if (showFeedback){ showToast('הנתונים עודכנו.'); }
       render();
+      if (merged && (healNeeded || state.hasUnsavedChanges)){ scheduleSave(true); } // push the combined result back
     }catch(e){
       if (showFeedback){ showToast('הרענון נכשל — בדוק חיבור לאינטרנט.'); }
     }
@@ -1209,12 +1298,16 @@
   async function loadData(){
     state.storageOk = true;
     var rawValue = null;
+    var loadCorrupt = false;
     try{
       if (USE_SHEETS_BACKEND){
         // Non-destructive check: a successful GET (even of empty/no data) means
         // the connection is healthy. We must NOT write a probe value here, since
         // that would overwrite real data sitting in the same cell.
-        rawValue = await sheetsGet();
+        var loadRead = await readServerSane(hasLocalBackupData());
+        rawValue = loadRead.raw;
+        knownServerVersion = loadRead.version;
+        loadCorrupt = !!loadRead.corrupt;
       } else {
         if (typeof window.storage === 'undefined'){ throw new Error('no storage api'); }
         var probeValue = 'ok-'+Date.now();
@@ -1229,8 +1322,16 @@
     try{
       var data;
       if (USE_SHEETS_BACKEND){
-        data = (state.storageOk && rawValue) ? JSON.parse(rawValue) : null;
-        if (state.storageOk){ lastKnownServerContent = rawValue || '{}'; }
+        if (loadCorrupt){
+          // The sheet content can't be parsed. Never write over it — that could destroy data that is still recoverable.
+          state.saveBlocked = { type:'corrupt' };
+          data = null;
+        } else {
+          data = (state.storageOk && rawValue) ? JSON.parse(rawValue) : null;
+          if (data){ checkServerMeta(rawValue); }
+          if (state.storageOk){ lastKnownServerContent = rawValue || '{}'; }
+          if (data && ((data.groups||[]).length || (data.students||[]).length)){ saveSnapshot(rawValue, 'load'); }
+        }
       } else {
         var res = await window.storage.get(STORAGE_KEY, false);
         data = res && res.value ? JSON.parse(res.value) : null;
@@ -1244,6 +1345,8 @@
         state.campaigns = data.campaigns || [];
         state.yearArchives = data.yearArchives || [];
         state.activityLog = data.activityLog || [];
+        state.tombstones = data.tombstones || [];
+        state.lessons = data.lessons || [];
 
         var fixedAny = false;
         state.students.forEach(function(s){
@@ -1258,7 +1361,9 @@
         });
         if (fixedAny){ saveData(); }
       }
-    }catch(e){ /* no data yet */ }
+    }catch(e){
+      if (USE_SHEETS_BACKEND && rawValue){ state.saveBlocked = { type:'corrupt' }; }  // present but unreadable: protect it
+    }
     state.loaded = true;
     resetUndoHistory();
     if (state.storageOk){ state.lastSavedAt = Date.now(); } // confirms a healthy connection right on load, not just after your first change
@@ -1284,62 +1389,179 @@
   }
 
   var LOCAL_BACKUP_KEY = 'martial-arts-crm-local-backup';
-  function mergeArraysByID(baseline, local, server){
-    // baseline: what we last knew from the server (before either side's changes)
-    // local: our current in-memory version
-    // server: what's currently on the server right now (includes anyone else's changes)
-    var baselineIds = {}; (baseline||[]).forEach(function(item){ if (item && item.id) baselineIds[item.id]=item; });
-    var localIds = {}; (local||[]).forEach(function(item){ if (item && item.id) localIds[item.id]=item; });
-    var serverIds = {}; (server||[]).forEach(function(item){ if (item && item.id) serverIds[item.id]=item; });
-    var allIds = {};
-    Object.keys(baselineIds).forEach(function(id){ allIds[id]=true; });
-    Object.keys(localIds).forEach(function(id){ allIds[id]=true; });
-    Object.keys(serverIds).forEach(function(id){ allIds[id]=true; });
+  // ---------------------------------------------------------------
+  // Merging two versions of the data (ours and what's on the sheet)
+  //  - a record that merely MISSES on one side is never treated as deleted
+  //    (that is exactly what happens when a stale tab overwrites the sheet);
+  //    only an explicit deletion, recorded as a "tombstone", removes a record
+  //  - when both sides changed the same record, the more recently changed one
+  //    wins (every changed record is stamped with _m = time of change)
+  // ---------------------------------------------------------------
+  var SYNC_ARRAYS = ['groups','students','techCategories','techSubCategories','techniques','campaigns','lessons'];
+  var lastMergeStats = { resurrected: 0 };
+  function stripM(o){ return JSON.stringify(o, function(k, v){ return k === '_m' ? undefined : v; }); }
+  function idMapOf(arr){ var m = {}; (arr||[]).forEach(function(x){ if (x && x.id){ m[x.id] = x; } }); return m; }
+  function tombMap(arr){ var m = {}; (arr||[]).forEach(function(t){ if (t && t.id){ m[t.id] = Math.max(m[t.id]||0, t.at||1); } }); return m; }
 
-    var merged = [];
-    Object.keys(allIds).forEach(function(id){
-      var inBaseline = baselineIds[id], inLocal = localIds[id], inServer = serverIds[id];
-      if (!inLocal && !inServer) return; // gone on both sides
-      if (!inLocal && inServer){
-        if (inBaseline) return; // we deleted it locally — respect that, don't resurrect it
-        merged.push(inServer); // brand new from the other side — pull it in
-        return;
+  // ---- field-level merge of ONE record that both sides changed ----
+  // Three-way: compare each field with the version both sides started from.
+  //  - only one side changed a field  -> take that change
+  //  - both changed it                -> lists of plain values (attendance dates, lesson techniques...)
+  //                                       are combined; anything else: the later change wins
+  function jsonOf(v){ return v === undefined ? 'undefined' : JSON.stringify(v); }
+  function isPrimArray(a){ return Array.isArray(a) && a.every(function(x){ return x === null || typeof x !== 'object'; }); }
+  function mergeSetArrays(b, l, s){
+    var lSet = {}, sSet = {}, removed = {};
+    l.forEach(function(x){ lSet[jsonOf(x)] = 1; });
+    s.forEach(function(x){ sSet[jsonOf(x)] = 1; });
+    (b||[]).forEach(function(x){ var k = jsonOf(x); if (!lSet[k] || !sSet[k]){ removed[k] = 1; } });   // removed by either side
+    var out = [], seen = {};
+    l.concat(s).forEach(function(x){ var k = jsonOf(x); if (removed[k] || seen[k]) return; seen[k] = 1; out.push(x); });
+    return out;
+  }
+  function mergeRecordFields(b, l, sv){
+    var out = {}, keys = {};
+    [b, l, sv].forEach(function(o){ Object.keys(o).forEach(function(k){ keys[k] = 1; }); });
+    var lNewer = (l._m || 0) >= (sv._m || 0);
+    Object.keys(keys).forEach(function(k){
+      if (k === '_m') return;
+      var bv = b[k], lv = l[k], svv = sv[k], val;
+      var jb = jsonOf(bv), jl = jsonOf(lv), js = jsonOf(svv);
+      if (jl === js){ val = lv; }
+      else if (jl === jb){ val = svv; }              // only the other side changed it
+      else if (js === jb){ val = lv; }               // only we changed it
+      else if (k === 'monthlyPayments' && Array.isArray(lv) && Array.isArray(svv)){
+        val = lv.map(function(x, i){
+          var bi = jsonOf((bv||[])[i]), li = jsonOf(x), si = jsonOf(svv[i]);
+          if (li === si) return x; if (li === bi) return svv[i]; if (si === bi) return x;
+          return lNewer ? x : svv[i];
+        });
       }
-      if (inLocal && !inServer){
-        if (inBaseline) return; // the other side deleted it — respect that, don't keep a ghost copy
-        merged.push(inLocal); // brand new from us — keep it
-        return;
-      }
-      // exists on both sides
-      var localChanged = inBaseline ? JSON.stringify(inBaseline) !== JSON.stringify(inLocal) : true;
-      var serverChanged = inBaseline ? JSON.stringify(inBaseline) !== JSON.stringify(inServer) : true;
-      if (localChanged && !serverChanged){ merged.push(inLocal); }
-      else if (!localChanged && serverChanged){ merged.push(inServer); }
-      else { merged.push(inLocal); } // both changed (rare direct conflict) or neither — prefer our own active edit
+      else if (isPrimArray(lv) && isPrimArray(svv)){ val = mergeSetArrays(isPrimArray(bv) ? bv : [], lv, svv); }
+      else { val = lNewer ? lv : svv; }              // both changed the same field: the later change wins
+      if (val !== undefined){ out[k] = val; }
     });
-    return merged;
+    var m = Math.max(l._m || 0, sv._m || 0);
+    if (m){ out._m = m; }
+    return out;
+  }
+
+  function mergeArraysByID(baseline, local, server, localTombs, serverTombs, stats){
+    var bMap = idMapOf(baseline), lMap = idMapOf(local), sMap = idMapOf(server);
+    var order = [], seen = {};
+    (local||[]).forEach(function(x){ if (x && x.id && !seen[x.id]){ seen[x.id] = 1; order.push(x.id); } });   // keep our own ordering
+    (server||[]).forEach(function(x){ if (x && x.id && !seen[x.id]){ seen[x.id] = 1; order.push(x.id); } });
+    var out = [];
+    order.forEach(function(id){
+      var b = bMap[id], l = lMap[id], sv = sMap[id];
+      if (l && !sv){
+        if (serverTombs[id]) return;                    // the other side explicitly deleted it
+        if (b && stats){ stats.resurrected++; }          // the sheet lost something we had — keep it, and write it back
+        out.push(l); return;
+      }
+      if (!l && sv){
+        if (localTombs[id]) return;                     // we explicitly deleted it
+        out.push(sv); return;                           // new from the other side (or something we lost by accident)
+      }
+      var ls = stripM(l), ss = stripM(sv);
+      if (ls === ss){ out.push(l); return; }
+      if (b){ out.push(mergeRecordFields(b, l, sv)); return; }   // both sides changed the record: merge field by field
+      var lm = l._m || 0, sm = sv._m || 0;
+      if (lm && sm){ out.push(sm > lm ? sv : l); return; }   // no common starting point: the later change wins
+      var lc = b ? stripM(b) !== ls : true, sc = b ? stripM(b) !== ss : true;
+      if (!lc && sc){ out.push(sv); } else { out.push(l); }   // otherwise prefer our own active edit
+    });
+    return out;
   }
   function mergePayloads(baselineStr, localPayload, serverStr){
     var baseline = baselineStr ? JSON.parse(baselineStr) : {};
     var server = serverStr ? JSON.parse(serverStr) : {};
+    var lT = tombMap(localPayload.tombstones), sT = tombMap(server.tombstones);
+    var stats = { resurrected: 0 };
+    var out = {};
+    SYNC_ARRAYS.forEach(function(n){ out[n] = mergeArraysByID(baseline[n], localPayload[n], server[n], lT, sT, stats); });
+    out.activityLog = mergeArraysByID(baseline.activityLog, localPayload.activityLog, server.activityLog, {}, {}, null);
+    var seenA = {}; out.yearArchives = [];   // append-only snapshots: just the union
+    (server.yearArchives||[]).concat(localPayload.yearArchives||[]).forEach(function(a){
+      var key = a.savedAt + '|' + a.label;
+      if (!seenA[key]){ seenA[key] = true; out.yearArchives.push(a); }
+    });
+    // tombstones: union, newest 30 days, and never for a record that still exists
+    var exists = {}; SYNC_ARRAYS.forEach(function(n){ out[n].forEach(function(x){ exists[x.id] = true; }); });
+    var tAll = {}; Object.keys(lT).forEach(function(id){ tAll[id] = lT[id]; });
+    Object.keys(sT).forEach(function(id){ tAll[id] = Math.max(tAll[id]||0, sT[id]); });
+    var cutoff = Date.now() - 30*24*60*60*1000;
+    out.tombstones = Object.keys(tAll).filter(function(id){ return !exists[id] && tAll[id] > cutoff; }).map(function(id){ return { id:id, at:tAll[id] }; });
+    lastMergeStats = stats;
+    return out;
+  }
+  function livePayload(){
+    // References to the live state (not copies) — what we save is exactly what is on screen at that moment.
     return {
-      groups: mergeArraysByID(baseline.groups, localPayload.groups, server.groups),
-      students: mergeArraysByID(baseline.students, localPayload.students, server.students),
-      techCategories: mergeArraysByID(baseline.techCategories, localPayload.techCategories, server.techCategories),
-      techSubCategories: mergeArraysByID(baseline.techSubCategories, localPayload.techSubCategories, server.techSubCategories),
-      techniques: mergeArraysByID(baseline.techniques, localPayload.techniques, server.techniques),
-      campaigns: mergeArraysByID(baseline.campaigns, localPayload.campaigns, server.campaigns),
-      // yearArchives are append-only snapshots, never edited — just take the union, newest-safe
-      activityLog: mergeArraysByID(baseline.activityLog, localPayload.activityLog, server.activityLog),
-      yearArchives: (function(){
-        var seen = {}; var out = [];
-        (server.yearArchives||[]).concat(localPayload.yearArchives||[]).forEach(function(a){
-          var key = a.savedAt + '|' + a.label;
-          if (!seen[key]){ seen[key]=true; out.push(a); }
-        });
-        return out;
-      })()
+      groups:state.groups, students:state.students,
+      techCategories:state.techCategories, techSubCategories:state.techSubCategories, techniques:state.techniques,
+      campaigns:state.campaigns, yearArchives:state.yearArchives, lessons:state.lessons,
+      activityLog:state.activityLog, tombstones:state.tombstones
     };
+  }
+  function applyPayloadToState(p){
+    state.groups = p.groups || []; state.students = p.students || [];
+    state.techCategories = p.techCategories || []; state.techSubCategories = p.techSubCategories || [];
+    state.techniques = p.techniques || []; state.campaigns = p.campaigns || []; state.lessons = p.lessons || [];
+    state.yearArchives = p.yearArchives || []; state.activityLog = p.activityLog || [];
+    state.tombstones = p.tombstones || [];
+  }
+  function normalizeLoadedData(){
+    state.students.forEach(function(s){
+      if (s.classGrade){ s.classGrade = normalizeClassGrade(s.classGrade); }
+      if (s.status === 'new'){ s.status = 'follow'; }
+    });
+    state.techCategories.forEach(function(c){ if (!c.subject){ c.subject = 'היאבקות'; } });
+  }
+  function localHasData(){ return (state.students.length + state.groups.length) > 0; }
+  // An empty read is only suspicious if the sheet was NOT empty the last time we looked.
+  function serverHadData(){
+    if (lastKnownServerContent === null){ return false; }
+    var c = serverCounts(lastKnownServerContent);
+    return c.ok && (c.students + c.groups) > 0;
+  }
+  function hasLocalBackupData(){
+    try{
+      var b = JSON.parse(window.localStorage.getItem(LOCAL_BACKUP_KEY) || 'null');
+      return !!(b && b.data && ((b.data.groups||[]).length || (b.data.students||[]).length));
+    }catch(e){ return false; }
+  }
+
+  // ---- reading the sheet safely ----
+  // While another device is in the middle of saving, the sheet can briefly look
+  // empty or half-written. That must never be mistaken for "the data is gone".
+  function serverCounts(raw){
+    try{ var o = JSON.parse(raw || '{}'); return { students:(o.students||[]).length, groups:(o.groups||[]).length, ok:true }; }
+    catch(e){ return { students:0, groups:0, ok:false }; }
+  }
+  async function readServerSane(expectData){
+    var waits = [800, 1600, 3200], d = null, c = null;
+    for (var i=0; i<=waits.length; i++){
+      d = await sheetsCall('');
+      c = serverCounts(d.value);
+      var empty = c.ok && c.students === 0 && c.groups === 0;
+      if (c.ok && !(empty && expectData)){ return { raw:d.value, version:(d.version!==undefined?d.version:null), suspicious:false, empty:empty, corrupt:false }; }
+      if (i < waits.length){ await sleep(waits[i]); }
+    }
+    return { raw:d.value, version:(d.version!==undefined?d.version:null), suspicious:true, empty:(c.ok && c.students===0 && c.groups===0), corrupt:!c.ok };
+  }
+  var knownServerVersion = null; // write-counter of the content we last saw/wrote (v4 script only)
+  function checkServerMeta(raw){
+    // A newer version of the app has saved to this sheet. An older copy still open
+    // (e.g. a tab left open for days) must not write over it.
+    try{
+      var o = JSON.parse(raw || '{}');
+      if (o.meta && o.meta.v && String(o.meta.v) > APP_VERSION){
+        state.saveBlocked = { type:'stale-version', serverVersion:o.meta.v };
+        return true;
+      }
+    }catch(e){}
+    return false;
   }
 
   // ---------------------------------------------------------------
@@ -1367,7 +1589,7 @@
     return JSON.stringify({
       groups:state.groups, students:state.students,
       techCategories:state.techCategories, techSubCategories:state.techSubCategories, techniques:state.techniques,
-      campaigns:state.campaigns, yearArchives:state.yearArchives
+      campaigns:state.campaigns, yearArchives:state.yearArchives, lessons:state.lessons
     });
   }
   function resetUndoHistory(){ undoStack = []; undoBaseline = serializeState(); activityBaseline = undoBaseline; }
@@ -1388,6 +1610,7 @@
     state.techSubCategories = prev.techSubCategories || [];
     state.techniques = prev.techniques || [];
     state.campaigns = prev.campaigns || [];
+    state.lessons = prev.lessons || [];
     state.yearArchives = prev.yearArchives || [];
     undoBaseline = serializeState();
     scheduleSave(true);
@@ -1427,6 +1650,7 @@
       var c = cG[id], b = bG[id];
       if (!b){ add('gAdd', '➕ נוצרה קבוצה: '+c.name); return; }
       if (b.name !== c.name){ add('gEdit', '✏️ שם קבוצה שונה: '+b.name+' ← '+c.name); }
+      if ((b.note||'') !== (c.note||'')){ add('gNote', c.note ? ('📌 '+c.name+': הערת קבוצה — "'+snippet(c.note)+'"') : ('📌 '+c.name+': הערת הקבוצה נמחקה')); }
       var bs = b.sessions || [], cs = c.sessions || [];
       var newS = cs.filter(function(d){ return bs.indexOf(d) === -1; });
       var goneS = bs.filter(function(d){ return cs.indexOf(d) === -1; });
@@ -1450,6 +1674,9 @@
       }
       if (!!b.advanced !== !!c.advanced){ add('sFlag', c.advanced ? '★ '+c.name+' סומן כמועמד למתקדמים' : '★ '+c.name+' הוסר ממועמדים למתקדמים'); }
       if (!!b.isLead !== !!c.isLead){ add('sFlag', c.isLead ? '📈 '+c.name+' סומן כליד' : '📈 '+c.name+' הוסר מסימון ליד'); }
+      if ((b.advGroupId||'') !== (c.advGroupId||'')){ add('sAdv', '🎓 '+c.name+': קבוצה מיועדת למתקדמים — '+(c.advGroupId ? gName(c.advGroupId) : 'לא נקבעה')); }
+      if ((b.advStatus||'candidate') !== (c.advStatus||'candidate')){ add('sAdv', '🎓 '+c.name+': שלב מועמדות — '+advStatusInfo(c.advStatus).label); }
+      if ((b.advNote||'') !== (c.advNote||'')){ add('sAdv', c.advNote ? ('🎓 '+c.name+': הערת מועמדות — "'+snippet(c.advNote)+'"') : ('🎓 '+c.name+': הערת המועמדות נמחקה')); }
       var edits = [];
       if (b.name !== c.name){ add('sEdit', '✏️ שם תלמיד שונה: '+b.name+' ← '+c.name); }
       if ((b.phone||'') !== (c.phone||'')){ edits.push('טלפון'); }
@@ -1497,6 +1724,17 @@
     Object.keys(cC).forEach(function(id){ if (!bC[id]){ add('tech', '📚 נוספה קטגוריה: '+cC[id].name); } });
     Object.keys(bC).forEach(function(id){ if (!cC[id]){ add('tech', '📚 נמחקה קטגוריה: '+bC[id].name); } });
 
+    // ---- lesson log ----
+    var bL = byId(base.lessons), cL = byId(state.lessons);
+    Object.keys(cL).forEach(function(id){
+      var c = cL[id], b = bL[id], gn = gName(c.groupId), items = (c.techniqueIds||[]).length + (c.extras||[]).length;
+      if (!b){ add('lesson', '📓 '+gn+': '+(c.done ? 'נרשם שיעור ('+shortDate(c.date)+')' : 'נפתח תכנון לשיעור')); return; }
+      if (!b.done && c.done){ add('lesson', '📓 '+gn+': שיעור '+shortDate(c.date)+' סומן כבוצע ('+items+' פריטים)'); }
+      else if (JSON.stringify(b.techniqueIds||[]) !== JSON.stringify(c.techniqueIds||[]) || JSON.stringify(b.extras||[]) !== JSON.stringify(c.extras||[]) || (b.note||'') !== (c.note||'')){
+        add('lesson', '📓 '+gn+': עודכן '+(c.done ? 'שיעור' : 'תכנון שיעור')+' ('+shortDate(c.date)+')');
+      }
+    });
+
     // ---- new school year ----
     if ((state.yearArchives||[]).length > (base.yearArchives||[]).length){ add('year', '🎓 נפתחה שנה חדשה'); }
 
@@ -1505,6 +1743,8 @@
       sAdd:'➕ נוספו {n} תלמידים', sDel:'🗑 נמחקו {n} תלמידים', sStatus:'🔄 שונה סטטוס ל-{n} תלמידים',
       sMove:'↔ הועברו {n} תלמידים בין קבוצות', sNote:'📝 עודכנו הערות ל-{n} תלמידים', sFlag:'★ עודכנו סימונים ל-{n} תלמידים',
       sEdit:'✏️ עודכנו פרטים של {n} תלמידים', sTrash:'🗄 {n} תלמידים הועברו/שוחזרו (ארכיון/פח)',
+      lesson:'📓 עודכן יומן השיעורים ({n} שינויים)', gNote:'📌 עודכנו הערות קבוצה ({n} שינויים)',
+      sAdv:'🎓 עודכנו נתוני מועמדות ל-{n} שינויים',
       pay:'💳 עודכנו תשלומים ({n} שינויים)', att:'✅ עודכנה נוכחות ({n} שינויים)', session:'📅 עודכנו מפגשים ({n} שינויים)',
       tech:'📚 עודכנו טכניקות/קטגוריות ({n} שינויים)'
     };
@@ -1527,13 +1767,49 @@
       state.activityLog = state.activityLog.slice(state.activityLog.length - 300);
     }
   }
+  var allowShrinkOnce = false; // set by deliberate bulk deletions (reset, restore, import) so the mass-delete guard lets them through
+  function stampAndTombstone(baselineStr){
+    if (!baselineStr) return;
+    var base; try{ base = JSON.parse(baselineStr); }catch(e){ return; }
+    var now = Date.now();
+    var tombs = tombMap(state.tombstones);
+    var current = {};
+    SYNC_ARRAYS.forEach(function(name){
+      var bm = {}; (base[name]||[]).forEach(function(o){ if (o && o.id){ bm[o.id] = stripM(o); } });
+      (state[name]||[]).forEach(function(o){
+        if (!o || !o.id) return;
+        current[o.id] = true;
+        if (bm[o.id] === undefined || bm[o.id] !== stripM(o)){ o._m = now; }   // new or changed since the last point -> stamp
+      });
+      Object.keys(bm).forEach(function(id){ if (!(state[name]||[]).some(function(o){ return o && o.id === id; })){ tombs[id] = now; } });  // gone from our data -> an explicit deletion
+    });
+    var cutoff = now - 30*24*60*60*1000;
+    state.tombstones = Object.keys(tombs).filter(function(id){ return !current[id] && tombs[id] > cutoff; }).map(function(id){ return { id:id, at:tombs[id] }; });
+  }
+  function massDeleteCheck(){
+    if (allowShrinkOnce || !activityBaseline) return null;
+    var base; try{ base = JSON.parse(activityBaseline); }catch(e){ return null; }
+    var cur = idMapOf(state.students), removed = 0, total = (base.students||[]).length;
+    (base.students||[]).forEach(function(x){ if (x && x.id && !cur[x.id]){ removed++; } });
+    if (total >= 8 && removed >= 5 && removed >= total * 0.15){ return { removed:removed, total:total, what:'תלמידים' }; }
+    var curT = idMapOf(state.techniques), removedT = 0, totalT = (base.techniques||[]).length;
+    (base.techniques||[]).forEach(function(x){ if (x && x.id && !curT[x.id]){ removedT++; } });
+    if (totalT >= 15 && removedT >= 10 && removedT >= totalT * 0.3){ return { removed:removedT, total:totalT, what:'טכניקות' }; }
+    return null;
+  }
   function logPendingChanges(){
     var texts = computeActivityEntries(activityBaseline);
     if (texts.length){
       var now = Date.now(), dev = getDeviceId();
-      texts.forEach(function(t, i){ (state.activityLog = state.activityLog || []).push({ id: uid('act'), at: now + i, d: dev, t: t }); });
+      var recent = (state.activityLog || []).slice(-40);
+      texts.forEach(function(t, i){
+        // skip an identical line this device just logged (e.g. several quick edits of the same lesson plan)
+        if (recent.some(function(e){ return e.d === dev && e.t === t && now - e.at < 10*60*1000; })){ return; }
+        (state.activityLog = state.activityLog || []).push({ id: uid('act'), at: now + i, d: dev, t: t });
+      });
       pruneActivityLog();
     }
+    stampAndTombstone(activityBaseline);
     activityBaseline = serializeState();
   }
   function isToday(ms){ return new Date(ms).toDateString() === new Date().toDateString(); }
@@ -1542,14 +1818,112 @@
     return (state.activityLog||[]).filter(function(e){ return e.d !== dev && e.at > seen && isToday(e.at); }).length;
   }
 
+  // ---------------------------------------------------------------
+  // Automatic safety copies kept in this browser (IndexedDB): the data as it was
+  // on the sheet at various moments. If something ever goes wrong, a previous
+  // version can be restored from "שחזור מגרסה קודמת".
+  // ---------------------------------------------------------------
+  var snapDBPromise = null, lastSnapAt = 0;
+  function snapDB(){
+    if (!snapDBPromise){
+      snapDBPromise = new Promise(function(res){
+        try{
+          var r = indexedDB.open('tatami-snapshots', 1);
+          r.onupgradeneeded = function(){ r.result.createObjectStore('snaps', { keyPath:'id', autoIncrement:true }); };
+          r.onsuccess = function(){ res(r.result); };
+          r.onerror = function(){ res(null); };
+          r.onblocked = function(){ res(null); };
+        }catch(e){ res(null); }
+      });
+    }
+    return snapDBPromise;
+  }
+  function idbDone(tx){ return new Promise(function(r){ tx.oncomplete = r; tx.onerror = r; tx.onabort = r; }); }
+  async function saveSnapshot(raw, source, force){
+    try{
+      if (!force && Date.now() - lastSnapAt < 10*60*1000){ return; }
+      var c = serverCounts(raw);
+      if (!c.ok || (c.students === 0 && c.groups === 0)){ return; } // never keep an empty/unreadable state as a "safety copy"
+      var db = await snapDB(); if (!db){ return; }
+      lastSnapAt = Date.now();
+      var tx = db.transaction('snaps', 'readwrite');
+      tx.objectStore('snaps').add({ at: Date.now(), source: source, students: c.students, groups: c.groups, size: raw.length, raw: raw });
+      await idbDone(tx);
+      pruneSnapshots();
+    }catch(e){ console.error('snapshot failed', e); }
+  }
+  async function allSnapshots(){
+    var db = await snapDB(); if (!db){ return []; }
+    return new Promise(function(res){
+      var out = [], tx = db.transaction('snaps', 'readonly'), req = tx.objectStore('snaps').openCursor();
+      req.onsuccess = function(){ var cur = req.result; if (cur){ out.push(cur.value); cur.continue(); } else { res(out); } };
+      req.onerror = function(){ res(out); };
+    });
+  }
+  async function pruneSnapshots(){
+    try{
+      var db = await snapDB(); if (!db){ return; }
+      var all = (await allSnapshots()).sort(function(a,b){ return b.at - a.at; });
+      var keep = {}, i = 0, perDay = {}, now = Date.now();
+      all.forEach(function(x){
+        if (i < 30){ keep[x.id] = true; i++; return; }                       // the 30 most recent
+        var day = new Date(x.at).toDateString();
+        if (!perDay[day] && now - x.at < 10*24*60*60*1000){ perDay[day] = true; keep[x.id] = true; }  // then one per day for 10 days
+      });
+      var tx = db.transaction('snaps', 'readwrite'), st = tx.objectStore('snaps');
+      all.forEach(function(x){ if (!keep[x.id]){ st.delete(x.id); } });
+      await idbDone(tx);
+    }catch(e){}
+  }
+  async function openRestoreDialog(){
+    openModal({ type:'restoreVersions', items:null });
+    var items = [];
+    try{
+      items = (await allSnapshots()).sort(function(a,b){ return b.at - a.at; }).map(function(x){
+        return { at:x.at, source:x.source, students:x.students, groups:x.groups, size:x.size, raw:x.raw };
+      });
+    }catch(e){}
+    try{
+      // Copies kept on the sheet itself by the v4 script (older script: no "history" in the reply, ignored)
+      var hd = await sheetsCall('&action=history');
+      (hd.history || []).forEach(function(h){ items.push({ at:h.at, source:'server', students:h.students, groups:h.groups, id:h.id, raw:null }); });
+    }catch(e){}
+    items.sort(function(a,b){ return b.at - a.at; });
+    if (state.modal && state.modal.type === 'restoreVersions'){ state.modal.items = items; render(); }
+  }
+  async function restoreItem(it){
+    var raw = it.raw;
+    if (!raw && it.id){
+      try{ var d = await sheetsCall('&action=snapshot&id=' + encodeURIComponent(it.id)); raw = d.value; }
+      catch(e){ showToast('לא הצלחתי לטעון את העותק מהגיליון.'); return; }
+    }
+    if (!raw){ showToast('העותק הזה ריק.'); return; }
+    restoreFromRaw(raw);
+  }
+  async function restoreFromRaw(raw){
+    var data; try{ data = JSON.parse(raw); }catch(e){ showToast('הגרסה הזו פגומה ואי אפשר לשחזר אותה.'); return; }
+    await saveSnapshot(JSON.stringify(livePayload()), 'before-restore', true); // keep what is on screen now, just in case
+    allowShrinkOnce = true;
+    applyPayloadToState(data);
+    normalizeLoadedData();
+    if (state.saveBlocked && state.saveBlocked.type === 'corrupt'){ state.saveBlocked = null; }
+    lastKnownServerContent = null;  // a restore replaces the sheet's content outright (no merging with what is there)
+    knownServerVersion = null;
+    state.selectedGroupId = state.groups.length ? state.groups[0].id : null;
+    state.modal = null;
+    scheduleSave();
+    showToast('הגרסה שוחזרה ונשמרת לגיליון.');
+  }
+
   function saveIndicatorText(){
+    if (state.saveBlocked) return '⛔ השמירה מושבתת';
     if (state.isSaving) return state.sheetsSaveError ? '⏳ מנסה שוב לשמור...' : '⏳ שומר...';
     if (state.sheetsSaveError) return '⚠ השמירה האחרונה נכשלה';
     if (state.lastSavedAt) return '✓ נשמר לאחרונה: '+new Date(state.lastSavedAt).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
     return '';
   }
   function saveIndicatorClass(){
-    return 'last-saved-indicator'+(state.isSaving?' saving':(state.sheetsSaveError?' error':''));
+    return 'last-saved-indicator'+(state.saveBlocked?' error':(state.isSaving?' saving':(state.sheetsSaveError?' error':'')));
   }
   function updateSaveIndicator(){
     // Update just the small indicator (and the undo button) in place — no full re-render.
@@ -1579,13 +1953,31 @@
 
   function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
 
+  function blockForMassDelete(g){
+    state.saveBlocked = { type:'mass-delete' };
+    state.isSaving = false;
+    openModal({
+      type:'guardDialog',
+      title:'נמחקו הרבה נתונים בבת אחת',
+      body:'בפעולה האחרונה נעלמו '+g.removed+' '+g.what+' מתוך '+g.total+'. זה לא נראה רגיל — ייתכן שמשהו התרוקן בטעות, ולכן עצרתי את השמירה.\n\nאם מחקת בכוונה (למשל קבוצה או רשימה שלמה) — אשר. אם לא — טען מחדש מהגיליון, והנתונים יחזרו.',
+      keepLabel:'המחיקה מכוונת — שמור',
+      takeLabel:'טען מהגיליון (בטל את השינוי)',
+      onKeep:function(){ allowShrinkOnce = true; state.saveBlocked = null; closeModal(); saveData(); },
+      onTake:function(){ state.saveBlocked = null; state.hasUnsavedChanges = false; closeModal(); refreshFromStorage(true, true); }
+    });
+  }
+
   async function saveData(){
     if (state.readOnly) return; // safety net: never write from the shared view-only link
+    if (state.saveBlocked){ state.isSaving = false; updateSaveIndicator(); return; }
     if (savingInFlight){ saveQueued = true; return; }
+    var guard = massDeleteCheck();
+    if (guard){ blockForMassDelete(guard); return; }
+    allowShrinkOnce = false;
     savingInFlight = true;
     state.hasUnsavedChanges = true;
     state.isSaving = true;
-    logPendingChanges(); // record what this save changes, so it shows up in the updates hub
+    logPendingChanges(); // record what this save changes (activity log, change stamps, deletions)
     updateSaveIndicator();
     var needsFullRender = false;
     try{
@@ -1599,6 +1991,7 @@
           }catch(e){
             lastErr = e;
             console.error('ניסיון שמירה '+attempt+' נכשל', e);
+            if (e && e.noRetry){ break; }
             if (attempt < maxAttempts){
               state.sheetsSaveError = (e && e.message) ? e.message : String(e);
               updateSaveIndicator();
@@ -1627,8 +2020,9 @@
 
     state.isSaving = false;
     savingInFlight = false;
+    if (state.saveBlocked){ needsFullRender = true; }
     var stillPending = !!saveDebounceTimer || saveQueued;
-    if (!state.sheetsSaveError){ state.hasUnsavedChanges = stillPending; }
+    if (!state.sheetsSaveError && !state.saveBlocked){ state.hasUnsavedChanges = stillPending; }
 
     try{
       if (window.localStorage && (state.groups.length || state.students.length)){
@@ -1638,45 +2032,50 @@
 
     if (needsFullRender){ render(); } else { updateSaveIndicator(); }
 
-    if (saveQueued){ saveQueued = false; saveData(); }
+    if (saveQueued && !state.saveBlocked){ saveQueued = false; saveData(); }
   }
 
-  // One full attempt: conflict check + merge + write + verify. Throws on failure.
+  // One full attempt: safe read + merge + write + verify. Throws on failure.
   async function saveOnce(){
-    var mergedExternal = false;
-    var payload = JSON.parse(serializeState());
-    payload.activityLog = state.activityLog || [];
-    var payloadStr = JSON.stringify(payload);
+    var mergedExternal = false, currentServer = null, serverEmpty = false, expectedVersion = knownServerVersion;
     if (lastKnownServerContent !== null){
-      // Someone else (another device/user) may have saved since we last
-      // synced — merge their changes with ours by record ID so both survive.
-      var currentServer = null;
-      try{ currentServer = await sheetsGet(); }catch(eCheck){ /* if this check itself fails, don't block the save on it */ }
-      if (currentServer !== null && currentServer !== lastKnownServerContent){
-        var merged = mergePayloads(lastKnownServerContent, payload, currentServer);
-        payload = merged;
-        payloadStr = JSON.stringify(payload);
-        state.groups = payload.groups;
-        state.students = payload.students;
-        state.techCategories = payload.techCategories;
-        state.techSubCategories = payload.techSubCategories;
-        state.techniques = payload.techniques;
-        state.campaigns = payload.campaigns;
-        state.yearArchives = payload.yearArchives;
-        state.activityLog = payload.activityLog || [];
-        activityBaseline = serializeState(); // other people's changes are now part of our baseline — don't count them as ours
-        mergedExternal = true;
+      // Read the sheet first (this can take a few seconds)...
+      var r = await readServerSane(serverHadData());
+      if (r.corrupt){ throw new Error('נתוני הגיליון אינם קריאים כרגע (ייתכן שמישהו שומר באותו רגע). לא כתבתי כלום כדי לא לפגוע בהם.'); }
+      currentServer = r.raw; serverEmpty = r.empty; expectedVersion = r.version;
+      if (checkServerMeta(currentServer)){
+        var eStale = new Error('נפתחה גרסה חדשה יותר של האפליקציה. כדי לא לדרוס נתונים — רענן את הדף (Ctrl+Shift+R).');
+        eStale.noRetry = true; throw eStale;
       }
     }
-    await sheetsSet(payloadStr);
-    // Verify the write really landed (guards against truncated writes).
-    var verifyRaw = await sheetsGet();
-    if (verifyRaw !== payloadStr){ await sleep(1500); verifyRaw = await sheetsGet(); }  // give a slow write a moment to land
-    if (verifyRaw !== payloadStr){ await sleep(3000); verifyRaw = await sheetsGet(); }
+    // ...and only THEN take the data to save. From here until the write starts
+    // there is no waiting, so anything you changed while the sheet was being
+    // read is included (earlier versions saved a stale copy and lost such edits).
+    var payload = livePayload();
+    if (currentServer !== null && !serverEmpty && currentServer !== lastKnownServerContent){
+      var merged = mergePayloads(lastKnownServerContent, payload, currentServer);
+      applyPayloadToState(merged);
+      payload = merged;
+      mergedExternal = true;
+      resetUndoHistory(); // the data now includes other people's changes — undoing across that would be unsafe
+    }
+    payload.meta = { v: APP_VERSION, at: Date.now() };
+    var payloadStr = JSON.stringify(payload);
+    await sheetsSet(payloadStr, expectedVersion);
+    // Verify the write really landed (guards against truncated writes and lost races).
+    var vd = await sheetsCall('');
+    var verifyRaw = vd.value;
+    // With the v4 script a refused write (someone saved in between) shows up as a newer version
+    // number than the one we based our write on — no point waiting; re-read, merge and retry.
+    var refused = function(d){ return d.version !== undefined && d.version !== null && expectedVersion !== null && expectedVersion !== undefined && Number(d.version) > Number(expectedVersion); };
+    if (verifyRaw !== payloadStr && !refused(vd)){ await sleep(1500); vd = await sheetsCall(''); verifyRaw = vd.value; }  // give a slow write a moment to land
+    if (verifyRaw !== payloadStr && !refused(vd)){ await sleep(3000); vd = await sheetsCall(''); verifyRaw = vd.value; }
     if (verifyRaw !== payloadStr){
       throw new Error('האימות נכשל — מה שנשמר בגיליון לא תואם למה שניסינו לשמור (ייתכן שמישהו אחר שמר באותו רגע). מנסה שוב.');
     }
     lastKnownServerContent = payloadStr;
+    knownServerVersion = (vd.version !== undefined) ? vd.version : null;
+    saveSnapshot(payloadStr, 'auto');
     return { mergedExternal: mergedExternal };
   }
 
@@ -1823,6 +2222,7 @@
         openConfirm(
           'אישור אחרון: אין דרך לשחזר את זה מלבד גיבוי שעשית בעצמך.\n\nלמחוק הכל?',
           function(){
+            allowShrinkOnce = true;
             state.groups = [];
             state.students = [];
             state.selectedGroupId = null;
@@ -2012,6 +2412,7 @@
     var becomingJoined = patch.status === 'joined' && s.status !== 'joined';
     var becomingOut = patch.status === 'out' && s.status !== 'out';
     var noteChanged = patch.note !== undefined && patch.note !== s.note;
+    var advNoteChanged = patch.advNote !== undefined && patch.advNote !== (s.advNote || '');
     Object.assign(s, patch);
     if (becomingJoined){
       fillScheduledPayments(s);
@@ -2019,6 +2420,7 @@
       s.outDate = null;
     }
     if (becomingOut){ s.outDate = todayISO(); }
+    if (advNoteChanged){ s.advNoteUpdatedAt = s.advNote ? Date.now() : null; }
     if (noteChanged){
       s.noteUpdatedDate = s.note ? todayISO() : null; // clear the date if the note was emptied out
       s.noteUpdatedAt = s.note ? Date.now() : null;   // exact moment (date + time) the note was last changed
@@ -2274,6 +2676,7 @@
       if (k==='class') e.className = attrs[k];
       else if (k==='html') e.innerHTML = attrs[k];
       else if (k.indexOf('on')===0) e.addEventListener(k.slice(2), attrs[k]);
+      else if (k==='value' && tag==='textarea') e.value = attrs[k];   // a textarea ignores a "value" attribute — its text must be set as the value
       else e.setAttribute(k, attrs[k]);
     }
     (children||[]).forEach(function(c){
@@ -2284,7 +2687,65 @@
     return e;
   }
 
+  var expandedNotes = {}; // student ids whose note is kept fully open (view-only preference, not saved)
+  function fitNote(ta, focused){
+    // Collapsed: a single line. Focused (or pinned open): the whole text.
+    var cs = window.getComputedStyle(ta);
+    var lh = parseFloat(cs.lineHeight) || 18;
+    var pad = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0) + 2;
+    var collapsed = Math.ceil(lh + pad);   // exactly one line — no sliver of the next line showing
+    ta.style.height = 'auto';
+    var full = ta.scrollHeight + 2;
+    var open = focused || !!expandedNotes[ta.dataset.sid];
+    var target = open ? Math.min(full, 360) : Math.min(full, collapsed);
+    ta.style.height = target + 'px';
+    ta.style.overflowY = (open && full > 360) ? 'auto' : 'hidden';
+    var wrap = ta.parentNode;
+    if (wrap && wrap.classList){
+      wrap.classList.toggle('has-more', full > collapsed + 2);
+      var btn = wrap.querySelector('.note-more-btn');
+      if (btn){ btn.textContent = expandedNotes[ta.dataset.sid] ? '▴ הקטן' : '▾ הצג הכל'; }
+    }
+  }
+  function fitAllNotes(){
+    var list = document.querySelectorAll('.note-area');
+    for (var i = 0; i < list.length; i++){ fitNote(list[i], document.activeElement === list[i]); }
+  }
+
+  // An auto-growing note box (one line when closed, whole text when opened).
+  // `field` is which of the student's notes it edits: 'note' (the regular one) or
+  // 'advNote' (the one that exists only in the advanced-candidates page).
+  function noteBox(s, field, placeholder, extraClass){
+    var ta = el('textarea',{
+      class:'inline-input note-area '+(extraClass||''),
+      placeholder: placeholder, rows:'1', value: s[field] || '', title: s[field] || ''
+    });
+    var key = field + ':' + s.id;
+    ta.dataset.sid = key;
+    ta.addEventListener('change', function(e){ var patch = {}; patch[field] = e.target.value; updateStudent(s.id, patch); });
+    ta.addEventListener('focus', function(){ fitNote(ta, true); });
+    ta.addEventListener('input', function(){ fitNote(ta, true); });
+    ta.addEventListener('blur', function(){ fitNote(ta, false); });
+    ta.addEventListener('keydown', function(e){
+      // Enter saves (as the one-line field always did); Shift+Enter inserts a new line.
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing){ e.preventDefault(); ta.blur(); }
+    });
+    var moreBtn = el('button',{class:'note-more-btn', type:'button', onclick:function(){
+      expandedNotes[key] = !expandedNotes[key];
+      fitNote(ta, document.activeElement === ta);
+    }},['▾ הצג הכל']);
+    var container = el('div',{class:'note-field-wrap'},[ta, moreBtn]);
+    if (field === 'note' && (s.noteUpdatedDate || s.noteUpdatedAt)){
+      container.appendChild(el('div',{class:'note-date-tag'},['עודכן: '+noteStamp(s)]));
+    }
+    if (field === 'advNote' && s.advNoteUpdatedAt){
+      container.appendChild(el('div',{class:'note-date-tag'},['עודכן: '+stampOf(s.advNoteUpdatedAt)]));
+    }
+    return container;
+  }
+
   function editableInput(s, field, placeholder, extraClass){
+    if (field === 'note'){ return noteBox(s, 'note', placeholder, extraClass); }
     var inp = el('input',{
       type:'text', class:'inline-input '+(extraClass||''),
       placeholder: placeholder, value: s[field] || '', title: s[field] || ''
@@ -2295,13 +2756,6 @@
       var patch = {}; patch[field] = val;
       updateStudent(s.id, patch);
     });
-    if (field === 'note'){
-      var container = el('div',{class:'note-field-wrap'},[inp]);
-      if (s.noteUpdatedDate || s.noteUpdatedAt){
-        container.appendChild(el('div',{class:'note-date-tag'},['עודכן: '+noteStamp(s)]));
-      }
-      return container;
-    }
     return inp;
   }
 
@@ -2380,6 +2834,21 @@
       ]));
     }
 
+    if (state.saveBlocked && state.saveBlocked.type === 'stale-version'){
+      app.appendChild(el('div',{class:'storage-warning'},[
+        el('b',{},['⛔ השמירה מושבתת במכשיר הזה — הדף הזה בגרסה ישנה']),
+        el('span',{},[' נשמרה בגיליון גרסה חדשה יותר של האפליקציה ('+state.saveBlocked.serverVersion+'). כדי לא לדרוס נתונים של אחרים, צריך לרענן את הדף (Ctrl+Shift+R). שינויים שעשית כאן מאז הרענון האחרון לא נשמרו. ']),
+        el('button',{class:'btn-primary', style:'padding:4px 14px;margin-inline-start:6px;', onclick:function(){ window.location.reload(); }},['רענן עכשיו'])
+      ]));
+    }
+    if (state.saveBlocked && state.saveBlocked.type === 'corrupt'){
+      app.appendChild(el('div',{class:'storage-warning'},[
+        el('b',{},['⛔ השמירה מושבתת — נתוני הגיליון אינם קריאים']),
+        el('span',{},[' ייתכן שהם נפגעו. עצרתי את השמירה כדי לא לדרוס אותם. אפשר לשחזר גרסה קודמת מהעותקים האוטומטיים. ']),
+        el('button',{class:'btn-primary', style:'padding:4px 14px;margin-inline-start:6px;', onclick:function(){ openRestoreDialog(); }},['שחזור מגרסה קודמת'])
+      ]));
+    }
+
     var sectionNav = el('div',{class:'section-nav'}, state.readOnly ? [
       el('button',{class:'section-btn active'},['צפייה בטכניקות']),
       el('button',{
@@ -2402,13 +2871,7 @@
       renderActivityHub(),
       el('button',{
         class:'section-btn refresh-btn', title:'משיכת עדכונים אחרונים (למשל אם עדכנת ממכשיר אחר)',
-        onclick:function(){
-          if (state.hasUnsavedChanges){
-            openConfirm('יש לך שינויים שעדיין לא אושרו כנשמרים בהצלחה. רענון עכשיו עלול לדרוס אותם עם הנתונים הישנים מהגיליון. לרענן בכל זאת?', function(){ refreshFromStorage(true); }, 'רענון בכל זאת');
-          } else {
-            refreshFromStorage(true);
-          }
-        }
+        onclick:function(){ refreshFromStorage(true); }
       },['🔄 רענון נתונים']),
       (function(){
         var ub = el('button',{
@@ -2466,6 +2929,7 @@
         el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openModal({type:'importExcel'}); }},['📋 הוספה מהדבקת אקסל']),
         el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openModal({type:'exportExcel'}); }},['📊 ייצוא לאקסל']),
         el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openModal({type:'backup'}); }},['📤 גיבוי / העברה בין מכשירים']),
+        el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openRestoreDialog(); }},['🕘 שחזור מגרסה קודמת']),
         el('div',{class:'more-menu-divider'}),
         el('button',{class:'more-menu-item', style:'color:var(--accent);font-weight:700;', onclick:function(){ state.showMoreActions=false; openNewYear(); }},['🎓 פתיחת שנה חדשה']),
         el('button',{class:'more-menu-item danger', onclick:function(){ state.showMoreActions=false; resetAllStudentsAndGroups(); }},['🗑 מחיקת כל המתאמנים והקבוצות'])
@@ -2623,6 +3087,8 @@
       }catch(eRestore){ console.error('form restore failed', eRestore); }
     }
 
+    fitAllNotes(); // size the note boxes (needs the elements to be in the page)
+
     function restoreScroll(){
       window.scrollTo(0, pageScrollY);
       var newWraps = document.querySelectorAll('.table-wrap');
@@ -2640,7 +3106,7 @@
     // Wait for layout before restoring scroll — on some mobile browsers it
     // lands a frame later than on desktop.
     requestAnimationFrame(function(){
-      requestAnimationFrame(restoreScroll);
+      requestAnimationFrame(function(){ restoreScroll(); fitAllNotes(); });   // once more after layout/fonts settle
     });
   }
 
@@ -2793,6 +3259,20 @@
       ])
     ]);
     wrap.appendChild(groupHeader);
+
+    // group-level notes, shown above the student list
+    var gNoteArea = el('textarea',{
+      class:'group-note-input',
+      placeholder:'הערות לקבוצה — למשל: נושא השיעור הבא, ציוד להביא, תזכורות למאמן, דברים לדבר עליהם עם ההורים…',
+      rows: String(Math.max(2, Math.min(10, (group.note||'').split('\n').length + 1))),
+      value: group.note || ''
+    });
+    gNoteArea.addEventListener('change', function(e){ updateGroupNote(group.id, e.target.value); });
+    gNoteArea.addEventListener('input', function(e){ e.target.rows = Math.max(2, Math.min(10, e.target.value.split('\n').length + 1)); });
+    wrap.appendChild(el('div',{class:'group-note-box'},[
+      el('div',{class:'group-note-label'},['📌 הערות קבוצה'+(group.noteUpdatedAt ? ' · עודכן: '+stampOf(group.noteUpdatedAt) : '')]),
+      gNoteArea
+    ]));
 
     if (!group.sessions.length){
       wrap.appendChild(el('p',{style:'color:var(--muted);font-size:13.5px;margin-top:-10px;'},['אין עדיין מפגשים רשומים לקבוצה זו. לחץ על "הוספת מפגש" כדי לפתוח עמודת נוכחות לתאריך.']));
@@ -3546,33 +4026,98 @@
     return wrap;
   }
 
+  // Stages of an advanced-group candidate (separate from the membership status).
+  var ADV_STATUSES = [
+    { key:'candidate', label:'מועמד — טרם הוזמן',      color:'#9A968A' },
+    { key:'invited',   label:'הוזמן לשיעור ניסיון',     color:'#3A6EA5' },
+    { key:'came',      label:'הגיע לשיעור ניסיון',      color:'#D97F3D' },
+    { key:'approved',  label:'אושר — ממתין להצטרפות',   color:'#8B5FBF' },
+    { key:'joined',    label:'הצטרף למתקדמים',          color:'#4B7F52' },
+    { key:'declined',  label:'לא מעוניין / לא מתאים',   color:'#B91717' }
+  ];
+  function advStatusInfo(key){
+    for (var i=0;i<ADV_STATUSES.length;i++){ if (ADV_STATUSES[i].key === (key||'candidate')) return ADV_STATUSES[i]; }
+    return ADV_STATUSES[0];
+  }
+
   function renderAdvancedView(){
     var wrap = el('div',{});
     wrap.appendChild(el('div',{class:'group-header'},[
-      el('h2',{},['מועמדים למתקדמים'])
+      el('h2',{},['מועמדים למתקדמים']),
+      el('p',{style:'color:var(--muted);font-size:13px;margin:4px 0 0;'},[
+        'כאן מנהלים את מסלול המועמדות של כל אחד: לאיזו קבוצה הוא מיועד, באיזה שלב הוא, והערות שמופיעות רק בדף הזה (לא ברשימה הרגילה של הקבוצה).'
+      ])
     ]));
 
-    var candidates = state.students.filter(function(s){ return s.advanced && !s.archived && !s.trashed; });
+    var all = state.students.filter(function(s){ return s.advanced && !s.archived && !s.trashed; });
 
-    if (!candidates.length){
+    if (!all.length){
       wrap.appendChild(el('p',{style:'color:var(--muted);font-size:14px;'},[
         'עדיין לא סימנת אף אחד. סמן וי בעמודת "מתקדמים" בטבלה של כל קבוצה כדי שהמתאמן יופיע כאן.'
       ]));
       return wrap;
     }
 
+    // ---- filter by candidacy stage ----
+    var counts = {}; all.forEach(function(s){ var k = advStatusInfo(s.advStatus).key; counts[k] = (counts[k]||0) + 1; });
+    var filterBar = el('div',{class:'tech-filter-bar'});
+    filterBar.appendChild(el('span',{class:'tech-filter-label'},['שלב מועמדות:']));
+    filterBar.appendChild(el('button',{
+      class:'tech-filter-pill'+(state.advStatusFilter===null?' active':''),
+      onclick:function(){ state.advStatusFilter = null; render(); }
+    },['הכל ('+all.length+')']));
+    ADV_STATUSES.forEach(function(st){
+      if (!counts[st.key] && state.advStatusFilter !== st.key) return;   // only stages that are in use
+      filterBar.appendChild(el('button',{
+        class:'tech-filter-pill'+(state.advStatusFilter===st.key?' active':''),
+        onclick:function(){ state.advStatusFilter = st.key; render(); }
+      },[st.label+' ('+(counts[st.key]||0)+')']));
+    });
+    wrap.appendChild(filterBar);
+
+    var candidates = state.advStatusFilter ? all.filter(function(s){ return advStatusInfo(s.advStatus).key === state.advStatusFilter; }) : all;
+    if (!candidates.length){
+      wrap.appendChild(el('p',{style:'color:var(--muted);font-size:14px;margin-top:10px;'},['אין מועמדים בשלב הזה.']));
+      return wrap;
+    }
+
     var thead = el('thead',{},[ el('tr',{},[
-      el('th',{},['שם']), el('th',{},['טלפון']), el('th',{},['קבוצה']), el('th',{class:'col-narrow'},['סטטוס']), el('th',{class:'col-narrow'},['מתקדמים']), el('th',{class:'col-narrow'},[''])
+      el('th',{},['שם']), el('th',{},['טלפון']), el('th',{},['קבוצה נוכחית']),
+      el('th',{},['קבוצה מיועדת']), el('th',{},['שלב מועמדות']), el('th',{},['הערות למתקדמים']),
+      el('th',{class:'col-narrow'},['סטטוס מנוי']), el('th',{class:'col-narrow'},['מתקדמים']), el('th',{class:'col-narrow'},[''])
     ])]);
 
     var tbody = el('tbody',{});
     candidates.forEach(function(s){
       var g = state.groups.find(function(x){return x.id===s.groupId;});
-      var st = statusInfo(s.status);
+
+      // target group
+      var tgtSel = el('select',{class:'status-select-inline adv-target-select'}, [ el('option',{value:''},['— לא נקבעה —']) ].concat(
+        state.groups.map(function(gr){
+          var o = el('option',{value:gr.id},[gr.name]);
+          if (gr.id === s.advGroupId){ o.setAttribute('selected','selected'); }
+          return o;
+        })));
+      if (!s.advGroupId || !state.groups.some(function(gr){ return gr.id === s.advGroupId; })){ tgtSel.firstChild.setAttribute('selected','selected'); }
+      tgtSel.addEventListener('change', function(e){ updateStudent(s.id, { advGroupId: e.target.value }); });
+
+      // candidacy stage
+      var ast = advStatusInfo(s.advStatus);
+      var stageSel = el('select',{class:'status-select-inline adv-stage-select', style:'border-inline-start:4px solid '+ast.color+';'},
+        ADV_STATUSES.map(function(opt){
+          var o = el('option',{value:opt.key},[opt.label]);
+          if (opt.key === ast.key){ o.setAttribute('selected','selected'); }
+          return o;
+        }));
+      stageSel.addEventListener('change', function(e){ updateStudent(s.id, { advStatus: e.target.value }); });
+
       tbody.appendChild(el('tr',{},[
         el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name]),
         el('td',{class:'phone-cell'},[s.phone || '—']),
         el('td',{},[g ? g.name : '—']),
+        el('td',{},[ tgtSel ]),
+        el('td',{},[ stageSel ]),
+        el('td',{class:'adv-note-cell'},[ noteBox(s, 'advNote', 'הערות על המועמדות…', 'adv-note-area') ]),
         el('td',{},[ statusSelectFor(s) ]),
         el('td',{class:'att-cell'},[
           el('button',{class:'adv-box checked', title:'ביטול סימון', onclick:function(){ toggleAdvanced(s.id); }},['✓'])
@@ -3839,6 +4384,7 @@
       students: state.students,
       techCategories: state.techCategories,
       techSubCategories: state.techSubCategories,
+      lessons: state.lessons,
       techniques: state.techniques,
       exportedAt: new Date().toISOString()
     }, null, 2);
@@ -3854,6 +4400,7 @@
     if (!data || !Array.isArray(data.groups) || !Array.isArray(data.students)){
       return { ok:false, error:'המבנה של הקובץ לא תואם לגיבוי של האפליקציה.' };
     }
+    allowShrinkOnce = true;
     state.groups = data.groups || [];
     state.students = data.students || [];
     state.techCategories = data.techCategories || [];
@@ -3862,6 +4409,8 @@
         state.campaigns = data.campaigns || [];
         state.yearArchives = data.yearArchives || [];
         state.activityLog = data.activityLog || [];
+        state.tombstones = data.tombstones || [];
+        state.lessons = data.lessons || [];
     state.students.forEach(function(s){
       if (s.classGrade){ s.classGrade = normalizeClassGrade(s.classGrade); }
       if (s.status === 'new'){ s.status = 'follow'; }
@@ -4145,6 +4694,263 @@
     app.appendChild(wrap);
   }
 
+  // ---------------------------------------------------------------
+  // Lesson log (inside "ניהול טכניקות"): plan the current lesson, see what was
+  // taught in the previous one, and keep a per-group history. Each technique
+  // shows when the group last practiced it, and the picker suggests the ones
+  // not practiced for the longest time.
+  // ---------------------------------------------------------------
+  function lessonsForGroup(gid){
+    return state.lessons.filter(function(l){ return l.groupId === gid; })
+      .sort(function(a,b){ return (b.date||'').localeCompare(a.date||'') || (b.createdAt||0) - (a.createdAt||0); });
+  }
+  function techById(id){ return state.techniques.find(function(t){ return t.id === id; }); }
+  function techCategoryName(t){
+    var c = state.techCategories.find(function(x){ return x.id === t.categoryId; });
+    return c ? c.name : '';
+  }
+  function techLastDone(techId, gid){
+    var last = '', count = 0;
+    state.lessons.forEach(function(l){
+      if (l.groupId === gid && l.done && (l.techniqueIds||[]).indexOf(techId) !== -1){
+        count++;
+        if ((l.date||'') > last){ last = l.date; }
+      }
+    });
+    return { last:last, count:count };
+  }
+  function lastDoneLabel(info){
+    if (!info.last){ return 'טרם נלמדה בקבוצה'; }
+    return 'בוצעה לאחרונה: '+shortDate(info.last)+(info.count > 1 ? ' · '+info.count+' פעמים' : '');
+  }
+  function addLesson(groupId, copyFrom){
+    var l = { id: uid('les'), groupId: groupId, date: todayISO(), techniqueIds: [], extras: [], note: '', done: false, createdAt: Date.now() };
+    if (copyFrom){ l.techniqueIds = (copyFrom.techniqueIds||[]).slice(); l.extras = (copyFrom.extras||[]).slice(); }
+    state.lessons.push(l);
+    scheduleSave();
+    return l;
+  }
+  function updateLesson(id, patch){
+    var l = state.lessons.find(function(x){ return x.id === id; });
+    if (!l) return;
+    for (var k in patch){ l[k] = patch[k]; }
+    scheduleSave();
+  }
+  function markLessonDone(id){
+    var l = state.lessons.find(function(x){ return x.id === id; });
+    if (!l) return;
+    l.done = true; l.doneAt = Date.now();
+    var gid = l.groupId;
+    state.lessons.push({ id: uid('les'), groupId: gid, date: todayISO(), techniqueIds: [], extras: [], note: '', done: false, createdAt: Date.now() + 1 });
+    scheduleSave();
+    showToast('השיעור נרשם ביומן. נפתח תכנון לשיעור הבא.');
+  }
+  function deleteLesson(id){
+    var l = state.lessons.find(function(x){ return x.id === id; });
+    if (!l) return;
+    openConfirm('למחוק את השיעור מיום '+(l.date ? shortDate(l.date) : '—')+' מהיומן?', function(){
+      state.lessons = state.lessons.filter(function(x){ return x.id !== id; });
+      scheduleSave();
+    }, 'מחיקה');
+  }
+
+  function renderTechModeBar(){
+    return el('div',{class:'tech-mode-bar'},[
+      el('button',{class:'tech-mode-btn'+(state.techMode==='library'?' active':''), onclick:function(){ state.techMode = 'library'; render(); }},['📚 ספריית טכניקות']),
+      el('button',{class:'tech-mode-btn'+(state.techMode==='lessons'?' active':''), onclick:function(){ state.techMode = 'lessons'; render(); }},['📓 יומן שיעורים'])
+    ]);
+  }
+
+  function lessonTechRow(tid, gid, removeFn, extraBtn){
+    var t = techById(tid);
+    var kids = [
+      el('span',{class:'lesson-row-name'},[ t ? t.name : '(טכניקה שנמחקה מהספרייה)' ])
+    ];
+    if (t && techCategoryName(t)){ kids.push(el('span',{class:'lesson-chip'},[techCategoryName(t)])); }
+    if (t){ kids.push(el('span',{class:'lesson-meta'},[lastDoneLabel(techLastDone(tid, gid))])); }
+    if (extraBtn){ kids.push(extraBtn); }
+    if (removeFn){ kids.push(el('button',{class:'icon-btn', title:'הסרה מהשיעור', onclick:removeFn},['✕'])); }
+    return el('div',{class:'lesson-row'}, kids);
+  }
+
+  function renderPlannerCard(L, gid){
+    var card = el('div',{class:'lesson-card current'});
+    var dateIn = el('input',{type:'date', value: L.date || ''});
+    dateIn.addEventListener('change', function(e){ updateLesson(L.id, { date: e.target.value }); });
+    card.appendChild(el('div',{class:'lesson-card-head'},[
+      el('h3',{},['🟢 השיעור הנוכחי / הבא']),
+      el('span',{style:'display:flex;gap:8px;align-items:center;flex-wrap:wrap;'},[
+        el('label',{style:'font-size:12.5px;color:var(--muted);'},['תאריך:']), dateIn
+      ])
+    ]));
+
+    var ids = L.techniqueIds || [], extras = L.extras || [];
+    if (!ids.length && !extras.length){
+      card.appendChild(el('p',{class:'lesson-empty'},['עדיין לא נבחרו טכניקות לשיעור הזה. חפש בספרייה למטה, או הוסף פריט חופשי.']));
+    }
+    ids.forEach(function(tid){
+      card.appendChild(lessonTechRow(tid, gid, function(){ updateLesson(L.id, { techniqueIds: ids.filter(function(x){ return x !== tid; }) }); }));
+    });
+    extras.forEach(function(txt, i){
+      card.appendChild(el('div',{class:'lesson-row'},[
+        el('span',{class:'lesson-row-name'},[txt]),
+        el('span',{class:'lesson-chip free'},['חופשי']),
+        el('button',{class:'icon-btn', title:'הסרה', onclick:function(){ updateLesson(L.id, { extras: extras.filter(function(_, j){ return j !== i; }) }); }},['✕'])
+      ]));
+    });
+
+    // free-text item
+    var freeIn = el('input',{type:'text', class:'lesson-free-input', placeholder:'פריט חופשי (תרגיל, משחק, חימום…) ולחץ Enter'});
+    function addFree(){
+      var v = freeIn.value.trim();
+      if (!v) return;
+      updateLesson(L.id, { extras: extras.concat([v]) });
+    }
+    freeIn.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); addFree(); } });
+    card.appendChild(el('div',{class:'lesson-add-free'},[freeIn, el('button',{class:'btn-ghost', onclick:addFree},['+ הוספה'])]));
+
+    // library picker
+    var q = (state.lessonPickerQuery || '').trim();
+    var catSel = el('select',{}, [ (function(){ var o = el('option',{value:'all'},['כל הקטגוריות']); return o; })() ].concat(
+      state.techCategories.map(function(c){
+        var o = el('option',{value:c.id},[c.name]);
+        if (state.lessonPickerCat === c.id){ o.setAttribute('selected','selected'); }
+        return o;
+      })));
+    if (state.lessonPickerCat === 'all'){ catSel.firstChild.setAttribute('selected','selected'); }
+    catSel.addEventListener('change', function(e){ state.lessonPickerCat = e.target.value; render(); });
+    var searchIn = el('input',{type:'text', class:'lesson-search-input', placeholder:'חיפוש טכניקה בספרייה להוספה לשיעור…', value: state.lessonPickerQuery || ''});
+    searchIn.addEventListener('input', function(e){ state.lessonPickerQuery = e.target.value; render(); });
+    card.appendChild(el('div',{class:'lesson-picker'},[
+      el('div',{class:'lesson-picker-head'},[ searchIn, catSel ])
+    ]));
+
+    var pool = state.techniques.filter(function(t){
+      if (ids.indexOf(t.id) !== -1) return false;
+      if (state.lessonPickerCat !== 'all' && t.categoryId !== state.lessonPickerCat) return false;
+      if (q && t.name.indexOf(q) === -1 && techCategoryName(t).indexOf(q) === -1) return false;
+      return true;
+    }).map(function(t){ return { t:t, info: techLastDone(t.id, gid) }; })
+      .sort(function(a,b){
+        var la = a.info.last || '', lb = b.info.last || '';
+        if (la !== lb){ return la < lb ? -1 : 1; }   // never practiced first, then the longest ago
+        return a.t.name.localeCompare(b.t.name);
+      });
+    var pickBox = el('div',{class:'lesson-picker-list'});
+    pickBox.appendChild(el('div',{class:'lesson-picker-title'},[ q ? 'תוצאות ('+pool.length+')' : 'הצעות — טכניקות שלא נלמדו בקבוצה הכי הרבה זמן' ]));
+    if (!state.techniques.length){
+      pickBox.appendChild(el('p',{class:'lesson-empty'},['ספריית הטכניקות ריקה. הוסף טכניקות במצב "ספריית טכניקות".']));
+    } else if (!pool.length){
+      pickBox.appendChild(el('p',{class:'lesson-empty'},['לא נמצאו טכניקות מתאימות.']));
+    }
+    pool.slice(0, 10).forEach(function(x){
+      pickBox.appendChild(el('button',{class:'lesson-pick', onclick:function(){ updateLesson(L.id, { techniqueIds: ids.concat([x.t.id]) }); }},[
+        el('span',{class:'lesson-pick-plus'},['+']),
+        el('span',{class:'lesson-row-name'},[x.t.name]),
+        techCategoryName(x.t) ? el('span',{class:'lesson-chip'},[techCategoryName(x.t)]) : null,
+        el('span',{class:'lesson-meta'},[lastDoneLabel(x.info)])
+      ]));
+    });
+    if (pool.length > 10){ pickBox.appendChild(el('div',{class:'lesson-meta', style:'padding:6px 4px;'},['מוצגות 10 מתוך '+pool.length+' — צמצם בחיפוש או בקטגוריה.'])); }
+    card.appendChild(pickBox);
+
+    var noteIn = el('textarea',{class:'lesson-note-input', rows:'3', placeholder:'הערות לשיעור — מה לחזור עליו, מה לא הספקנו, מה להדגיש בפעם הבאה…', value: L.note || ''});
+    noteIn.addEventListener('change', function(e){ updateLesson(L.id, { note: e.target.value }); });
+    card.appendChild(el('div',{class:'field', style:'margin-top:10px;'},[ el('label',{},['הערות לשיעור']), noteIn ]));
+
+    card.appendChild(el('div',{class:'modal-actions', style:'justify-content:space-between;margin-top:8px;'},[
+      el('button',{class:'btn-text', style:'color:#8A1010;', onclick:function(){ deleteLesson(L.id); }},['🗑 מחיקת התכנון']),
+      el('button',{class:'btn-primary', onclick:function(){ markLessonDone(L.id); }},['✓ סמן את השיעור כבוצע'])
+    ]));
+    return card;
+  }
+
+  function renderLessonsView(){
+    var wrap = el('div',{class:'lessons-view'});
+    if (!state.groups.length){
+      wrap.appendChild(el('p',{class:'lesson-empty', style:'padding:30px;text-align:center;'},['אין עדיין קבוצות. צור קבוצה בלשונית "ניהול מתאמנים" כדי לנהל לה יומן שיעורים.']));
+      return wrap;
+    }
+    if (!state.lessonGroupId || !state.groups.some(function(g){ return g.id === state.lessonGroupId; })){
+      state.lessonGroupId = (state.selectedGroupId && state.groups.some(function(g){ return g.id === state.selectedGroupId; })) ? state.selectedGroupId : state.groups[0].id;
+    }
+    var gid = state.lessonGroupId;
+    var lessons = lessonsForGroup(gid);
+    var planned = lessons.filter(function(l){ return !l.done; })[0] || null;
+    var doneList = lessons.filter(function(l){ return l.done; });
+    var prev = doneList[0] || null;
+
+    var groupSel = el('select',{}, state.groups.map(function(g){
+      var o = el('option',{value:g.id},[g.name]);
+      if (g.id === gid){ o.setAttribute('selected','selected'); }
+      return o;
+    }));
+    groupSel.addEventListener('change', function(e){ state.lessonGroupId = e.target.value; state.lessonPickerQuery = ''; render(); });
+    var uniq = {}; doneList.forEach(function(l){ (l.techniqueIds||[]).forEach(function(t){ uniq[t] = true; }); });
+    wrap.appendChild(el('div',{class:'lesson-topbar'},[
+      el('label',{},['קבוצה:']), groupSel,
+      el('span',{class:'lesson-meta'},[doneList.length ? doneList.length+' שיעורים ביומן · '+Object.keys(uniq).length+' טכניקות שונות נלמדו' : 'עדיין לא נרשמו שיעורים לקבוצה הזו'])
+    ]));
+
+    // --- current / next lesson ---
+    if (planned){
+      wrap.appendChild(renderPlannerCard(planned, gid));
+    } else {
+      wrap.appendChild(el('div',{class:'lesson-card current'},[
+        el('h3',{},['🟢 השיעור הנוכחי / הבא']),
+        el('p',{class:'lesson-empty'},['אין כרגע תכנון לשיעור.']),
+        el('div',{style:'display:flex;gap:8px;flex-wrap:wrap;'},[
+          el('button',{class:'btn-primary', onclick:function(){ addLesson(gid); }},['➕ תכנון שיעור חדש']),
+          prev ? el('button',{class:'btn-ghost', onclick:function(){ addLesson(gid, prev); }},['➕ שיעור חדש — להתחיל מהשיעור הקודם']) : null
+        ])
+      ]));
+    }
+
+    // --- previous lesson ---
+    if (prev){
+      var pc = el('div',{class:'lesson-card'});
+      pc.appendChild(el('div',{class:'lesson-card-head'},[
+        el('h3',{},['⏮ השיעור הקודם — '+(prev.date ? formatDateFull(prev.date) : '')]),
+        (planned && ((prev.techniqueIds||[]).length || (prev.extras||[]).length)) ? el('button',{class:'btn-ghost', style:'padding:4px 12px;font-size:12px;', onclick:function(){
+          var have = planned.techniqueIds || [], haveX = planned.extras || [];
+          updateLesson(planned.id, {
+            techniqueIds: have.concat((prev.techniqueIds||[]).filter(function(t){ return have.indexOf(t) === -1; })),
+            extras: haveX.concat((prev.extras||[]).filter(function(t){ return haveX.indexOf(t) === -1; }))
+          });
+        }},['↻ העתק הכל לשיעור הנוכחי']) : null
+      ]));
+      if (!(prev.techniqueIds||[]).length && !(prev.extras||[]).length){ pc.appendChild(el('p',{class:'lesson-empty'},['לא נרשמו טכניקות בשיעור הזה.'])); }
+      (prev.techniqueIds||[]).forEach(function(tid){
+        var already = planned && (planned.techniqueIds||[]).indexOf(tid) !== -1;
+        pc.appendChild(lessonTechRow(tid, gid, null, (planned && !already) ? el('button',{class:'btn-text', onclick:function(){ updateLesson(planned.id, { techniqueIds: (planned.techniqueIds||[]).concat([tid]) }); }},['↻ הוסף לשיעור הנוכחי']) : (already ? el('span',{class:'lesson-meta'},['✓ כבר בשיעור הנוכחי']) : null)));
+      });
+      (prev.extras||[]).forEach(function(txt){
+        pc.appendChild(el('div',{class:'lesson-row'},[ el('span',{class:'lesson-row-name'},[txt]), el('span',{class:'lesson-chip free'},['חופשי']) ]));
+      });
+      if (prev.note){ pc.appendChild(el('div',{class:'lesson-note-view'},['📝 '+prev.note])); }
+      wrap.appendChild(pc);
+    }
+
+    // --- history ---
+    if (doneList.length > 1){
+      var det = el('details',{class:'lesson-card'});
+      if (state.lessonShowHistory){ det.setAttribute('open','open'); }
+      det.addEventListener('toggle', function(){ state.lessonShowHistory = det.open; });
+      det.appendChild(el('summary',{},['📚 היסטוריית שיעורים ('+(doneList.length - 1)+')']));
+      doneList.slice(1, 41).forEach(function(l){
+        var names = (l.techniqueIds||[]).map(function(id){ var t = techById(id); return t ? t.name : '(נמחקה)'; }).concat(l.extras||[]);
+        det.appendChild(el('div',{class:'lesson-history-item'},[
+          el('b',{},[l.date ? formatDateFull(l.date) : '—']),
+          el('span',{style:'flex:1;'},[ names.length ? names.join(' · ') : 'ללא טכניקות' + '' ]),
+          el('button',{class:'icon-btn', title:'מחיקת השיעור מהיומן', onclick:function(){ deleteLesson(l.id); }},['🗑'])
+        ]));
+        if (l.note){ det.appendChild(el('div',{class:'lesson-note-view', style:'margin:-2px 0 6px;'},['📝 '+l.note])); }
+      });
+      wrap.appendChild(det);
+    }
+    return wrap;
+  }
+
   function renderTechniquesSection(app){
     var header = el('header',{},[
       el('div',{class:'brand'},[
@@ -4157,6 +4963,13 @@
         el('div',{},[el('b',{},[String(state.techCategories.length)]),'קטגוריות'])
       ])
     ]);
+
+    if (!state.readOnly && state.techMode === 'lessons'){
+      app.appendChild(header);
+      app.appendChild(renderTechModeBar());
+      app.appendChild(renderLessonsView());
+      return;
+    }
 
     var actionsRow2 = el('div',{class:'schedule-actions'});
     if (!state.readOnly){
@@ -4311,6 +5124,7 @@
     }
 
     app.appendChild(header);
+    if (!state.readOnly){ app.appendChild(renderTechModeBar()); }
     app.appendChild(actionsRow2);
     app.appendChild(subjectTabsBar);
     app.appendChild(tabsBar);
@@ -5015,6 +5829,45 @@
       setTimeout(function(){ importTechText.focus(); },0);
     }
 
+    else if (m.type === 'guardDialog'){
+      content = el('div',{class:'modal'},[
+        el('h2',{},[m.title]),
+        el('p',{style:'font-size:14px;color:var(--ink);line-height:1.65;white-space:pre-line;'},[m.body]),
+        el('div',{class:'modal-actions', style:'flex-wrap:wrap;gap:8px;'},[
+          el('button',{class:'btn-primary', onclick:m.onTake},[m.takeLabel]),
+          el('button',{class:'btn-ghost', onclick:m.onKeep},[m.keepLabel])
+        ])
+      ]);
+    }
+    else if (m.type === 'restoreVersions'){
+      var rvKids = [
+        el('h2',{},['🕘 שחזור מגרסה קודמת']),
+        el('p',{style:'font-size:13px;color:var(--muted);line-height:1.6;margin:0 0 10px;'},[
+          'עותקי ביטחון אוטומטיים — בדפדפן הזה, ואם עודכן סקריפט הגיליון (v4) גם ישירות בגיליון. בחירה בגרסה מחליפה את כל הנתונים הנוכחיים בה; מה שמוצג עכשיו נשמר כעותק, כך שאפשר לחזור.'
+        ])
+      ];
+      if (m.items === null){
+        rvKids.push(el('p',{},['טוען…']));
+      } else if (!m.items.length){
+        rvKids.push(el('p',{style:'color:var(--muted);'},['עדיין אין עותקי ביטחון בדפדפן הזה. הם נוצרים אוטומטית מעכשיו.']));
+      } else {
+        var srcLabel = { auto:'עותק בדפדפן (שמירה)', load:'עותק בדפדפן (פתיחה)', refresh:'עותק בדפדפן (רענון)', 'before-restore':'לפני שחזור', server:'עותק שמור בגיליון' };
+        var rvList = el('div',{style:'max-height:50vh;overflow:auto;border:1px solid var(--line);border-radius:4px;'});
+        m.items.forEach(function(it){
+          var when = new Date(it.at).toLocaleString('he-IL',{day:'numeric',month:'numeric',hour:'2-digit',minute:'2-digit'});
+          rvList.appendChild(el('div',{style:'display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px;'},[
+            el('b',{style:'min-width:92px;'},[when]),
+            el('span',{style:'flex:1;color:var(--muted);'},[it.students+' תלמידים · '+it.groups+' קבוצות · '+(srcLabel[it.source]||it.source)]),
+            el('button',{class:'btn-ghost', style:'padding:4px 12px;font-size:12px;', onclick:function(){
+              openConfirm('לשחזר את הנתונים כפי שהיו ב-'+when+' ('+it.students+' תלמידים)?\n\nהנתונים הנוכחיים יישמרו כעותק כך שאפשר לחזור.', function(){ restoreItem(it); }, 'שחזור');
+            }},['שחזר'])
+          ]));
+        });
+        rvKids.push(rvList);
+      }
+      rvKids.push(el('div',{class:'modal-actions'},[ el('button',{class:'btn-ghost', onclick:closeModal},['סגירה']) ]));
+      content = el('div',{class:'modal'}, rvKids);
+    }
     else if (m.type === 'exportExcel'){
       var EXPORT_FIELDS = [
         {key:'name', label:'שם', always:true},
@@ -5029,9 +5882,12 @@
         {key:'joinedDate', label:'תאריך הצטרפות'},
         {key:'outDate', label:'תאריך הפיכה ללא רלוונטי'},
         {key:'note', label:'הערה'},
-        {key:'payments', label:'תשלומים (12 חודשים)'}
+        {key:'payments', label:'תשלומים (12 חודשים)'},
+        {key:'advGroup', label:'קבוצה מיועדת (מתקדמים)'},
+        {key:'advStatus', label:'שלב מועמדות (מתקדמים)'},
+        {key:'advNote', label:'הערות מועמדות (מתקדמים)'}
       ];
-      if (!m.fields){ m.fields = {}; EXPORT_FIELDS.forEach(function(f){ m.fields[f.key] = true; }); }
+      if (!m.fields){ m.fields = {}; EXPORT_FIELDS.forEach(function(f){ m.fields[f.key] = (f.key.indexOf('adv') !== 0); }); }   // the advanced-candidate columns are opt-in
       if (!m.statuses){ m.statuses = {}; STATUSES.forEach(function(st){ m.statuses[st.key] = true; }); }
       if (!m.groupFilter){ m.groupFilter = {}; state.groups.forEach(function(g){ m.groupFilter[g.id] = true; }); m.groupFilter['__none__'] = true; }
 
@@ -5099,6 +5955,9 @@
                   case 'joinedDate': return s.joinedDate ? formatDateFull(s.joinedDate) : '';
                   case 'outDate': return s.outDate ? formatDateFull(s.outDate) : '';
                   case 'note': return s.note||'';
+                  case 'advGroup': { var ag = state.groups.find(function(x){return x.id===s.advGroupId;}); return (s.advanced && ag) ? ag.name : ''; }
+                  case 'advStatus': return s.advanced ? advStatusInfo(s.advStatus).label : '';
+                  case 'advNote': return s.advNote || '';
                   case 'payments': return (s.monthlyPayments||[]).map(function(p,i){ return ACADEMIC_MONTHS[i].label+':'+(p==='paid'?'שולם':p==='problem'?'בעיה':p==='scheduled'?'מתוכנן':'-'); }).join(' | ');
                   default: return '';
                 }
@@ -5349,6 +6208,11 @@
       performUndo();
     }
   });
+
+  // Test hook — only active when the page is opened with ?tatamiTest=1 (used by automated tests, not by normal use).
+  if (/[?&]tatamiTest=1/.test(window.location.search)){
+    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); } };
+  }
 
   loadData();
 })();
