@@ -118,6 +118,95 @@
   }
   .tab-add:hover{color:var(--ink);border-color:var(--ink);}
 
+  .forms-view{ padding:20px 22px 90px; max-width:1100px; margin:0 auto; }
+  .fv-hero h2{ margin:0 0 4px; font-size:24px; } .fv-hero p{ margin:0 0 16px; color:var(--muted); font-size:14.5px; }
+  .fv-tabs{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .fv-tab{ display:inline-flex; align-items:center; gap:7px; padding:10px 16px; border:1.5px solid var(--line); border-radius:999px; background:#fff; font-family:inherit; font-size:14.5px; font-weight:600; cursor:pointer; color:#3A3733; transition:all .12s; }
+  .fv-tab:hover{ border-color:#BDB8AE; } .fv-tab.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .fv-badge{ background:var(--accent); color:#fff; border-radius:999px; padding:0 8px; font-size:12px; min-width:20px; text-align:center; line-height:20px; }
+  .publish-bar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:#fff; border:1px solid var(--line); border-radius:14px; padding:10px 14px; margin-bottom:16px; position:sticky; top:0; z-index:20; box-shadow:0 4px 14px rgba(0,0,0,.06); }
+  .pub-chip{ font-weight:700; font-size:14px; } .pub-chip.ok{ color:#2F7A3B; } .pub-chip.dirty{ color:#B26A00; }
+  .btn-preview{ padding:9px 18px; border-radius:10px; border:2px solid var(--accent); background:#fff; color:var(--accent); font-weight:800; font-family:inherit; font-size:14.5px; cursor:pointer; } .btn-preview:hover{ background:#FFF4F4; }
+  .pub-btn{ padding:10px 20px; border-radius:10px; font-size:14.5px; }
+  .welcome{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:26px 28px; max-width:760px; }
+  .welcome h3{ margin:0 0 14px; font-size:21px; } .welcome-steps{ display:grid; gap:10px; margin-bottom:14px; } .welcome-steps div{ display:flex; gap:12px; align-items:center; font-size:15px; }
+  .welcome-steps b{ width:30px; height:30px; border-radius:50%; background:var(--accent); color:#fff; display:grid; place-content:center; flex:none; } .welcome-btns{ display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+  .callout{ display:flex; gap:12px; align-items:flex-start; background:#FFF8E6; border:1px solid #F0DFA6; border-radius:12px; padding:12px 14px; margin:0 0 14px; font-size:14px; line-height:1.6; }
+  .callout.soft{ background:#F2F6FB; border-color:#CFDDEE; } .callout-ic{ font-size:18px; line-height:1.3; } .callout-tx b{ margin-inline-end:6px; }
+  .pc{ background:#fff; border:1px solid var(--line); border-radius:14px; margin-bottom:14px; overflow:hidden; }
+  .pc-head{ display:flex; gap:12px; align-items:center; padding:13px 16px; border-bottom:1px solid var(--line); background:#FBFAF7; } .pc-ic{ font-size:22px; } .pc-head h3{ margin:0; font-size:16px; } .pc-sub{ color:var(--muted); font-size:13px; margin-top:2px; }
+  .pc-body{ padding:14px 16px 16px; }
+  .pc .field input[type=text], .pc .field input[type=number], .pc .field select, .pc .field textarea, .fq-edit .field input[type=text], .fq-edit .field select, .fq-edit .field textarea, .qset select, .qset input[type=number]{ width:100%; box-sizing:border-box; padding:9px 11px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14.5px; background:#fff; }
+  .pc .field input:focus, .pc .field select:focus, .pc .field textarea:focus, .fq-edit input:focus, .fq-edit select:focus, .fq-edit textarea:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(185,23,23,.12); }
+  .fhint{ font-size:12.8px; color:var(--muted); margin-top:4px; line-height:1.5; } .fe-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; }
+  .subttl{ font-weight:700; margin:16px 0 6px; font-size:14px; }
+  .steps{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:10px; margin-bottom:16px; }
+  .step{ display:flex; align-items:center; gap:12px; text-align:right; background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:12px 14px; cursor:pointer; font-family:inherit; transition:all .12s; position:relative; flex-wrap:wrap; }
+  .step:hover{ border-color:#BDB8AE; } .step.on{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(185,23,23,.10); }
+  .step-n{ width:30px; height:30px; border-radius:50%; background:#ECE9E3; display:grid; place-content:center; font-weight:800; flex:none; } .step.on .step-n{ background:var(--accent); color:#fff; }
+  .step-tx{ display:flex; flex-direction:column; flex:1; min-width:100px; } .step-tx b{ font-size:15px; } .step-tx span{ font-size:12.5px; color:var(--muted); }
+  .step-st{ font-size:12px; font-weight:700; padding:2px 10px; border-radius:999px; white-space:nowrap; } .step-st.ok{ background:#E7F4E8; color:#2F7A3B; } .step-st.warn{ background:#FFF1D6; color:#B26A00; }
+  .fq-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+  .fq-sec{ display:flex; align-items:center; gap:8px; background:#FCEDEB; border-inline-start:5px solid var(--accent); border-radius:10px; padding:8px 12px; margin-top:10px; }
+  .fq-sec-tag{ font-size:11.5px; font-weight:800; color:var(--accent); } .fq-sec-in{ flex:1; padding:7px 10px; border:1.5px solid transparent; border-radius:8px; background:transparent; font-family:inherit; font-size:15px; font-weight:800; } .fq-sec-in:hover, .fq-sec-in:focus{ border-color:var(--line); background:#fff; outline:none; }
+  .fq-row{ background:#fff; border:1.5px solid var(--line); border-radius:12px; overflow:hidden; margin-inline-start:14px; transition:border-color .12s; } .fq-row:hover{ border-color:#BDB8AE; } .fq-row.open{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(185,23,23,.08); }
+  .fq-head{ display:flex; align-items:center; gap:12px; padding:11px 14px; cursor:pointer; } .fq-ic{ font-size:20px; width:28px; text-align:center; flex:none; }
+  .fq-main{ flex:1; min-width:0; } .fq-label{ font-weight:700; font-size:15px; line-height:1.4; overflow-wrap:anywhere; } .fq-badges{ display:flex; gap:5px; flex-wrap:wrap; margin-top:5px; }
+  .bdg{ font-size:11.5px; background:#F1EFEA; color:#5B5750; border-radius:999px; padding:1px 9px; } .bdg.req{ background:#FDE9E7; color:#A92F1E; font-weight:700; } .bdg.cond{ background:#EEE8F7; color:#6B3FA0; } .bdg.map{ background:#E7F1FB; color:#1F5C99; }
+  .fq-acts{ display:flex; align-items:center; gap:4px; flex:none; } .fq-edit-btn{ font-size:13px; color:var(--accent); font-weight:700; padding:4px 10px; border-radius:8px; background:#FFF4F4; white-space:nowrap; }
+  .fq-edit{ border-top:1px solid var(--line); padding:14px 16px 16px; background:#FBFAF7; display:flex; flex-direction:column; gap:14px; } .fq-edit .field{ margin:0; }
+  .fq-del{ border-top:1px dashed var(--line); padding-top:10px; } .btn-danger-text{ background:none; border:none; color:#B00020; font-family:inherit; font-size:13.5px; cursor:pointer; font-weight:600; padding:4px 6px; }
+  .opt-ed{ display:flex; flex-direction:column; gap:6px; } .opt-row{ display:flex; align-items:center; gap:6px; } .opt-num{ width:22px; text-align:center; color:var(--muted); font-size:12.5px; } .opt-in{ flex:1; }
+  .opt-actions{ display:flex; gap:10px; align-items:center; margin-top:4px; } .opt-bulk{ width:100%; margin-top:6px; }
+  .qset{ background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px 14px; display:flex; flex-direction:column; gap:8px; } .qset-title{ font-weight:700; font-size:14px; }
+  .cnt-tbl{ display:flex; flex-direction:column; gap:6px; } .cnt-row{ display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:14px; border-bottom:1px dashed var(--line); padding-bottom:5px; }
+  .seg{ display:inline-flex; background:#ECE9E3; border-radius:10px; padding:3px; gap:2px; } .seg-b{ border:none; background:transparent; padding:7px 16px; border-radius:8px; font-family:inherit; font-size:13.5px; font-weight:600; cursor:pointer; color:#4A4742; } .seg-b.on{ background:#fff; color:var(--ink); box-shadow:0 1px 4px rgba(0,0,0,.12); font-weight:800; }
+  .cond-box{ border:1.5px dashed var(--line); border-radius:10px; padding:8px 10px; background:#fff; margin-top:8px; } .cond-row{ display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; padding:6px 0; border-bottom:1px solid #F0EEE9; } .cond-row:last-of-type{ border-bottom:none; }
+  .cond-lead{ font-weight:800; font-size:13.5px; color:var(--accent); min-width:46px; padding-top:8px; } .cond-row select{ padding:7px 9px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; max-width:260px; }
+  .cond-vals{ display:flex; flex-wrap:wrap; gap:4px 12px; flex:1; padding-top:6px; } .cond-missing{ color:#B00020; font-size:12px; }
+  .add-box{ background:#fff; border:1.5px dashed #BDB8AE; border-radius:14px; padding:16px; } .add-title{ font-weight:800; margin-bottom:10px; }
+  .tiles{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:10px; margin-bottom:10px; }
+  .tile{ display:flex; flex-direction:column; gap:3px; text-align:right; background:#FBFAF7; border:1.5px solid var(--line); border-radius:12px; padding:12px; cursor:pointer; font-family:inherit; transition:all .12s; } .tile:hover{ border-color:var(--accent); background:#fff; transform:translateY(-1px); }
+  .tile-ic{ font-size:22px; } .tile-d{ font-size:12.5px; color:var(--muted); line-height:1.4; } .fq-addbtn{ padding:11px 22px; border-radius:10px; }
+  .mode-cards{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-bottom:14px; }
+  .mode-card{ display:flex; flex-direction:column; gap:5px; text-align:right; background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:13px 14px; cursor:pointer; font-family:inherit; } .mode-card span{ font-size:12.8px; color:var(--muted); line-height:1.45; }
+  .mode-card:hover{ border-color:#BDB8AE; } .mode-card.on{ border-color:var(--accent); background:#FFF8F8; box-shadow:0 0 0 3px rgba(185,23,23,.10); }
+  .mx-pick{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:6px 0 10px; font-size:14px; } .mx-pick select{ padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; max-width:260px; }
+  .mx-prog{ font-size:13.5px; font-weight:700; color:#B26A00; background:#FFF4DC; border-radius:8px; padding:7px 12px; margin-bottom:10px; } .mx-prog.done{ color:#2F7A3B; background:#E7F4E8; }
+  .mx-table{ border-collapse:separate; border-spacing:0; width:100%; font-size:13px; } .mx-table th, .mx-table td{ border-bottom:1px solid var(--line); border-inline-start:1px solid var(--line); padding:6px; vertical-align:middle; }
+  .mx-table thead th{ background:#F6F4F0; font-weight:700; text-align:center; min-width:170px; } .mx-corner{ text-align:right !important; font-size:12px; color:var(--muted); min-width:150px !important; } .mx-corner div{ line-height:1.5; }
+  .mx-row{ background:#F6F4F0; text-align:right; font-weight:700; white-space:nowrap; }
+  .mx-cell{ width:100%; min-width:160px; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:12.5px; direction:ltr; text-align:left; box-sizing:border-box; } .mx-cell.ok{ border-color:#7CB787; background:#F3FAF4; } .mx-cell.bad, .url-in.bad{ border-color:#B00020 !important; background:#FDECEE; }
+  .rule{ border:1.5px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:10px; background:#FBFAF7; } .rule-head{ display:flex; align-items:center; gap:8px; margin-bottom:6px; } .rule-head input{ flex:1; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; background:#fff; }
+  .rule-n{ width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; display:grid; place-content:center; font-weight:800; font-size:13px; flex:none; }
+  .rule-then{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; } .rule-then select{ padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; }
+  .url-in{ flex:1; min-width:240px; padding:9px 11px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; direction:ltr; text-align:left; background:#fff; }
+  .sw{ display:flex; align-items:flex-start; gap:12px; cursor:pointer; } .sw-input{ position:absolute; opacity:0; pointer-events:none; } .sw-track{ width:42px; height:24px; border-radius:999px; background:#C9C4BA; position:relative; flex:none; transition:background .15s; margin-top:1px; }
+  .sw-dot{ position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:transform .15s; box-shadow:0 1px 3px rgba(0,0,0,.3); } .sw-input:checked + .sw-track{ background:#2F7A3B; } .sw-input:checked + .sw-track .sw-dot{ transform:translateX(-18px); }
+  .sw-input:focus-visible + .sw-track{ outline:3px solid rgba(185,23,23,.25); } .sw-text{ display:flex; flex-direction:column; gap:2px; } .sw-hint{ font-size:12.8px; color:var(--muted); font-weight:400; }
+  .stat-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:10px; } .stat{ background:#fff; border:1px solid var(--line); border-radius:999px; padding:5px 14px; font-size:13.5px; } .stat.warn{ border-color:#F0DFA6; background:#FFF8E6; } .stat.ok{ border-color:#BFE0C4; background:#F1FAF2; }
+  .fg-actions{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px; } .chips{ display:flex; gap:6px; flex-wrap:wrap; }
+  .pilltog{ border:1.5px solid var(--line); background:#fff; border-radius:999px; padding:4px 12px; font-family:inherit; font-size:12.8px; cursor:pointer; color:#4A4742; transition:all .1s; } .pilltog:hover{ border-color:#BDB8AE; } .pilltog.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
+  .gsec{ margin:16px 0; } .gsec-head{ display:flex; align-items:baseline; gap:10px; border-bottom:2px solid var(--accent); padding-bottom:6px; margin-bottom:10px; } .gsec-head b{ font-size:15.5px; } .gsec-n{ font-size:12.5px; color:var(--muted); }
+  .gcard{ background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px; display:flex; flex-direction:column; gap:8px; } .gcard.off{ opacity:.55; } .gcard.full{ border-color:#E8B4BC; }
+  .gcard-top{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } .g-name{ flex:1; min-width:220px; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14px; }
+  .g-aud, .g-link{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; } .g-lab{ font-size:12.5px; color:var(--muted); min-width:84px; } .fg-tg{ min-width:200px; padding:6px 8px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:13px; }
+  .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; } .dot.ok{ background:#2F9E44; } .dot.warn{ background:#E8A317; }
+  .gcard-more{ border-top:1px dashed var(--line); padding-top:10px; display:flex; flex-direction:column; gap:10px; } .gcard-more input[type=text]{ width:100%; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; box-sizing:border-box; } .gcard-btns{ display:flex; gap:10px; align-items:center; }
+  .color-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .swatches{ display:flex; gap:8px; } .swatch{ width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; } .swatch.on{ box-shadow:0 0 0 3px var(--ink); } .color-in{ width:44px; height:34px; border:1.5px solid var(--line); border-radius:8px; padding:2px; background:#fff; cursor:pointer; }
+  .link-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; word-break:break-all; font-size:13.5px; }
+  .fpv-modal{ width:min(520px, 96vw); max-width:96vw; } .fpv-modal.wide{ width:min(1060px, 96vw); } .fpv-ctrl{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+  .fpv-stage{ background:#D9D6CF; border-radius:14px; padding:14px; display:flex; justify-content:center; } .fpv-frame{ width:100%; height:68vh; border:none; border-radius:10px; background:#fff; } .fpv-frame.phone{ width:392px; max-width:100%; border-radius:26px; border:9px solid #1B1B1B; height:70vh; }
+  .iss-title{ font-weight:800; margin:10px 0 4px; } .iss-title.err{ color:#B00020; } .iss-title.warn{ color:#B26A00; }
+  .iss-list{ margin:0 0 6px; padding-inline-start:20px; font-size:13.5px; line-height:1.6; } .iss-list.err li{ color:#8A1020; }
+  .ib-bar{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin:6px 0 12px; }
+  .ib-table{ border-collapse:collapse; width:100%; font-size:13.5px; } .ib-table th, .ib-table td{ border-bottom:1px solid var(--line); padding:7px 8px; vertical-align:top; text-align:right; } .ib-table th{ background:var(--canvas); }
+  .ib-done{ opacity:.55; } .ib-groups div{ margin-bottom:2px; } .ib-details td{ background:#FBFAF7; } .ib-detail-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:4px 16px; font-size:13px; }
+  .ft-modal{ width:min(760px, 96vw); max-width:96vw; max-height:90vh; overflow:auto; }
+  .ft-block{ border:1px solid var(--line); border-radius:6px; padding:10px 12px; margin-bottom:10px; background:#fff; }
+  .ft-head{ margin-bottom:8px; } .ft-fields{ display:flex; gap:10px 14px; flex-wrap:wrap; align-items:center; margin-bottom:8px; font-size:13.5px; } .ft-fields input[type=text]{ padding:5px 7px; border:1px solid var(--line); border-radius:4px; font-family:inherit; } .ft-fields select{ padding:5px; border:1px solid var(--line); border-radius:4px; font-family:inherit; }
+  .ft-entry{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:4px 0; } .ft-entry.dup{ background:#FFF6E0; border-radius:4px; padding:4px 6px; }
+  .ft-label{ flex:1; min-width:180px; font-size:13.5px; } .ft-select{ min-width:200px; padding:5px; border:1px solid var(--line); border-radius:4px; font-family:inherit; } .ft-dup{ color:#B26A00; font-size:12.5px; font-weight:700; }
   .group-note-box{ margin:0 0 14px; background:#FFFBEA; border:1px solid #E8DCA8; border-radius:6px; padding:8px 12px; }
   .group-note-label{ font-size:12px; font-weight:700; color:#7A6A1F; margin-bottom:4px; }
   .group-note-input{ width:100%; min-height:48px; border:1px solid #E1D6A0; border-radius:4px; padding:8px 10px; font-family:inherit; font-size:14px; line-height:1.5; background:#FFFEF7; resize:vertical; box-sizing:border-box; }
@@ -942,7 +1031,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-10-14 13:00';
+  var APP_VERSION = '2026-10-23 12:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1088,6 +1177,19 @@
     leadRevenueStatusFilter: null, // status key to filter the lead revenue breakdown by, or null for all
     selectedTechSubject: null, // which technique subject (e.g. היאבקות) is currently shown — set on first render
     activityLog: [],            // shared log of changes made (by anyone) — shown in the updates hub
+    forms: [],                  // [{id:'forms_cfg', config, publishedHash, publishedVersion, publishedAt}] — the questionnaires' definition (draft)
+    formsTab: 'inbox',
+    formsExpanded: {},
+    formsStep: 'questions',     // which of the three steps is open in a form editor
+    formsOpenQ: null,           // the question being edited
+    formsAddOpen: false,        // the "add a question" picker
+    formsBulk: {},              // option lists open in paste-a-list mode
+    formsSpecialOpen: false,    // special routing rules section
+    formsGroupOpen: {},         // group cards with their extra settings open
+    formsGroupFilter: '',       // show only groups for this audience
+    formsPreviewForm: 'registration', formsPreviewDevice: 'phone',
+    formsPublishing: false,
+    inbox: { items: [], loading: false, error: '', showAll: false, supported: null, selected: {}, newCount: 0, loadedAt: 0 },
     lessons: [],                // lesson log: [{id, groupId, date, techniqueIds[], extras[], note, done}]
     techMode: 'library',        // 'library' | 'lessons' inside the techniques section
     lessonGroupId: null,
@@ -1347,6 +1449,7 @@
         state.activityLog = data.activityLog || [];
         state.tombstones = data.tombstones || [];
         state.lessons = data.lessons || [];
+        state.forms = data.forms || [];
 
         var fixedAny = false;
         state.students.forEach(function(s){
@@ -1366,6 +1469,7 @@
     }
     state.loaded = true;
     resetUndoHistory();
+    setTimeout(maybeCheckInbox, 1500);
     if (state.storageOk){ state.lastSavedAt = Date.now(); } // confirms a healthy connection right on load, not just after your first change
     lastRefreshTime = Date.now();
     if (state.groups.length && !state.selectedGroupId){ state.selectedGroupId = state.groups[0].id; }
@@ -1397,7 +1501,7 @@
   //  - when both sides changed the same record, the more recently changed one
   //    wins (every changed record is stamped with _m = time of change)
   // ---------------------------------------------------------------
-  var SYNC_ARRAYS = ['groups','students','techCategories','techSubCategories','techniques','campaigns','lessons'];
+  var SYNC_ARRAYS = ['groups','students','techCategories','techSubCategories','techniques','campaigns','lessons','forms'];
   var lastMergeStats = { resurrected: 0 };
   function stripM(o){ return JSON.stringify(o, function(k, v){ return k === '_m' ? undefined : v; }); }
   function idMapOf(arr){ var m = {}; (arr||[]).forEach(function(x){ if (x && x.id){ m[x.id] = x; } }); return m; }
@@ -1500,14 +1604,14 @@
     return {
       groups:state.groups, students:state.students,
       techCategories:state.techCategories, techSubCategories:state.techSubCategories, techniques:state.techniques,
-      campaigns:state.campaigns, yearArchives:state.yearArchives, lessons:state.lessons,
+      campaigns:state.campaigns, yearArchives:state.yearArchives, lessons:state.lessons, forms:state.forms,
       activityLog:state.activityLog, tombstones:state.tombstones
     };
   }
   function applyPayloadToState(p){
     state.groups = p.groups || []; state.students = p.students || [];
     state.techCategories = p.techCategories || []; state.techSubCategories = p.techSubCategories || [];
-    state.techniques = p.techniques || []; state.campaigns = p.campaigns || []; state.lessons = p.lessons || [];
+    state.techniques = p.techniques || []; state.campaigns = p.campaigns || []; state.lessons = p.lessons || []; state.forms = p.forms || [];
     state.yearArchives = p.yearArchives || []; state.activityLog = p.activityLog || [];
     state.tombstones = p.tombstones || [];
   }
@@ -1518,12 +1622,14 @@
     });
     state.techCategories.forEach(function(c){ if (!c.subject){ c.subject = 'היאבקות'; } });
   }
-  function localHasData(){ return (state.students.length + state.groups.length) > 0; }
+  function localHasData(){
+    return SYNC_ARRAYS.some(function(n){ return (state[n] || []).length > 0; });   // any kind of record counts, not just students and groups
+  }
   // An empty read is only suspicious if the sheet was NOT empty the last time we looked.
   function serverHadData(){
     if (lastKnownServerContent === null){ return false; }
     var c = serverCounts(lastKnownServerContent);
-    return c.ok && (c.students + c.groups) > 0;
+    return c.ok && c.total > 0;
   }
   function hasLocalBackupData(){
     try{
@@ -1536,15 +1642,20 @@
   // While another device is in the middle of saving, the sheet can briefly look
   // empty or half-written. That must never be mistaken for "the data is gone".
   function serverCounts(raw){
-    try{ var o = JSON.parse(raw || '{}'); return { students:(o.students||[]).length, groups:(o.groups||[]).length, ok:true }; }
-    catch(e){ return { students:0, groups:0, ok:false }; }
+    try{
+      var o = JSON.parse(raw || '{}');
+      var total = 0;
+      SYNC_ARRAYS.forEach(function(n){ total += (o[n] || []).length; });
+      return { students:(o.students||[]).length, groups:(o.groups||[]).length, total:total, ok:true };
+    }
+    catch(e){ return { students:0, groups:0, total:0, ok:false }; }
   }
   async function readServerSane(expectData){
     var waits = [800, 1600, 3200], d = null, c = null;
     for (var i=0; i<=waits.length; i++){
       d = await sheetsCall('');
       c = serverCounts(d.value);
-      var empty = c.ok && c.students === 0 && c.groups === 0;
+      var empty = c.ok && c.total === 0;
       if (c.ok && !(empty && expectData)){ return { raw:d.value, version:(d.version!==undefined?d.version:null), suspicious:false, empty:empty, corrupt:false }; }
       if (i < waits.length){ await sleep(waits[i]); }
     }
@@ -1589,7 +1700,7 @@
     return JSON.stringify({
       groups:state.groups, students:state.students,
       techCategories:state.techCategories, techSubCategories:state.techSubCategories, techniques:state.techniques,
-      campaigns:state.campaigns, yearArchives:state.yearArchives, lessons:state.lessons
+      campaigns:state.campaigns, yearArchives:state.yearArchives, lessons:state.lessons, forms:state.forms
     });
   }
   function resetUndoHistory(){ undoStack = []; undoBaseline = serializeState(); activityBaseline = undoBaseline; }
@@ -1611,6 +1722,7 @@
     state.techniques = prev.techniques || [];
     state.campaigns = prev.campaigns || [];
     state.lessons = prev.lessons || [];
+    state.forms = prev.forms || [];
     state.yearArchives = prev.yearArchives || [];
     undoBaseline = serializeState();
     scheduleSave(true);
@@ -1735,6 +1847,15 @@
       }
     });
 
+    // ---- questionnaires ----
+    var bF = byId(base.forms), cF = byId(state.forms);
+    Object.keys(cF).forEach(function(id){
+      var c = cF[id], b = bF[id];
+      if (!b){ add('forms', '📝 נוצרו הגדרות הטפסים'); return; }
+      if ((b.publishedVersion||0) !== (c.publishedVersion||0)){ add('forms', '📝 פורסמו הגדרות הטפסים'); }
+      else if (JSON.stringify(b.config) !== JSON.stringify(c.config)){ add('forms', '📝 עודכנו הגדרות הטפסים (טיוטה)'); }
+    });
+
     // ---- new school year ----
     if ((state.yearArchives||[]).length > (base.yearArchives||[]).length){ add('year', '🎓 נפתחה שנה חדשה'); }
 
@@ -1743,7 +1864,7 @@
       sAdd:'➕ נוספו {n} תלמידים', sDel:'🗑 נמחקו {n} תלמידים', sStatus:'🔄 שונה סטטוס ל-{n} תלמידים',
       sMove:'↔ הועברו {n} תלמידים בין קבוצות', sNote:'📝 עודכנו הערות ל-{n} תלמידים', sFlag:'★ עודכנו סימונים ל-{n} תלמידים',
       sEdit:'✏️ עודכנו פרטים של {n} תלמידים', sTrash:'🗄 {n} תלמידים הועברו/שוחזרו (ארכיון/פח)',
-      lesson:'📓 עודכן יומן השיעורים ({n} שינויים)', gNote:'📌 עודכנו הערות קבוצה ({n} שינויים)',
+      lesson:'📓 עודכן יומן השיעורים ({n} שינויים)', forms:'📝 עודכנו הגדרות הטפסים ({n} שינויים)', gNote:'📌 עודכנו הערות קבוצה ({n} שינויים)',
       sAdv:'🎓 עודכנו נתוני מועמדות ל-{n} שינויים',
       pay:'💳 עודכנו תשלומים ({n} שינויים)', att:'✅ עודכנה נוכחות ({n} שינויים)', session:'📅 עודכנו מפגשים ({n} שינויים)',
       tech:'📚 עודכנו טכניקות/קטגוריות ({n} שינויים)'
@@ -1843,7 +1964,7 @@
     try{
       if (!force && Date.now() - lastSnapAt < 10*60*1000){ return; }
       var c = serverCounts(raw);
-      if (!c.ok || (c.students === 0 && c.groups === 0)){ return; } // never keep an empty/unreadable state as a "safety copy"
+      if (!c.ok || c.total === 0){ return; } // never keep an empty/unreadable state as a "safety copy"
       var db = await snapDB(); if (!db){ return; }
       lastSnapAt = Date.now();
       var tx = db.transaction('snaps', 'readwrite');
@@ -2384,7 +2505,9 @@
       status: data.status || 'follow',
       attendance: [],
       advanced: false,
-      note: '',
+      note: data.note || '',
+      noteUpdatedAt: data.note ? Date.now() : null,
+      noteUpdatedDate: data.note ? todayISO() : null,
       shirtSize: data.shirtSize || '',
       shirtReceived: false,
       classGrade: data.classGrade || '',
@@ -2405,6 +2528,7 @@
     if (s.status === 'joined'){ fillScheduledPayments(s); }
     state.students.unshift(s);
     scheduleSave();
+    return s;
   }
   function updateStudent(id, patch){
     var s = state.students.find(function(x){return x.id===id;});
@@ -2868,6 +2992,10 @@
         class:'section-btn'+(state.section==='payments'?' active':''),
         onclick:function(){ state.section='payments'; render(); }
       },['💳 ניהול תשלומים']),
+      el('button',{
+        class:'section-btn'+(state.section==='forms'?' active':''),
+        onclick:function(){ state.section='forms'; if (state.inbox.newCount && formsRecord()){ state.formsTab = 'inbox'; } render(); if (state.formsTab === 'inbox'){ loadInbox(); } }
+      },['📝 טפסים'+(state.inbox.newCount ? ' ('+state.inbox.newCount+')' : '')]),
       renderActivityHub(),
       el('button',{
         class:'section-btn refresh-btn', title:'משיכת עדכונים אחרונים (למשל אם עדכנת ממכשיר אחר)',
@@ -2890,6 +3018,12 @@
 
     if (state.section === 'techniques' || state.readOnly){
       renderTechniquesSection(app);
+      if (state.modal){ app.appendChild(renderModal()); }
+      return;
+    }
+
+    if (state.section === 'forms'){
+      renderFormsSection(app);
       if (state.modal){ app.appendChild(renderModal()); }
       return;
     }
@@ -4385,6 +4519,7 @@
       techCategories: state.techCategories,
       techSubCategories: state.techSubCategories,
       lessons: state.lessons,
+      forms: state.forms,
       techniques: state.techniques,
       exportedAt: new Date().toISOString()
     }, null, 2);
@@ -4411,6 +4546,7 @@
         state.activityLog = data.activityLog || [];
         state.tombstones = data.tombstones || [];
         state.lessons = data.lessons || [];
+        state.forms = data.forms || [];
     state.students.forEach(function(s){
       if (s.classGrade){ s.classGrade = normalizeClassGrade(s.classGrade); }
       if (s.status === 'new'){ s.status = 'follow'; }
@@ -4753,6 +4889,1149 @@
       scheduleSave();
     }, 'מחיקה');
   }
+
+  // ===============================================================
+  // Questionnaires: registration + trial lesson (public page: register.html)
+  // The definition is edited here, kept with the rest of the synced data, and
+  // PUBLISHED to the sheet; the public page reads only the published copy.
+  // ===============================================================
+  // Starting point for the form definitions, built from the Jotform screenshots. Plain ES5 so the very same text is used inside the studio app.
+  function makeSeedFormConfig(uid){
+    uid = uid || function(p){ return p + '_' + Math.random().toString(36).slice(2,8); };
+    var T0 = 'טרום / גן חובה', T1 = 'כיתות א-ג', T2 = "כיתות ד' ומעלה", T3 = 'נוער';
+    var cfg = { version:1, general:{ whatsapp:'0545791435', businessName:'Ninjutsu Haifa', brandColor:'#B91717', logoUrl:'', termsUrl:'', termsLabel:'תקנון ההשתתפות והצהרת הבריאות' }, groups:[], forms:{} };
+    function grp(section, tiers, name){ cfg.groups.push({ id:uid('g'), name:name, section:section, showFor:tiers, forms:['registration','trial'], full:false, active:true, tatamiGroupId:'' }); }
+    var s0 = 'קבוצות טרום / גן חובה (המחירים המצוינים הם פר חודש)';
+    ['קבוצת גן פעמיים בשבוע, ראשון ושלישי, 350 ש"ח','טרום / גן חובה פעם בשבוע, ימי ראשון, 210 ש"ח','טרום / גן חובה פעם בשבוע, ימי שלישי, 210 ש"ח'].forEach(function(n){ grp(s0,[T0],n); });
+    var s1 = 'קבוצות לכיתות א-ג';
+    ['נופים, שלישי, 15:00','נופים, רביעי, 17:45','בית ספר "אלון", 13:00-13:50','מתנ"ס בגין, חמישי, 16:00','מתנ"ס בגין - קבוצת קשב וריכוז, ראשון, 17:45-18:45','פיכמן, חמישי, 12:50 (כיתות א-ד)','אחוזה (כיתות א-ב) שלישי 12:50 / כיתות ג\' ומעלה ב-13:40','הרצל, שני, 14:45 (כיתות א-ד)','נתיב אליעזר, ראשון, 13:25','הבונים, רביעי, 15:00','אילנות, ראשון, 15:00','טשרניחובסקי, שני, 13:25'].forEach(function(n){ grp(s1,[T1],n); });
+    var s2 = "קבוצות לכיתות ד' ומעלה";
+    ['נופים, שלישי, 16:00','נופים, רביעי, 16:45','בית ספר "אלון", 13:50-14:40 (גם לכיתות ג\')','מתנ"ס בגין, חמישי, 17:00','מתנ"ס בגין - קבוצת קשב וריכוז, ראשון, 17:45-18:45','פיכמן, חמישי, 13:40 (כיתות ד-ו)','פיכמן, חמישי, 12:50 (כיתות א-ד)','אחוזה (כיתות ג-ו) שלישי 13:40','נתיב אליעזר, ראשון, 13:25','הבונים, רביעי, 15:00','הרצל, שני, 14:45','אילנות, ראשון, 15:00','טשרניחובסקי, שני, 13:25','קבוצת כושר, ראשון, 18:30-19:00, מתנ"ס בגין'].forEach(function(n){ grp(s2,[T2],n); });
+    var s3 = 'קבוצות הנוער';
+    ['נוער, 19:00-20:30, פעמיים בשבוע, במתנ"ס 300 ש"ח','נוער, 19:00-20:30, פעם בשבוע, במתנ"ס 230 ש"ח','נופים, שלישי, 16:00, כיתות ד-ח','נופים, רביעי, 16:45, כיתות ד-ח','מתנ"ס בגין, חמישי, 17:00, כיתות ד-ח','קבוצת כושר, ראשון, 18:30-19:00, מתנ"ס בגין'].forEach(function(n){ grp(s3,[T3],n); });
+  
+    function Q(type, label, extra){ var q = { id:uid('q'), type:type, label:label, help:'', required:false, placeholder:'', options:[], showIf:[], mapTo:'' }; for (var k in (extra||{})) q[k] = extra[k]; return q; }
+    function opts(list){ return list.map(function(l){ return typeof l === 'string' ? { label:l } : l; }); }
+    var grades = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','יא','יב'], classes = ['גן חובה','טרום חובה'];
+    grades.forEach(function(g){ for (var n = 1; n <= 4; n++) classes.push(g + n); });
+  
+    // ---- registration ----
+    var tier = Q('select','בחר/י שכבת גיל',{ required:true, options:opts([T0,T1,T2,T3]) });
+    var perWeek = Q('radio','בחרו את כמות האימונים השבועית שתרצו להירשם אליה',{ required:true, options:opts([{label:'אימון אחד בשבוע',count:1},{label:'שני אימונים בשבוע (הנחה 17%)',count:2},{label:'שלושה אימונים בשבוע (הנחה 40%)',count:3}]) });
+    var klass = Q('select','בחר/י מספר כיתה',{ required:true, mapTo:'classGrade', options:opts(classes), showIf:[{ q:tier.id, op:'notIn', values:[T0] }] });
+    var reg = [
+      Q('heading','פרטים בסיסיים'),
+      Q('info','הייתם רשומים שנה שעברה? פנו אלי בוואטסאפ להרשמה מהירה יותר {whatsapp}'),
+      Q('text','שם פרטי + משפחה של ההורה המשלם',{ required:true, mapTo:'parentName' }),
+      Q('phone','מספר טלפון של ההורה (איש קשר)',{ required:true, mapTo:'phone', help:'הכניסו מספר טלפון ללא מקף', placeholder:'0000000000' }),
+      Q('text','שם פרטי + משפחה של הילד/ה',{ required:true, mapTo:'childName' }),
+      Q('radio','מין',{ required:true, mapTo:'gender', options:opts(['זכר','נקבה']) }),
+      tier, klass,
+      Q('radio','האם הילד/ה בצהרון בבית הספר?',{ required:true, mapTo:'daycare', options:opts(['כן','לא']) }),
+      Q('select','מידת חולצה',{ required:true, mapTo:'shirtSize', options:opts(['4','6','8','10','12','14','16','S','M','L','XL']) }),
+      Q('heading','בואו נבחר מסלול רישום'),
+      perWeek,
+      Q('groups','מעולה! סמנו קבוצות לפי הכמות שבחרתם בסעיף הקודם',{ required:true, mapTo:'groups', groups:{ filterBy:tier.id, countFrom:perWeek.id, exact:0 } }),
+      Q('single_checkbox','סמנו "כן" במידה ותרצו לקבל מידע על אימונים פרטניים (מיועד לילדים בעלי קושי מוטורי / חברתי)'),
+      Q('heading','אישור תקנון ותשלום'),
+      Q('single_checkbox','מאשר/ת {terms}',{ required:true })
+    ];
+    var cells = {};
+    cfg.forms.registration = {
+      enabled:true, title:'הרשמה לאימונים', intro:'', submitLabel:'אישור תקנון ותשלום',
+      after:{ mode:'auto', delaySec:3, message:'תודה! הפרטים התקבלו. מעבירים אותך לדף התשלום…', buttonLabel:'המשך לתשלום' },
+      questions:reg,
+      routing:{ special:[], matrix:{ enabled:true, rowQ:tier.id, colQ:perWeek.id, cells:cells }, fallback:{ type:'message', url:'', message:'תודה! הפרטים התקבלו. ניצור איתך קשר בהקדם עם קישור לתשלום.' } }
+    };
+  
+    // ---- trial lesson ----
+    var tier2 = Q('select','בחר/י שכבת גיל',{ required:true, options:opts([T0,T1,T2,T3]) });
+    var klass2 = Q('select','בחר/י מספר כיתה',{ required:true, mapTo:'classGrade', options:opts(classes), showIf:[{ q:tier2.id, op:'notIn', values:[T0] }] });
+    cfg.forms.trial = {
+      enabled:true, title:'הרשמה לאימון ניסיון', intro:'נשמח לראות אתכם באימון ניסיון! מלאו את הפרטים ונחזור אליכם לתיאום.', submitLabel:'שליחה',
+      after:{ mode:'button', delaySec:0, message:'', buttonLabel:'המשך' },
+      questions:[
+        Q('heading','פרטים בסיסיים'),
+        Q('text','שם פרטי + משפחה של ההורה',{ required:true, mapTo:'parentName' }),
+        Q('phone','מספר טלפון של ההורה',{ required:true, mapTo:'phone', placeholder:'0000000000' }),
+        Q('text','שם פרטי + משפחה של הילד/ה',{ required:true, mapTo:'childName' }),
+        Q('radio','מין',{ mapTo:'gender', options:opts(['זכר','נקבה']) }),
+        tier2, klass2,
+        Q('groups','באיזו קבוצה תרצו לנסות?',{ required:true, mapTo:'groups', groups:{ filterBy:tier2.id, countFrom:'', exact:1 } }),
+        Q('textarea','הערות (לא חובה)',{ placeholder:'למשל: ניסיון קודם, רגישויות, שאלות…' }),
+        Q('single_checkbox','מאשר/ת {terms}',{ required:true })
+      ],
+      routing:{ special:[], matrix:{ enabled:false, rowQ:'', colQ:'', cells:{} }, fallback:{ type:'message', url:'', message:'תודה שנרשמתם לאימון ניסיון! ניצור איתכם קשר בקרוב לתיאום.' } }
+    };
+    return cfg;
+  }
+  
+
+  var FORM_NAMES = { registration:'שאלון הרשמה', trial:'שאלון אימון ניסיון' };
+  var FORM_QTYPES = [
+    {key:'text', label:'טקסט קצר'}, {key:'phone', label:'טלפון'}, {key:'number', label:'מספר'}, {key:'textarea', label:'טקסט ארוך'},
+    {key:'select', label:'רשימה נפתחת'}, {key:'radio', label:'בחירה אחת (כפתורים)'}, {key:'checkbox', label:'בחירה מרובה'},
+    {key:'single_checkbox', label:'תיבת סימון / אישור'}, {key:'groups', label:'בחירת קבוצות'},
+    {key:'heading', label:'כותרת (פס אדום)'}, {key:'info', label:'טקסט הסבר'}
+  ];
+  var FORM_MAPTO = [
+    {key:'', label:'— לא מועבר —'}, {key:'childName', label:'שם המתאמן/ת (הילד/ה)'}, {key:'parentName', label:'שם ההורה'}, {key:'phone', label:'טלפון'},
+    {key:'classGrade', label:'כיתה'}, {key:'shirtSize', label:'מידת חולצה'}, {key:'daycare', label:'צהרון (כן/לא)'}, {key:'gender', label:'מין (זכר/נקבה)'},
+    {key:'groups', label:'קבוצות (בשאלת בחירת קבוצות)'}, {key:'email', label:'אימייל'}
+  ];
+  var FORM_OPS = [ {key:'in', label:'שווה לאחד מ'}, {key:'notIn', label:'לא שווה ל'}, {key:'notEmpty', label:'מולא'}, {key:'empty', label:'לא מולא'} ];
+  var FORM_PUBLIC_PATH = 'register.html';
+
+  function formsRecord(){ return state.forms.find(function(x){ return x.id === 'forms_cfg'; }) || null; }
+  function formsCfg(){ var r = formsRecord(); return r ? r.config : null; }
+  function createFormsRecord(fromSeed){
+    var base = fromSeed ? makeSeedFormConfig(uid) : {
+      version:1, general:{ whatsapp:'', businessName:'', brandColor:'#B91717', logoUrl:'', termsUrl:'', termsLabel:'תקנון ההשתתפות והצהרת הבריאות' }, groups:[],
+      forms:{
+        registration:{ enabled:true, title:'הרשמה', intro:'', submitLabel:'שליחה', after:{ mode:'button', delaySec:3, message:'תודה! הפרטים התקבלו.', buttonLabel:'המשך לתשלום' }, questions:[], routing:{ special:[], matrix:{ enabled:false, rowQ:'', colQ:'', cells:{} }, fallback:{ type:'message', url:'', message:'תודה! הפרטים התקבלו ונחזור אליך בהקדם.' } } },
+        trial:{ enabled:true, title:'הרשמה לאימון ניסיון', intro:'', submitLabel:'שליחה', after:{ mode:'button', delaySec:0, message:'', buttonLabel:'המשך' }, questions:[], routing:{ special:[], matrix:{ enabled:false, rowQ:'', colQ:'', cells:{} }, fallback:{ type:'message', url:'', message:'תודה שנרשמתם לאימון ניסיון! ניצור איתכם קשר בקרוב.' } } }
+      }
+    };
+    state.forms.push({ id:'forms_cfg', config:base, publishedHash:'', publishedVersion:0, publishedAt:0 });
+    state.formsTab = 'registration';
+    scheduleSave();
+  }
+  function cfgHash(c){ var str = JSON.stringify(c), h = 5381; for (var i = 0; i < str.length; i++){ h = ((h << 5) + h + str.charCodeAt(i)) | 0; } return String(h); }
+  function formsDirty(){ var r = formsRecord(); return !!r && r.publishedHash !== cfgHash(r.config); }
+  function editForms(mutator){ var c = formsCfg(); if (!c) return; mutator(c); scheduleSave(); }
+  function formQuestion(c, formKey, qid){ return (c.forms[formKey].questions || []).filter(function(q){ return q.id === qid; })[0]; }
+  function isInputQ(q){ return q.type !== 'heading' && q.type !== 'info'; }
+  function optionValuesOf(c, q){
+    if (!q) return [];
+    if (q.type === 'select' || q.type === 'radio' || q.type === 'checkbox') return (q.options || []).map(function(o){ return o.label; });
+    if (q.type === 'single_checkbox') return ['כן'];
+    return [];
+  }
+  function parseOptionLines(text){
+    // one per line; an optional "| 2" after the text sets how many groups that choice means
+    return String(text || '').split('\n').map(function(l){ return l.trim(); }).filter(Boolean).map(function(l){
+      var m = l.match(/^(.*?)\s*\|\s*(\d+)\s*$/);
+      return m ? { label:m[1].trim(), count:Number(m[2]) } : { label:l };
+    });
+  }
+  function optionLines(q){ return (q.options || []).map(function(o){ return o.label + (o.count ? ' | ' + o.count : ''); }).join('\n'); }
+  function appFolderUrl(){ return window.location.href.split('#')[0].split('?')[0].replace(/[^\/]*$/, ''); }
+  function customFormBase(){
+    var c = formsCfg(), v = c && c.general ? String(c.general.formBaseUrl || '').trim() : '';
+    return v;
+  }
+  function publicFormUrl(formKey){
+    var custom = customFormBase(), base;
+    if (custom){ base = /\.html?$/i.test(custom) ? custom : custom.replace(/\/*$/, '/') + FORM_PUBLIC_PATH; }
+    else { base = appFolderUrl() + FORM_PUBLIC_PATH; }
+    return base + '?form=' + formKey;
+  }
+  function validUrl(u){ return /^https?:\/\/[^\s]+\.[^\s]+/i.test(String(u || '').trim()); }
+
+  // ---- checks before publishing: errors block, warnings are shown but allowed ----
+  function validateFormsConfig(c){
+    var errors = [], warnings = [];
+    function E(where, msg){ errors.push({ where:where, msg:msg }); }
+    function W(where, msg){ warnings.push({ where:where, msg:msg }); }
+    ['registration','trial'].forEach(function(fk){
+      var f = c.forms[fk], where = FORM_NAMES[fk];
+      if (f.enabled === false) return;
+      var qs = f.questions || [], byId = {};
+      qs.forEach(function(q){ byId[q.id] = q; });
+      if (!qs.some(isInputQ)) E(where, 'אין אף שאלה בשאלון.');
+      var mapped = {};
+      qs.forEach(function(q, i){
+        var name = (q.label || '').trim() || ('שאלה ' + (i+1));
+        if (isInputQ(q) && !(q.label || '').trim()) E(where, 'שאלה ' + (i+1) + ' בלי נוסח.');
+        if (['select','radio','checkbox'].indexOf(q.type) !== -1){
+          var labels = (q.options || []).map(function(o){ return o.label; });
+          if (!labels.length) E(where, 'לשאלה "'+name+'" אין אפשרויות בחירה.');
+          if (labels.some(function(l, j){ return labels.indexOf(l) !== j; })) E(where, 'בשאלה "'+name+'" יש אפשרות שמופיעה פעמיים.');
+        }
+        if (q.mapTo){ if (mapped[q.mapTo]) W(where, 'שתי שאלות מועברות לאותו שדה ('+q.mapTo+'): "'+name+'" ו"'+mapped[q.mapTo]+'".'); mapped[q.mapTo] = name; }
+        (q.showIf || []).forEach(function(cd){
+          var rq = byId[cd.q];
+          if (!rq){ E(where, 'לשאלה "'+name+'" יש תנאי הצגה שמפנה לשאלה שנמחקה.'); return; }
+          if (rq.id === q.id) E(where, 'שאלה "'+name+'" תלויה בעצמה.');
+          if (cd.op === 'in' || cd.op === 'notIn'){
+            var have = optionValuesOf(c, rq);
+            if (!(cd.values || []).length) W(where, 'בתנאי ההצגה של "'+name+'" לא נבחרו ערכים.');
+            (cd.values || []).forEach(function(v){ if (have.length && have.indexOf(v) === -1) W(where, 'בתנאי ההצגה של "'+name+'": הערך "'+v+'" כבר לא קיים בשאלה "'+rq.label+'".'); });
+          }
+        });
+        if (q.type === 'groups'){
+          var gc = q.groups || {};
+          if (gc.filterBy && !byId[gc.filterBy]) E(where, 'בבחירת הקבוצות "'+name+'" מוגדר סינון לפי שאלה שנמחקה.');
+          if (gc.countFrom && !byId[gc.countFrom]) E(where, 'בבחירת הקבוצות "'+name+'" הכמות נקבעת לפי שאלה שנמחקה.');
+          if (gc.countFrom && byId[gc.countFrom] && !(byId[gc.countFrom].options || []).some(function(o){ return o.count; })) W(where, 'בשאלה שקובעת את כמות הקבוצות ("'+byId[gc.countFrom].label+'") לא הוגדר מספר קבוצות לאף אפשרות.');
+          var mine = (c.groups || []).filter(function(g){ return g.active !== false && (g.forms || []).indexOf(fk) !== -1; });
+          if (!mine.length) E(where, 'אין אף קבוצה פעילה שמוגדרת לשאלון הזה (בלשונית "קבוצות").');
+          if (gc.filterBy && byId[gc.filterBy]){
+            optionValuesOf(c, byId[gc.filterBy]).forEach(function(v){ if (!mine.some(function(g){ return (g.showFor || []).indexOf(v) !== -1; })) W(where, 'אין קבוצות פעילות עבור "'+v+'" — לקוח שיבחר בזה לא יראה קבוצות.'); });
+          }
+        }
+      });
+      if (!mapped.childName) W(where, 'לא הוגדרה שאלה שמועברת כ"שם המתאמן/ת" — העברה לטטאמי תצטרך הקלדה ידנית של השם.');
+      if (!mapped.phone) W(where, 'לא הוגדרה שאלת טלפון — לא תהיה דרך ליצור קשר עם הנרשם.');
+      var rt = f.routing || {}, hasRoute = false;
+      (rt.special || []).forEach(function(r, i){
+        var rn = 'חוק מיוחד "'+(r.name || ('#'+(i+1)))+'"';
+        if (!(r.when || []).length) E(where, rn+': אין תנאי.');
+        (r.when || []).forEach(function(cd){ if (!byId[cd.q]) E(where, rn+': תנאי שמפנה לשאלה שנמחקה.'); });
+        if ((r.action || {}).type === 'redirect'){ if (!validUrl((r.action || {}).url)) E(where, rn+': חסר קישור תקין (חייב להתחיל ב-https://).'); }
+        else if (!((r.action || {}).message || '').trim()) E(where, rn+': אין הודעה להצגה.');
+      });
+      var mx = rt.matrix;
+      if (mx && mx.enabled){
+        if (!byId[mx.rowQ] || !byId[mx.colQ]) E(where, 'בטבלת הניתוב נבחרה שאלה שנמחקה.');
+        else {
+          var rows = optionValuesOf(c, byId[mx.rowQ]), cols = optionValuesOf(c, byId[mx.colQ]), empty = 0, total = 0;
+          rows.forEach(function(r){ cols.forEach(function(cl){
+            total++;
+            var cell = (mx.cells || {})[r + '|' + cl];
+            if (cell && cell.url){ hasRoute = true; if (!validUrl(cell.url)) E(where, 'בטבלה ('+r+' × '+cl+'): הקישור אינו תקין (חייב להתחיל ב-https://).'); } else empty++;
+          }); });
+          if (empty) W(where, 'בטבלת הניתוב '+empty+' מתוך '+total+' צירופים בלי קישור — מי שיבחר בהם יקבל את הודעת ברירת המחדל.');
+        }
+      }
+      var fb = rt.fallback || {};
+      if (fb.type === 'redirect'){ if (!validUrl(fb.url)) E(where, 'ברירת המחדל מפנה לקישור, אבל הקישור חסר או לא תקין.'); }
+      else if (!(fb.message || '').trim()) E(where, 'ברירת המחדל (כשאף חוק לא מתאים) חייבת הודעה או קישור.');
+    });
+    (c.groups || []).forEach(function(g){
+      if (!(g.name || '').trim()) E('קבוצות', 'יש קבוצה בלי שם.');
+      if (g.active !== false && !g.tatamiGroupId) W('קבוצות', 'הקבוצה "'+g.name+'" לא מקושרת לקבוצה בטטאמי — בהעברת נרשמים תצטרך לבחור אותה ידנית.');
+    });
+    var fbase = ((c.general || {}).formBaseUrl || '').trim();
+    if (!fbase || fbase.indexOf(appFolderUrl()) === 0){
+      W('כללי', 'דף הטפסים יושב באותה תיקייה כמו האפליקציה, ולכן לקוח שמקצר את הקישור עלול לנחש איפה האפליקציה. מומלץ לארח את register.html באתר נפרד ולהזין את כתובתו בלשונית "כללי".');
+    } else if (!validUrl(fbase)){
+      E('כללי', 'כתובת דף הטפסים אינה תקינה (חייבת להתחיל ב-https://).');
+    }
+    if (!((c.general || {}).whatsapp || '').trim()) W('כללי', 'לא הוגדר מספר וואטסאפ.');
+    var usesTerms = ['registration','trial'].some(function(fk){ return (c.forms[fk].questions || []).some(function(q){ return String(q.label || '').indexOf('{terms}') !== -1; }); });
+    if (usesTerms && !(c.general || {}).termsUrl) W('כללי', 'בשאלון יש אישור תקנון, אבל לא הוגדר קישור לתקנון.');
+    return { errors:errors, warnings:warnings };
+  }
+
+  // ---- talking to the sheet (admin key) ----
+  function sheetsPostAction(fields, timeoutMs){
+    return new Promise(function(resolve){
+      var iframeName = '__fa' + Date.now() + Math.floor(Math.random()*100000);
+      var iframe = document.createElement('iframe'); iframe.name = iframeName; iframe.style.display = 'none'; document.body.appendChild(iframe);
+      var form = document.createElement('form'); form.method = 'POST'; form.action = SHEETS_API_URL; form.target = iframeName; form.style.display = 'none';
+      var all = { key: SHEETS_API_KEY }; for (var k in fields){ all[k] = fields[k]; }
+      for (var name in all){ var inp = document.createElement('input'); inp.name = name; inp.value = all[name]; form.appendChild(inp); }
+      document.body.appendChild(form);
+      var settled = false, armed = false;
+      function done(){ if (settled) return; settled = true; clearTimeout(tid); setTimeout(function(){ if (form.parentNode) form.parentNode.removeChild(form); if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }, 1000); resolve(); }
+      var tid = setTimeout(done, timeoutMs || 45000);
+      iframe.onload = function(){ if (armed) done(); };
+      form.submit();
+      setTimeout(function(){ armed = true; }, 0);
+    });
+  }
+
+  async function doPublishForms(){
+    var rec = formsRecord(); if (!rec) return;
+    state.formsPublishing = true; render();
+    try{
+      var text = JSON.stringify(rec.config);
+      var cur = await sheetsCall('&action=formConfig');
+      if (cur.error || cur.version === undefined){ throw new Error('הסקריפט בגיליון לא עודכן לגרסה שתומכת בטפסים (v5).'); }
+      var ver = cur.version;
+      if (rec.publishedVersion && ver !== rec.publishedVersion && cur.config && JSON.stringify(cur.config) !== JSON.stringify(rec.config)){
+        var okOver = await new Promise(function(res){ openConfirm('בגיליון פורסמה גרסה אחרת של הטפסים מאז הפרסום האחרון שלך (ייתכן שממכשיר אחר). לדרוס אותה בגרסה שלך?', function(){ res(true); }, 'לדרוס ולפרסם'); var iv = setInterval(function(){ if (!state.modal){ clearInterval(iv); res(false); } }, 300); });
+        if (!okOver){ state.formsPublishing = false; render(); return; }
+      }
+      await sheetsPostAction({ action:'saveFormConfig', config:text, expected:String(ver) });
+      var after = await sheetsCall('&action=formConfig');
+      if (!after.config || JSON.stringify(after.config) !== text){ throw new Error('הפרסום לא אומת בגיליון. נסה שוב.'); }
+      rec.publishedHash = cfgHash(rec.config); rec.publishedVersion = after.version; rec.publishedAt = Date.now();
+      state.formsPublishing = false;
+      scheduleSave();
+      showToast('✓ הטפסים פורסמו. השינויים כבר פעילים בקישורים.');
+    }catch(e){
+      state.formsPublishing = false; render();
+      openModal({ type:'formIssues', issues:{ errors:[{ where:'פרסום', msg:(e && e.message) || 'הפרסום נכשל.' }], warnings:[] }, blocking:true });
+    }
+  }
+  function publishForms(){
+    var rec = formsRecord(); if (!rec) return;
+    var issues = validateFormsConfig(rec.config);
+    if (issues.errors.length){ openModal({ type:'formIssues', issues:issues, blocking:true }); return; }
+    if (issues.warnings.length){ openModal({ type:'formIssues', issues:issues, blocking:false }); return; }
+    doPublishForms();
+  }
+
+  // ---------------- screens: questionnaires ----------------
+  // ---- small building blocks ----
+  function fInput(value, onChange, attrs){
+    var i = el('input', Object.assign({ type:'text', value: value == null ? '' : value }, attrs || {}));
+    i.addEventListener('change', function(e){ onChange(e.target.value); });
+    return i;
+  }
+  function fArea(value, onChange, rows, attrs){
+    var t = el('textarea', Object.assign({ rows:String(rows || 2), value: value == null ? '' : value }, attrs || {}));
+    t.addEventListener('change', function(e){ onChange(e.target.value); });
+    return t;
+  }
+  function fSelect(options, value, onChange, attrs){
+    var sel = el('select', attrs || {}, options.map(function(o){
+      var op = el('option', { value:o.key }, [o.label]);
+      if (o.key === value){ op.setAttribute('selected', 'selected'); }
+      return op;
+    }));
+    sel.addEventListener('change', function(e){ onChange(e.target.value); });
+    return sel;
+  }
+  function fCheck(label, checked, onChange){
+    var c = el('input', { type:'checkbox' }); if (checked){ c.setAttribute('checked', 'checked'); }
+    c.addEventListener('change', function(e){ onChange(e.target.checked); });
+    return el('label', { class:'day-check-label' }, [c, label]);
+  }
+  function fField(label, control, hint){
+    return el('div', { class:'field' }, [ el('label', {}, [label]), control, hint ? el('div', { class:'fhint' }, [hint]) : null ]);
+  }
+  function fSwitch(label, checked, onChange, hint){
+    var inp = el('input', { type:'checkbox', class:'sw-input' }); if (checked){ inp.setAttribute('checked', 'checked'); }
+    inp.addEventListener('change', function(e){ onChange(e.target.checked); });
+    return el('label', { class:'sw' }, [ inp, el('span', { class:'sw-track' }, [ el('span', { class:'sw-dot' }) ]), el('span', { class:'sw-text' }, [ el('b', {}, [label]), hint ? el('span', { class:'sw-hint' }, [hint]) : null ]) ]);
+  }
+  function callout(icon, title, text, kind){
+    return el('div', { class:'callout ' + (kind || '') }, [ el('span', { class:'callout-ic' }, [icon]), el('div', { class:'callout-tx' }, [ title ? el('b', {}, [title]) : null, el('div', {}, [text]) ]) ]);
+  }
+  function panelCard(icon, title, subtitle, kids){
+    return el('div', { class:'pc' }, [ el('div', { class:'pc-head' }, [ el('span', { class:'pc-ic' }, [icon]), el('div', {}, [ el('h3', {}, [title]), subtitle ? el('div', { class:'pc-sub' }, [subtitle]) : null ]) ]), el('div', { class:'pc-body' }, kids) ]);
+  }
+  function copyText(text){
+    try{ navigator.clipboard.writeText(text).then(function(){ showToast('הקישור הועתק.'); }, function(){ window.prompt('העתק את הקישור:', text); }); }
+    catch(e){ window.prompt('העתק את הקישור:', text); }
+  }
+  function groupChoices(c, fk){
+    return (c.groups || []).filter(function(g){ return (g.forms || []).indexOf(fk) !== -1; }).map(function(g){ return { value:g.id, label:g.name }; });
+  }
+  var QTYPE_INFO = {
+    text:{ ic:'✏️', name:'תשובה קצרה', desc:'שם, עיר או כל טקסט קצר' },
+    phone:{ ic:'📞', name:'טלפון', desc:'בודק שהמספר תקין' },
+    number:{ ic:'🔢', name:'מספר', desc:'גיל, כמות וכד׳' },
+    textarea:{ ic:'📝', name:'תשובה ארוכה', desc:'הערות ושאלות חופשיות' },
+    select:{ ic:'🔽', name:'רשימה נפתחת', desc:'בחירה אחת מרשימה ארוכה (כיתה, מידה)' },
+    radio:{ ic:'⭕', name:'בחירה אחת', desc:'כפתורים, כשיש 2 עד 5 אפשרויות' },
+    checkbox:{ ic:'☑️', name:'בחירה מרובה', desc:'אפשר לסמן כמה אפשרויות' },
+    single_checkbox:{ ic:'✅', name:'אישור', desc:'תיבת סימון אחת, למשל תקנון' },
+    groups:{ ic:'👥', name:'בחירת קבוצות', desc:'ההורה בוחר קבוצות מהרשימה שלך' },
+    heading:{ ic:'🟥', name:'כותרת מקטע', desc:'מחלק את הטופס לחלקים' },
+    info:{ ic:'ℹ️', name:'טקסט הסבר', desc:'הודעה למילוי, בלי שאלה' }
+  };
+  var MAPTO_FRIENDLY = [
+    { key:'', label:'לא מועבר (נשמר רק בגיליון)' }, { key:'childName', label:'שם המתאמן/ת' }, { key:'parentName', label:'שם ההורה' }, { key:'phone', label:'טלפון' },
+    { key:'classGrade', label:'כיתה' }, { key:'shirtSize', label:'מידת חולצה' }, { key:'daycare', label:'צהרון (כן/לא)' }, { key:'gender', label:'מין' }, { key:'email', label:'אימייל' }
+  ];
+  function mapToLabel(k){ var m = MAPTO_FRIENDLY.filter(function(x){ return x.key === k; })[0]; return m ? m.label : (k === 'groups' ? 'קבוצות' : k); }
+  var OPS_FRIENDLY = [ { key:'in', label:'היא אחת מ' }, { key:'notIn', label:'אינה' }, { key:'notEmpty', label:'מולאה' }, { key:'empty', label:'לא מולאה' } ];
+
+  // ---- "show only if…" / "when…" conditions, written as a sentence ----
+  function renderConditions(c, fk, conds, apply, excludeQid, lead){
+    var qs = (c.forms[fk].questions || []).filter(function(q){ return isInputQ(q) && q.id !== excludeQid && ['textarea','text','number'].indexOf(q.type) === -1; });
+    var box = el('div', { class:'cond-box' });
+    if (!qs.length){ box.appendChild(el('div', { class:'fhint' }, ['עוד אין שאלות שאפשר לבסס עליהן תנאי (שאלות בחירה, רשימה או אישור).'])); return box; }
+    conds.forEach(function(cd, i){
+      var q = qs.find(function(x){ return x.id === cd.q; });
+      var row = el('div', { class:'cond-row' });
+      row.appendChild(el('span', { class:'cond-lead' }, [ i === 0 ? (lead || 'אם') : 'וגם' ]));
+      row.appendChild(fSelect(qs.map(function(x){ return { key:x.id, label:x.label || '(ללא נוסח)' }; }).concat(q ? [] : [{ key:cd.q, label:'(שאלה שנמחקה)' }]), cd.q, function(v){ apply(function(){ cd.q = v; cd.values = []; }); }));
+      row.appendChild(fSelect(OPS_FRIENDLY, cd.op, function(v){ apply(function(){ cd.op = v; }); }, { class:'cond-op' }));
+      if (cd.op === 'in' || cd.op === 'notIn'){
+        var choices = q ? (q.type === 'groups' ? groupChoices(c, fk) : optionValuesOf(c, q).map(function(v){ return { value:v, label:v }; })) : [];
+        var vals = el('div', { class:'cond-vals' });
+        choices.forEach(function(ch){
+          vals.appendChild(fCheck(ch.label, (cd.values || []).indexOf(ch.value) !== -1, function(checked){ apply(function(){ var cur = (cd.values || []).filter(function(x){ return x !== ch.value; }); if (checked) cur.push(ch.value); cd.values = cur; }); }));
+        });
+        (cd.values || []).forEach(function(v){ if (!choices.some(function(ch){ return ch.value === v; })){ vals.appendChild(el('span', { class:'cond-missing' }, ['⚠ "'+v+'" כבר לא קיים'])); } });
+        row.appendChild(vals);
+      }
+      row.appendChild(el('button', { class:'icon-btn', title:'הסרת תנאי', onclick:function(){ apply(function(){ conds.splice(i, 1); }); }}, ['✕']));
+      box.appendChild(row);
+    });
+    box.appendChild(el('button', { class:'btn-text', onclick:function(){ apply(function(){ conds.push({ q:qs[0].id, op:'in', values:[] }); }); }}, [conds.length ? '+ עוד תנאי (וגם…)' : '+ הוסף תנאי']));
+    return box;
+  }
+
+  // ---- renaming a choice must not break the rules that mention it ----
+  function mapValues(arr, oldL, newL){ return (arr || []).map(function(v){ return v === oldL ? newL : v; }); }
+  function renameOption(c, fk, q, oldL, newL){
+    if (!oldL || !newL || oldL === newL) return;
+    var f = c.forms[fk];
+    (f.questions || []).forEach(function(x){ (x.showIf || []).forEach(function(cd){ if (cd.q === q.id){ cd.values = mapValues(cd.values, oldL, newL); } }); });
+    ((f.routing || {}).special || []).forEach(function(r){ (r.when || []).forEach(function(cd){ if (cd.q === q.id){ cd.values = mapValues(cd.values, oldL, newL); } }); });
+    var mx = (f.routing || {}).matrix;
+    if (mx && mx.cells && (mx.rowQ === q.id || mx.colQ === q.id)){
+      var nc = {};
+      Object.keys(mx.cells).forEach(function(k){ var p = k.split('|'); if (mx.rowQ === q.id && p[0] === oldL){ p[0] = newL; } if (mx.colQ === q.id && p[1] === oldL){ p[1] = newL; } nc[p.join('|')] = mx.cells[k]; });
+      mx.cells = nc;
+    }
+    var isFilter = (f.questions || []).some(function(x){ return x.type === 'groups' && x.groups && x.groups.filterBy === q.id; });
+    if (isFilter){        // the groups' "shown to" lists, and the same choice in the other form, follow along
+      (c.groups || []).forEach(function(g){ g.showFor = mapValues(g.showFor, oldL, newL); });
+      ['registration','trial'].forEach(function(ofk){
+        if (ofk === fk) return;
+        (c.forms[ofk].questions || []).forEach(function(x){
+          if (x.type !== 'groups' || !x.groups || !x.groups.filterBy) return;
+          var fq = formQuestion(c, ofk, x.groups.filterBy);
+          if (fq){ (fq.options || []).forEach(function(o){ if (o.label === oldL){ o.label = newL; renameOption(c, ofk, fq, oldL, newL); } }); }
+        });
+      });
+    }
+  }
+
+  // ---- questions ----
+  var NEW_Q_DEFAULTS = { text:'שאלה חדשה', phone:'מספר טלפון', number:'מספר', textarea:'הערות', select:'שאלה חדשה', radio:'שאלה חדשה', checkbox:'שאלה חדשה', single_checkbox:'אני מאשר/ת', groups:'בחרו קבוצות', heading:'מקטע חדש', info:'כתוב כאן הסבר' };
+  function newQuestion(type){
+    var q = { id:uid('q'), type:type, label:NEW_Q_DEFAULTS[type] || 'שאלה חדשה', help:'', required:false, placeholder:'', options:[], showIf:[], mapTo:'' };
+    if (['select','radio','checkbox'].indexOf(type) !== -1){ q.options = [{ label:'אפשרות 1' }, { label:'אפשרות 2' }]; }
+    if (type === 'groups'){ q.groups = { filterBy:'', countFrom:'', exact:0 }; q.mapTo = 'groups'; }
+    return q;
+  }
+  function moveQuestion(fk, qid, dir){
+    editForms(function(c){ var qs = c.forms[fk].questions, i = qs.findIndex(function(q){ return q.id === qid; }), j = i + dir; if (i < 0 || j < 0 || j >= qs.length) return; var t = qs[i]; qs[i] = qs[j]; qs[j] = t; });
+  }
+  function deleteQuestion(fk, qid){
+    var q = formQuestion(formsCfg(), fk, qid); if (!q) return;
+    openConfirm('למחוק את "'+(q.label || 'השאלה')+'"? אם משהו אחר תלוי בה (תנאי הצגה, טבלת הניתוב), תקבל על כך הודעה לפני הפרסום.', function(){
+      if (state.formsOpenQ === qid){ state.formsOpenQ = null; }
+      editForms(function(c){ c.forms[fk].questions = c.forms[fk].questions.filter(function(x){ return x.id !== qid; }); });
+    }, 'מחיקה');
+  }
+  function iconBtn(title, text, fn){ return el('button', { class:'icon-btn', title:title, onclick:function(e){ e.stopPropagation(); fn(); } }, [text]); }
+
+  function renderOptionsEditor(c, fk, q){
+    var box = el('div', { class:'opt-ed' });
+    (q.options || []).forEach(function(o, i){
+      box.appendChild(el('div', { class:'opt-row' }, [
+        el('span', { class:'opt-num' }, [String(i + 1)]),
+        fInput(o.label, function(v){ v = v.trim(); if (!v) return; editForms(function(){ var old = o.label; o.label = v; renameOption(c, fk, q, old, v); }); }, { class:'opt-in' }),
+        iconBtn('למעלה', '▲', function(){ editForms(function(){ if (i > 0){ var t = q.options[i-1]; q.options[i-1] = q.options[i]; q.options[i] = t; } }); }),
+        iconBtn('למטה', '▼', function(){ editForms(function(){ if (i < q.options.length - 1){ var t = q.options[i+1]; q.options[i+1] = q.options[i]; q.options[i] = t; } }); }),
+        iconBtn('מחיקת אפשרות', '✕', function(){ editForms(function(){ q.options.splice(i, 1); }); })
+      ]));
+    });
+    box.appendChild(el('div', { class:'opt-actions' }, [
+      el('button', { class:'btn-ghost', onclick:function(){ editForms(function(){ q.options.push({ label:'אפשרות ' + (q.options.length + 1) }); }); } }, ['+ אפשרות']),
+      el('button', { class:'btn-text', onclick:function(){ state.formsBulk[q.id] = !state.formsBulk[q.id]; render(); } }, [state.formsBulk[q.id] ? 'סגור הדבקה' : '📋 הדבקת רשימה שלמה'])
+    ]));
+    if (state.formsBulk[q.id]){
+      box.appendChild(fArea((q.options || []).map(function(o){ return o.label; }).join('\n'), function(v){
+        var keep = {}; (q.options || []).forEach(function(o){ if (o.count){ keep[o.label] = o.count; } });
+        editForms(function(){ q.options = parseOptionLines(v).map(function(o){ if (!o.count && keep[o.label]){ o.count = keep[o.label]; } return o; }); });
+      }, 8, { class:'opt-bulk', placeholder:'שורה אחת לכל אפשרות' }));
+      box.appendChild(el('div', { class:'fhint' }, ['הדבק רשימה (למשל מאקסל) — שורה לכל אפשרות. הרשימה מוחלפת כשיוצאים מהשדה.']));
+    }
+    return box;
+  }
+
+  function renderGroupsQuestionSettings(c, fk, q){
+    var gc = q.groups || (q.groups = { filterBy:'', countFrom:'', exact:0 });
+    var f = c.forms[fk];
+    var choiceQs = (f.questions || []).filter(function(x){ return ['select','radio','checkbox'].indexOf(x.type) !== -1 && x.id !== q.id; });
+    var box = el('div', { class:'qset' });
+    box.appendChild(el('div', { class:'qset-title' }, ['אילו קבוצות להציג להורה?']));
+    box.appendChild(fSelect([{ key:'', label:'את כל הקבוצות' }].concat(choiceQs.map(function(x){ return { key:x.id, label:'רק קבוצות שמתאימות לתשובה על: ' + (x.label || '') }; })), gc.filterBy || '', function(v){ editForms(function(){ gc.filterBy = v; }); }));
+    box.appendChild(el('div', { class:'fhint' }, ['למשל לפי "שכבת גיל": ההורה יראה רק קבוצות שסימנת בלשונית "קבוצות" כמתאימות לשכבה שבחר.']));
+    box.appendChild(el('div', { class:'qset-title' }, ['כמה קבוצות ההורה בוחר?']));
+    var countQs = choiceQs.filter(function(x){ return x.type !== 'checkbox'; });
+    box.appendChild(fSelect([{ key:'', label:'מספר קבוע' }].concat(countQs.map(function(x){ return { key:x.id, label:'לפי התשובה על: ' + (x.label || '') }; })), gc.countFrom || '', function(v){ editForms(function(){ gc.countFrom = v; }); }));
+    if (!gc.countFrom){
+      box.appendChild(fField('מספר הקבוצות (0 = כמה שרוצים, לפחות אחת)', fInput(String(gc.exact || 0), function(v){ editForms(function(){ gc.exact = Math.max(0, parseInt(v, 10) || 0); }); }, { type:'number', min:'0', style:'max-width:110px;' })));
+    } else {
+      var cq = formQuestion(c, fk, gc.countFrom);
+      box.appendChild(el('div', { class:'fhint' }, ['כמה קבוצות בוחרים לכל תשובה?']));
+      var tbl = el('div', { class:'cnt-tbl' });
+      ((cq && cq.options) || []).forEach(function(o){
+        tbl.appendChild(el('div', { class:'cnt-row' }, [ el('span', {}, [o.label]), fInput(o.count ? String(o.count) : '', function(v){ editForms(function(){ var n = parseInt(v, 10); if (n > 0){ o.count = n; } else { delete o.count; } }); }, { type:'number', min:'0', placeholder:'—', style:'width:70px;' }) ]));
+      });
+      box.appendChild(tbl);
+    }
+    return box;
+  }
+
+  function renderQuestionEditor(c, fk, q){
+    var f = c.forms[fk];
+    var ed = el('div', { class:'fq-edit' });
+    if (q.type === 'info'){
+      ed.appendChild(fField('הטקסט שיוצג להורה', fArea(q.text != null ? q.text : q.label, function(v){ editForms(function(){ q.text = v; }); }, 3), 'אפשר לכתוב {whatsapp} כדי להציג קישור לוואטסאפ שלך.'));
+    } else {
+      ed.appendChild(fField(q.type === 'single_checkbox' ? 'נוסח האישור' : 'מה לשאול?', fInput(q.label || '', function(v){ editForms(function(){ q.label = v; }); }), q.type === 'single_checkbox' ? 'אפשר לכתוב {terms} כדי להציג קישור לתקנון.' : null));
+      ed.appendChild(fField('הסבר קטן מתחת לשאלה (לא חובה)', fInput(q.help || '', function(v){ editForms(function(){ q.help = v; }); })));
+      if (['text','phone','number','textarea'].indexOf(q.type) !== -1){ ed.appendChild(fField('טקסט רמז בתוך השדה (לא חובה)', fInput(q.placeholder || '', function(v){ editForms(function(){ q.placeholder = v; }); }))); }
+    }
+    if (['select','radio','checkbox'].indexOf(q.type) !== -1){
+      ed.appendChild(el('div', { class:'field' }, [ el('label', {}, ['אפשרויות הבחירה']), renderOptionsEditor(c, fk, q) ]));
+    }
+    if (q.type === 'groups'){ ed.appendChild(renderGroupsQuestionSettings(c, fk, q)); }
+    if (isInputQ(q)){
+      ed.appendChild(fSwitch('חובה למלא', !!q.required, function(v){ editForms(function(){ q.required = v; }); }, 'ההורה לא יוכל לשלוח בלי לענות'));
+      if (q.type !== 'groups'){
+        ed.appendChild(fField('איפה זה יופיע בכרטיס המתאמן?', fSelect(MAPTO_FRIENDLY, q.mapTo || '', function(v){ editForms(function(){ q.mapTo = v; }); }), 'כשתוסיף נרשם לקבוצה, השדה ימולא לבד. "לא מועבר" אומר שהתשובה נשמרת רק בגיליון.'));
+      }
+    }
+    // when to show it
+    var conditional = (q.showIf || []).length > 0;
+    var seg = el('div', { class:'seg' }, [
+      el('button', { class:'seg-b' + (conditional ? '' : ' on'), onclick:function(){ editForms(function(){ q.showIf = []; }); } }, ['מוצגת תמיד']),
+      el('button', { class:'seg-b' + (conditional ? ' on' : ''), onclick:function(){
+        var cand = (f.questions || []).filter(function(x){ return isInputQ(x) && x.id !== q.id && ['textarea','text','number'].indexOf(x.type) === -1; })[0];
+        if (!cand){ showToast('כדי להציג שאלה בתנאי צריך קודם שאלת בחירה, רשימה או אישור.'); return; }
+        if (!conditional){ editForms(function(){ q.showIf = [{ q:cand.id, op:'in', values:[] }]; }); }
+      } }, ['רק במקרים מסוימים'])
+    ]);
+    ed.appendChild(el('div', { class:'field' }, [ el('label', {}, ['מתי להציג את השאלה?']), seg, conditional ? renderConditions(c, fk, q.showIf, function(fn){ editForms(fn); }, q.id, 'הצג רק אם') : null ]));
+    ed.appendChild(el('div', { class:'fq-del' }, [ el('button', { class:'btn-danger-text', onclick:function(){ deleteQuestion(fk, q.id); } }, ['🗑 מחיקת השאלה']) ]));
+    return ed;
+  }
+
+  function renderQuestionList(c, fk){
+    var f = c.forms[fk], list = el('div', { class:'fq-list' });
+    (f.questions || []).forEach(function(q, idx){
+      var info = QTYPE_INFO[q.type] || { ic:'•', name:q.type };
+      if (q.type === 'heading'){
+        list.appendChild(el('div', { class:'fq-sec' }, [
+          el('span', { class:'fq-sec-tag' }, ['מקטע']),
+          fInput(q.label || '', function(v){ editForms(function(){ q.label = v; }); }, { class:'fq-sec-in', placeholder:'שם המקטע' }),
+          iconBtn('למעלה', '▲', function(){ moveQuestion(fk, q.id, -1); }), iconBtn('למטה', '▼', function(){ moveQuestion(fk, q.id, 1); }), iconBtn('מחיקה', '🗑', function(){ deleteQuestion(fk, q.id); })
+        ]));
+        return;
+      }
+      var open = state.formsOpenQ === q.id;
+      var badges = [ el('span', { class:'bdg' }, [info.name]) ];
+      if (q.required){ badges.push(el('span', { class:'bdg req' }, ['חובה'])); }
+      if ((q.showIf || []).length){ badges.push(el('span', { class:'bdg cond' }, ['⛓ בתנאי'])); }
+      if (q.mapTo && q.mapTo !== 'groups'){ badges.push(el('span', { class:'bdg map' }, ['← ' + mapToLabel(q.mapTo)])); }
+      var shown = q.type === 'info' ? (q.text != null ? q.text : q.label) : q.label;
+      var head = el('div', { class:'fq-head', onclick:function(){ state.formsOpenQ = open ? null : q.id; render(); } }, [
+        el('span', { class:'fq-ic' }, [info.ic]),
+        el('div', { class:'fq-main' }, [ el('div', { class:'fq-label' }, [String(shown || '(ללא נוסח)').slice(0, 110)]), el('div', { class:'fq-badges' }, badges) ]),
+        el('div', { class:'fq-acts' }, [ iconBtn('למעלה', '▲', function(){ moveQuestion(fk, q.id, -1); }), iconBtn('למטה', '▼', function(){ moveQuestion(fk, q.id, 1); }), el('span', { class:'fq-edit-btn' }, [open ? 'סגור ▴' : '✏️ עריכה']) ])
+      ]);
+      var row = el('div', { class:'fq-row' + (open ? ' open' : '') }, [head]);
+      if (open){ row.appendChild(renderQuestionEditor(c, fk, q)); }
+      list.appendChild(row);
+    });
+    return list;
+  }
+  function renderAddQuestion(c, fk){
+    var f = c.forms[fk];
+    if (!state.formsAddOpen){
+      return el('button', { class:'btn-primary fq-addbtn', onclick:function(){ state.formsAddOpen = true; render(); } }, ['+ הוספת שאלה']);
+    }
+    var grid = el('div', { class:'tiles' });
+    ['text','phone','textarea','select','radio','checkbox','single_checkbox','groups','heading','info'].forEach(function(t){
+      var info = QTYPE_INFO[t];
+      grid.appendChild(el('button', { class:'tile', onclick:function(){
+        var q = newQuestion(t); state.formsOpenQ = (t === 'heading') ? null : q.id; state.formsAddOpen = false;
+        editForms(function(){ f.questions.push(q); });
+        showToast('נוספה שאלה בסוף הרשימה. אפשר להזיז אותה עם החיצים.');
+      } }, [ el('span', { class:'tile-ic' }, [info.ic]), el('b', {}, [info.name]), el('span', { class:'tile-d' }, [info.desc]) ]));
+    });
+    return el('div', { class:'add-box' }, [ el('div', { class:'add-title' }, ['איזה סוג שאלה להוסיף?']), grid, el('button', { class:'btn-text', onclick:function(){ state.formsAddOpen = false; render(); } }, ['ביטול']) ]);
+  }
+
+  // ---- step 2: where to send the customer ----
+  function routingMode(f){ var rt = f.routing || {}; if (rt.matrix && rt.matrix.enabled) return 'matrix'; return (rt.fallback && rt.fallback.type === 'redirect') ? 'single' : 'message'; }
+  function ensureRouting(f){
+    var rt = f.routing || (f.routing = {});
+    rt.special = rt.special || [];
+    rt.matrix = rt.matrix || { enabled:false, rowQ:'', colQ:'', cells:{} };
+    rt.matrix.cells = rt.matrix.cells || {};
+    rt.fallback = rt.fallback || { type:'message', url:'', message:'' };
+    return rt;
+  }
+  function setRoutingMode(c, fk, mode){
+    editForms(function(){
+      var f = c.forms[fk], rt = ensureRouting(f);
+      if (mode === 'matrix'){
+        rt.matrix.enabled = true;
+        var choice = (f.questions || []).filter(function(q){ return ['select','radio','checkbox'].indexOf(q.type) !== -1; });
+        if (!rt.matrix.rowQ && choice[0]){ rt.matrix.rowQ = choice[0].id; }
+        if (!rt.matrix.colQ && (choice[1] || choice[0])){ rt.matrix.colQ = (choice[1] || choice[0]).id; }
+        if (rt.fallback.type === 'redirect' && !validUrl(rt.fallback.url)){ rt.fallback.type = 'message'; }   // an empty "link" would block publishing
+      } else {
+        rt.matrix.enabled = false;
+        rt.fallback.type = mode === 'single' ? 'redirect' : 'message';
+      }
+      if (rt.fallback.type === 'message' && !(rt.fallback.message || '').trim()){ rt.fallback.message = 'תודה! הפרטים התקבלו ונחזור אליך בהקדם.'; }
+    });
+  }
+  function matrixStats(c, fk){
+    var f = c.forms[fk], mx = (f.routing || {}).matrix, out = { total:0, filled:0, ready:false };
+    if (!mx || !mx.enabled) return out;
+    var rq = formQuestion(c, fk, mx.rowQ), cq = formQuestion(c, fk, mx.colQ);
+    if (!rq || !cq) return out;
+    out.ready = true;
+    optionValuesOf(c, rq).forEach(function(r){ optionValuesOf(c, cq).forEach(function(cl){ out.total++; var cell = (mx.cells || {})[r + '|' + cl]; if (cell && cell.url){ out.filled++; } }); });
+    return out;
+  }
+  function renderMatrix(c, fk){
+    var f = c.forms[fk], rt = ensureRouting(f), mx = rt.matrix;
+    var choiceQs = (f.questions || []).filter(function(q){ return ['select','radio','checkbox'].indexOf(q.type) !== -1; });
+    var opts = [{ key:'', label:'— בחר שאלה —' }].concat(choiceQs.map(function(q){ return { key:q.id, label:q.label }; }));
+    var box = el('div', { class:'mx-box' });
+    box.appendChild(el('div', { class:'mx-pick' }, [
+      el('span', {}, ['קישור התשלום נקבע לפי']), fSelect(opts, mx.rowQ || '', function(v){ editForms(function(){ mx.rowQ = v; }); }),
+      el('span', {}, ['וגם לפי']), fSelect(opts, mx.colQ || '', function(v){ editForms(function(){ mx.colQ = v; }); })
+    ]));
+    var rq = formQuestion(c, fk, mx.rowQ), cq = formQuestion(c, fk, mx.colQ);
+    if (!rq || !cq){ box.appendChild(el('div', { class:'fhint' }, ['בחר את שתי השאלות כדי לראות את הטבלה.'])); return box; }
+    var st = matrixStats(c, fk);
+    box.appendChild(el('div', { class:'mx-prog' + (st.filled === st.total ? ' done' : '') }, [ st.filled === st.total ? '✓ כל ' + st.total + ' הקישורים הוגדרו' : 'הוגדרו ' + st.filled + ' מתוך ' + st.total + ' קישורים. מי שיבחר צירוף בלי קישור יקבל את ההודעה שבהמשך.' ]));
+    var rows = optionValuesOf(c, rq), cols = optionValuesOf(c, cq);
+    var thead = el('thead', {}, [ el('tr', {}, [ el('th', { class:'mx-corner' }, [ el('div', {}, [cq.label + ' ←']), el('div', {}, [rq.label + ' ↓']) ]) ].concat(cols.map(function(cl){ return el('th', {}, [cl]); }))) ]);
+    var tbody = el('tbody', {});
+    rows.forEach(function(r){
+      tbody.appendChild(el('tr', {}, [ el('th', { class:'mx-row' }, [r]) ].concat(cols.map(function(cl){
+        var key = r + '|' + cl, cell = mx.cells[key];
+        return el('td', {}, [ fInput((cell && cell.url) || '', function(v){ editForms(function(){ v = v.trim(); if (v){ mx.cells[key] = { type:'redirect', url:v }; } else { delete mx.cells[key]; } }); }, { placeholder:'הדבק קישור תשלום', class:'mx-cell' + ((cell && cell.url && !validUrl(cell.url)) ? ' bad' : '') + ((cell && cell.url && validUrl(cell.url)) ? ' ok' : '') }) ]);
+      }))));
+    });
+    box.appendChild(el('div', { class:'table-wrap' }, [ el('table', { class:'mx-table' }, [thead, tbody]) ]));
+    return box;
+  }
+  function renderSpecialRules(c, fk){
+    var f = c.forms[fk], rt = ensureRouting(f), wrap = el('div', {});
+    rt.special.forEach(function(r, i){
+      var a = r.action || (r.action = { type:'redirect', url:'', message:'' });
+      var box = el('div', { class:'rule' });
+      box.appendChild(el('div', { class:'rule-head' }, [
+        el('span', { class:'rule-n' }, [String(i + 1)]),
+        fInput(r.name || '', function(v){ editForms(function(){ r.name = v; }); }, { placeholder:'שם לחוק (למשל: מתעניינים באימון פרטני)' }),
+        iconBtn('למעלה', '▲', function(){ editForms(function(){ if (i > 0){ var t = rt.special[i-1]; rt.special[i-1] = rt.special[i]; rt.special[i] = t; } }); }),
+        iconBtn('למטה', '▼', function(){ editForms(function(){ if (i < rt.special.length - 1){ var t = rt.special[i+1]; rt.special[i+1] = rt.special[i]; rt.special[i] = t; } }); }),
+        iconBtn('מחיקת החוק', '🗑', function(){ editForms(function(){ rt.special.splice(i, 1); }); })
+      ]));
+      box.appendChild(renderConditions(c, fk, r.when || (r.when = []), function(fn){ editForms(fn); }, null, 'אם'));
+      box.appendChild(el('div', { class:'rule-then' }, [
+        el('span', { class:'cond-lead' }, ['אז']),
+        fSelect([{ key:'redirect', label:'שלח לקישור' }, { key:'message', label:'הצג הודעה' }], a.type, function(v){ editForms(function(){ a.type = v; }); }),
+        a.type === 'redirect' ? fInput(a.url || '', function(v){ editForms(function(){ a.url = v.trim(); }); }, { placeholder:'https://…', class:'url-in' + ((a.url && !validUrl(a.url)) ? ' bad' : '') })
+                              : fInput(a.message || '', function(v){ editForms(function(){ a.message = v; }); }, { placeholder:'ההודעה שההורה יראה', class:'url-in' })
+      ]));
+      wrap.appendChild(box);
+    });
+    wrap.appendChild(el('button', { class:'btn-ghost', onclick:function(){ editForms(function(){ rt.special.push({ id:uid('r'), name:'', when:[], action:{ type:'redirect', url:'', message:'' } }); }); } }, ['+ הוסף חוק מיוחד']));
+    return wrap;
+  }
+  function renderRoutingPanel(c, fk){
+    var f = c.forms[fk], rt = ensureRouting(f), mode = routingMode(f), wrap = el('div', {});
+    wrap.appendChild(callout('💡', 'מה זה?', 'אחרי שההורה לוחץ "שליחה", הפרטים שלו נשמרים אצלך, והוא מועבר לדף תשלום (או רואה הודעת תודה). כאן קובעים לאן.'));
+    var modes = [
+      { k:'matrix', t:'קישור שונה לפי התשובות', d:'למשל לפי שכבת גיל וכמות אימונים. זה מה שמתאים לשאלון הרשמה עם מחירים שונים.' },
+      { k:'single', t:'קישור אחד לכולם', d:'כולם מועברים לאותו דף תשלום.' },
+      { k:'message', t:'בלי תשלום — רק הודעת תודה', d:'מתאים לאימון ניסיון: ההורה רואה הודעה ולא מועבר לשום מקום.' }
+    ];
+    var cards = el('div', { class:'mode-cards' }, modes.map(function(m){
+      return el('button', { class:'mode-card' + (mode === m.k ? ' on' : ''), onclick:function(){ setRoutingMode(c, fk, m.k); } }, [ el('b', {}, [m.t]), el('span', {}, [m.d]) ]);
+    }));
+    var fb = rt.fallback;
+    var body = [ cards ];
+    if (mode === 'matrix'){
+      body.push(renderMatrix(c, fk));
+      body.push(el('div', { class:'subttl' }, ['ואם לצירוף מסוים אין קישור, מה ההורה יראה?']));
+      body.push(el('div', { class:'rule-then' }, [
+        fSelect([{ key:'message', label:'הודעה' }, { key:'redirect', label:'קישור' }], fb.type, function(v){ editForms(function(){ fb.type = v; }); }),
+        fb.type === 'redirect' ? fInput(fb.url || '', function(v){ editForms(function(){ fb.url = v.trim(); }); }, { placeholder:'https://…', class:'url-in' + ((fb.url && !validUrl(fb.url)) ? ' bad' : '') }) : fInput(fb.message || '', function(v){ editForms(function(){ fb.message = v; }); }, { placeholder:'למשל: תודה! ניצור איתך קשר עם קישור לתשלום.', class:'url-in' })
+      ]));
+    } else if (mode === 'single'){
+      body.push(fField('קישור לדף התשלום', fInput(fb.url || '', function(v){ editForms(function(){ fb.url = v.trim(); }); }, { placeholder:'https://…', class:'url-in' + ((fb.url && !validUrl(fb.url)) ? ' bad' : '') })));
+    } else {
+      body.push(fField('הודעת התודה', fArea(fb.message || '', function(v){ editForms(function(){ fb.message = v; }); }, 2), 'ההורה רואה אותה אחרי השליחה, עם כפתור לוואטסאפ שלך.'));
+    }
+    wrap.appendChild(panelCard('🧭', 'לאן ממשיכים אחרי השליחה?', null, body));
+
+    var specialCount = rt.special.length;
+    var spBody = [];
+    if (state.formsSpecialOpen || specialCount){
+      spBody.push(el('div', { class:'fhint' }, ['חוקים כאלה נבדקים לפני הטבלה, והחוק הראשון שמתאים מנצח. למשל: מי שסימן שהוא מתעניין באימון פרטני יופנה לדף אחר.']));
+      spBody.push(renderSpecialRules(c, fk));
+    } else {
+      spBody.push(el('div', { class:'fhint' }, ['בדרך כלל לא צריך. זה למקרים כמו "מי שסימן X יופנה לקישור אחר".']));
+      spBody.push(el('button', { class:'btn-ghost', onclick:function(){ state.formsSpecialOpen = true; editForms(function(){ rt.special.push({ id:uid('r'), name:'', when:[], action:{ type:'redirect', url:'', message:'' } }); }); } }, ['הוסף מקרה מיוחד']));
+    }
+    wrap.appendChild(panelCard('⭐', 'מקרים מיוחדים' + (specialCount ? ' (' + specialCount + ')' : ' (לא חובה)'), null, spBody));
+
+    var a = f.after || (f.after = { mode:'button', delaySec:0, message:'', buttonLabel:'המשך' });
+    var afterBody = [
+      el('div', { class:'seg' }, [
+        el('button', { class:'seg-b' + ((a.mode || 'button') === 'auto' ? ' on' : ''), onclick:function(){ editForms(function(){ a.mode = 'auto'; }); } }, ['להעביר אוטומטית']),
+        el('button', { class:'seg-b' + ((a.mode || 'button') === 'button' ? ' on' : ''), onclick:function(){ editForms(function(){ a.mode = 'button'; }); } }, ['להציג כפתור'])
+      ]),
+      fField('הודעה שההורה רואה לפני ההעברה', fInput(a.message || '', function(v){ editForms(function(){ a.message = v; }); }), 'למשל: תודה! הפרטים התקבלו. מעבירים אותך לדף התשלום.'),
+      el('div', { class:'fe-grid' }, [
+        fField('כיתוב הכפתור', fInput(a.buttonLabel || '', function(v){ editForms(function(){ a.buttonLabel = v; }); })),
+        (a.mode === 'auto') ? fField('כמה שניות לחכות', fInput(String(a.delaySec || 0), function(v){ editForms(function(){ a.delaySec = Math.max(0, parseInt(v, 10) || 0); }); }, { type:'number', min:'0' })) : null
+      ])
+    ];
+    wrap.appendChild(panelCard('⏱', 'מה ההורה רואה אחרי השליחה?', 'ההעברה לקישור מתבצעת רק אחרי שהפרטים נשמרו.', afterBody));
+    return wrap;
+  }
+
+  // ---- step 3: titles and messages ----
+  function renderTextsPanel(c, fk){
+    var f = c.forms[fk];
+    return el('div', {}, [
+      panelCard('🏷', 'כותרות וטקסטים', 'כך הטופס נפתח אצל ההורה.', [
+        fField('כותרת הטופס', fInput(f.title || '', function(v){ editForms(function(){ f.title = v; }); })),
+        fField('טקסט פתיחה (לא חובה)', fArea(f.intro || '', function(v){ editForms(function(){ f.intro = v; }); }, 3), 'אפשר לכתוב {whatsapp} כדי להציג קישור לוואטסאפ שלך.'),
+        fField('כיתוב כפתור השליחה', fInput(f.submitLabel || '', function(v){ editForms(function(){ f.submitLabel = v; }); }))
+      ]),
+      panelCard('🚦', 'האם הטופס פתוח?', null, [
+        fSwitch('הטופס פתוח להרשמה', f.enabled !== false, function(v){ editForms(function(){ f.enabled = v; }); }, 'כשמכבים, מי שנכנס לקישור רואה "ההרשמה אינה זמינה כרגע" עם כפתור לוואטסאפ.')
+      ]),
+      callout('🎨', 'הצבע והלוגו', 'צבע המותג, הלוגו ושם העסק מוגדרים פעם אחת עבור כל הטפסים, בלשונית "הגדרות".')
+    ]);
+  }
+
+  // ---- the three-step editor ----
+  function stepStatus(c, fk, step){
+    var f = c.forms[fk];
+    if (step === 'questions'){ var n = (f.questions || []).filter(isInputQ).length; return { t:n + ' שאלות', ok:n > 0 }; }
+    if (step === 'routing'){
+      var m = routingMode(f);
+      if (m === 'matrix'){ var st = matrixStats(c, fk); if (!st.ready) return { t:'לבחור שאלות לטבלה', ok:false }; return st.filled === st.total ? { t:'✓ כל הקישורים הוגדרו', ok:true } : { t:'חסרים ' + (st.total - st.filled) + ' קישורים', ok:false }; }
+      if (m === 'single'){ return validUrl((f.routing.fallback || {}).url) ? { t:'✓ קישור אחד לכולם', ok:true } : { t:'חסר קישור', ok:false }; }
+      return { t:'✓ הודעת תודה בלבד', ok:true };
+    }
+    return { t:f.enabled === false ? 'סגור להרשמה' : 'פתוח', ok:f.enabled !== false };
+  }
+  function renderFormEditor(c, fk){
+    var f = c.forms[fk], wrap = el('div', { class:'fe' });
+    var steps = [
+      { k:'questions', n:'1', t:'השאלות', d:'מה ההורה ממלא' },
+      { k:'routing', n:'2', t:'לאן ממשיכים', d:'קישור תשלום או הודעה' },
+      { k:'texts', n:'3', t:'כותרות והודעות', d:'הטקסטים של הטופס' }
+    ];
+    wrap.appendChild(el('div', { class:'steps' }, steps.map(function(st){
+      var info = stepStatus(c, fk, st.k);
+      return el('button', { class:'step' + (state.formsStep === st.k ? ' on' : ''), onclick:function(){ state.formsStep = st.k; state.formsAddOpen = false; render(); } }, [
+        el('span', { class:'step-n' }, [st.n]), el('div', { class:'step-tx' }, [ el('b', {}, [st.t]), el('span', {}, [st.d]) ]), el('span', { class:'step-st' + (info.ok ? ' ok' : ' warn') }, [info.t])
+      ]);
+    })));
+    if (state.formsStep === 'routing'){ wrap.appendChild(renderRoutingPanel(c, fk)); }
+    else if (state.formsStep === 'texts'){ wrap.appendChild(renderTextsPanel(c, fk)); }
+    else {
+      wrap.appendChild(callout('💡', 'איך זה עובד?', 'אלה השאלות שההורה רואה, לפי הסדר. לחץ על שאלה כדי לערוך אותה, והזז עם החיצים. מקטע (פס אדום) מחלק את הטופס לחלקים.'));
+      wrap.appendChild(renderQuestionList(c, fk));
+      wrap.appendChild(renderAddQuestion(c, fk));
+    }
+    return wrap;
+  }
+
+  // ---- shared group list ----
+  function tokensOf(str){ return String(str || '').replace(/[\"'״׳,\-–()\/]/g, ' ').split(/\s+/).filter(function(t){ return t.length > 1; }); }
+  function suggestTatamiGroup(name){
+    var a = tokensOf(name), best = null, bestScore = 0, second = 0;
+    state.groups.forEach(function(g){
+      var b = tokensOf(g.name + ' ' + (g.time || '')), common = a.filter(function(t){ return b.indexOf(t) !== -1; }).length;
+      var score = common / Math.max(a.length, 1);
+      var ta = String(name).match(/\d{1,2}:\d{2}/g) || [], tb = String(g.name + ' ' + (g.time || '')).match(/\d{1,2}:\d{2}/g) || [];
+      if (ta.length && tb.length && !ta.some(function(t){ return tb.indexOf(t) !== -1; })){ score = 0; }   // different hours = a different group
+      if (score > bestScore){ second = bestScore; bestScore = score; best = g; } else if (score > second){ second = score; }
+    });
+    return (best && bestScore >= 0.5 && bestScore - second >= 0.1) ? best : null;
+  }
+  function pillTog(label, on, fn, title){ return el('button', { class:'pilltog' + (on ? ' on' : ''), title:title || '', onclick:fn }, [label]); }
+  function renderGroupsTab(c){
+    var wrap = el('div', {});
+    var all = c.groups || [];
+    var audiences = [], seen = {};
+    ['registration','trial'].forEach(function(fk){
+      (c.forms[fk].questions || []).filter(function(q){ return q.type === 'groups' && q.groups && q.groups.filterBy; }).forEach(function(q){
+        optionValuesOf(c, formQuestion(c, fk, q.groups.filterBy)).forEach(function(v){ if (!seen[v]){ seen[v] = 1; audiences.push(v); } });
+      });
+    });
+    wrap.appendChild(callout('💡', 'מה זה?', 'אלה הקבוצות שההורים בוחרים מהן. לכל קבוצה מסמנים לאילו שכבות היא מוצגת. קבוצה "מלאה" מופיעה אבל אי אפשר לבחור בה, וקבוצה שאינה "פעילה" לא מופיעה בכלל. "קבוצה בטטאמי" קובעת לאן הנרשם יועבר כשלוחצים "הוסף לקבוצה".'));
+    var linked = all.filter(function(g){ return g.tatamiGroupId && state.groups.some(function(x){ return x.id === g.tatamiGroupId; }); }).length;
+    wrap.appendChild(el('div', { class:'stat-row' }, [
+      el('span', { class:'stat' }, [el('b', {}, [String(all.length)]), ' קבוצות']),
+      el('span', { class:'stat' }, [el('b', {}, [String(all.filter(function(g){ return g.full; }).length)]), ' מלאות']),
+      el('span', { class:'stat' + (linked < all.length ? ' warn' : ' ok') }, [el('b', {}, [String(linked)]), ' מקושרות לטטאמי'])
+    ]));
+    wrap.appendChild(el('div', { class:'fg-actions' }, [
+      el('button', { class:'btn-primary', onclick:function(){ editForms(function(){ c.groups.push({ id:uid('g'), name:'קבוצה חדשה', section:'', showFor:[], forms:['registration','trial'], full:false, active:true, tatamiGroupId:'' }); }); } }, ['+ קבוצה חדשה']),
+      el('button', { class:'btn-ghost', title:'מקשר לבד קבוצות שעדיין לא מקושרות, לפי דמיון בשם ובשעה. אתה מאשר את התוצאה.', onclick:function(){
+        var n = 0; editForms(function(){ c.groups.forEach(function(g){ if (!g.tatamiGroupId){ var sg = suggestTatamiGroup(g.name); if (sg){ g.tatamiGroupId = sg.id; n++; } } }); });
+        showToast(n ? 'הוצעו התאמות ל-' + n + ' קבוצות. בדוק אותן בעמודה "קבוצה בטטאמי".' : 'לא נמצאו התאמות ברורות. אפשר לקשר ידנית.');
+      } }, ['✨ קשר אוטומטית לקבוצות בטטאמי'])
+    ]));
+    if (audiences.length){
+      var chips = el('div', { class:'chips' }, [ pillTog('כל הקבוצות', !state.formsGroupFilter, function(){ state.formsGroupFilter = ''; render(); }) ]);
+      audiences.forEach(function(a){ chips.appendChild(pillTog(a, state.formsGroupFilter === a, function(){ state.formsGroupFilter = (state.formsGroupFilter === a ? '' : a); render(); })); });
+      wrap.appendChild(el('div', { class:'fhint', style:'margin:8px 0 4px;' }, ['הצג רק את מה שרואה מי שבחר:']));
+      wrap.appendChild(chips);
+    } else {
+      wrap.appendChild(callout('ℹ️', null, 'כדי לסנן קבוצות לפי שכבה, הוסף לשאלון שאלת "בחירת קבוצות" והגדר בה סינון לפי שאלה (למשל שכבת גיל).', 'soft'));
+    }
+    var sections = [], bySec = {};
+    all.forEach(function(g){
+      if (state.formsGroupFilter && (g.showFor || []).indexOf(state.formsGroupFilter) === -1) return;
+      var sec = g.section || 'ללא כותרת'; if (!bySec[sec]){ bySec[sec] = []; sections.push(sec); } bySec[sec].push(g);
+    });
+    var secNames = {}; all.forEach(function(g){ if (g.section) secNames[g.section] = 1; });
+    var dl = el('datalist', { id:'fg-sections' }, Object.keys(secNames).map(function(v){ return el('option', { value:v }); }));
+    wrap.appendChild(dl);
+    sections.forEach(function(sec){
+      var box = el('div', { class:'gsec' }, [ el('div', { class:'gsec-head' }, [ el('b', {}, [sec]), el('span', { class:'gsec-n' }, [bySec[sec].length + ' קבוצות']) ]) ]);
+      bySec[sec].forEach(function(g){
+        var idx = c.groups.indexOf(g), open = !!state.formsGroupOpen[g.id];
+        var tgOk = g.tatamiGroupId && state.groups.some(function(x){ return x.id === g.tatamiGroupId; });
+        var aud = el('div', { class:'chips' }, audiences.map(function(a){ return pillTog(a, (g.showFor || []).indexOf(a) !== -1, function(){ editForms(function(){ var cur = (g.showFor || []).filter(function(x){ return x !== a; }); if ((g.showFor || []).indexOf(a) === -1) cur.push(a); g.showFor = cur; }); }); }));
+        (g.showFor || []).forEach(function(v){ if (audiences.indexOf(v) === -1){ aud.appendChild(el('span', { class:'cond-missing' }, ['⚠ "' + v + '" לא קיים'])); } });
+        var card = el('div', { class:'gcard' + (g.active === false ? ' off' : '') + (g.full ? ' full' : '') }, [
+          el('div', { class:'gcard-top' }, [
+            fInput(g.name || '', function(v){ editForms(function(){ g.name = v; }); }, { class:'g-name' }),
+            pillTog(g.full ? '🔴 מלאה' : 'מלאה?', !!g.full, function(){ editForms(function(){ g.full = !g.full; }); }, 'מוצגת להורים כמלאה, ואי אפשר לבחור בה'),
+            pillTog(g.active === false ? '⏸ לא פעילה' : '✓ פעילה', g.active !== false, function(){ editForms(function(){ g.active = (g.active === false); }); }, 'קבוצה לא פעילה לא מופיעה בטפסים'),
+            el('button', { class:'icon-btn', title:'עוד אפשרויות', onclick:function(){ state.formsGroupOpen[g.id] = !open; render(); } }, [open ? '▴' : '⋯'])
+          ]),
+          aud ? el('div', { class:'g-aud' }, [ el('span', { class:'g-lab' }, ['מוצגת ל:']), aud ]) : null,
+          el('div', { class:'g-link' }, [ el('span', { class:'dot ' + (tgOk ? 'ok' : 'warn') }), el('span', { class:'g-lab' }, ['קבוצה בטטאמי:']),
+            fSelect([{ key:'', label:'— לא מקושרת —' }].concat(state.groups.map(function(x){ return { key:x.id, label:x.name }; })), tgOk ? g.tatamiGroupId : '', function(v){ editForms(function(){ g.tatamiGroupId = v; }); }, { class:'fg-tg' }) ])
+        ]);
+        if (open){
+          card.appendChild(el('div', { class:'gcard-more' }, [
+            fField('כותרת המקטע שהקבוצה מופיעה תחתיו', fInput(g.section || '', function(v){ editForms(function(){ g.section = v; }); }, { list:'fg-sections' })),
+            el('div', { class:'field' }, [ el('label', {}, ['באילו שאלונים?']), el('div', { class:'chips' }, ['registration','trial'].map(function(fk){ return pillTog(fk === 'registration' ? 'הרשמה' : 'אימון ניסיון', (g.forms || []).indexOf(fk) !== -1, function(){ editForms(function(){ var cur = (g.forms || []).filter(function(x){ return x !== fk; }); if ((g.forms || []).indexOf(fk) === -1) cur.push(fk); g.forms = cur; }); }); })) ]),
+            el('div', { class:'gcard-btns' }, [
+              el('button', { class:'btn-ghost', onclick:function(){ editForms(function(){ var cp = JSON.parse(JSON.stringify(g)); cp.id = uid('g'); cp.name += ' (העתק)'; c.groups.splice(idx + 1, 0, cp); }); } }, ['⧉ שכפול']),
+              el('button', { class:'btn-danger-text', onclick:function(){ openConfirm('למחוק את "' + g.name + '" מהרשימה?', function(){ editForms(function(){ c.groups.splice(c.groups.indexOf(g), 1); }); }, 'מחיקה'); } }, ['🗑 מחיקה'])
+            ])
+          ]));
+        }
+        box.appendChild(card);
+      });
+      wrap.appendChild(box);
+    });
+    return wrap;
+  }
+
+  // ---- settings tab ----
+  var BRAND_SWATCHES = ['#B91717','#A92F1E','#0F4C81','#1B7F5C','#6B3FA0','#C2410C','#111827'];
+  function renderFormsGeneral(c){
+    var g = c.general || (c.general = {}), wrap = el('div', {});
+    var sw = el('div', { class:'swatches' }, BRAND_SWATCHES.map(function(col){
+      return el('button', { class:'swatch' + ((g.brandColor || '#B91717').toLowerCase() === col.toLowerCase() ? ' on' : ''), style:'background:' + col + ';', title:col, onclick:function(){ editForms(function(){ g.brandColor = col; }); } });
+    }));
+    var picker = el('input', { type:'color', class:'color-in', value:/^#[0-9a-f]{6}$/i.test(g.brandColor || '') ? g.brandColor : '#B91717' });
+    picker.addEventListener('change', function(e){ editForms(function(){ g.brandColor = e.target.value; }); });
+    wrap.appendChild(panelCard('🎨', 'המראה של הטפסים', 'כל מה שההורים רואים: צבע, לוגו ושם.', [
+      fField('שם העסק', fInput(g.businessName || '', function(v){ editForms(function(){ g.businessName = v; }); }, { placeholder:'Ninjutsu Haifa' }), 'מוצג בתחתית הטופס.'),
+      el('div', { class:'field' }, [ el('label', {}, ['צבע המותג']), el('div', { class:'color-row' }, [sw, picker]), el('div', { class:'fhint' }, ['הצבע של הכפתורים, הכותרות והסימונים. לחץ "תצוגה מקדימה" כדי לראות.']) ]),
+      fField('כתובת לוגו (לא חובה)', fInput(g.logoUrl || '', function(v){ editForms(function(){ g.logoUrl = v.trim(); }); }, { placeholder:'https://…/logo.png', style:'direction:ltr;text-align:left;' }), 'אם משאירים ריק, הטופס משתמש בלוגו של הסטודיו.')
+    ]));
+    wrap.appendChild(panelCard('💬', 'יצירת קשר', null, [
+      fField('מספר וואטסאפ שלך', fInput(g.whatsapp || '', function(v){ editForms(function(){ g.whatsapp = v.trim(); }); }, { placeholder:'0545791435' }), 'מופיע בטפסים ובהודעות. בטקסטים אפשר לכתוב {whatsapp} כדי להציג אותו כקישור.')
+    ]));
+    wrap.appendChild(panelCard('📄', 'תקנון והצהרת בריאות', null, [
+      fField('קישור לתקנון', fInput(g.termsUrl || '', function(v){ editForms(function(){ g.termsUrl = v.trim(); }); }, { placeholder:'https://…', style:'direction:ltr;text-align:left;' }), 'בשאלה "מאשר/ת {terms}" המילה {terms} הופכת לקישור הזה.'),
+      fField('כיתוב הקישור', fInput(g.termsLabel || '', function(v){ editForms(function(){ g.termsLabel = v; }); }))
+    ]));
+    var linkKids = [
+      fField('כתובת האתר של הטפסים (מומלץ: אתר נפרד מהאפליקציה)', fInput(g.formBaseUrl || '', function(v){ editForms(function(){ g.formBaseUrl = v.trim(); }); }, { placeholder:'https://uriyariv17.github.io/tatami-forms/', style:'direction:ltr;text-align:left;' }),
+        'הלקוחות נכנסים רק לשם. הדף הזה לא מכיל שום דרך להגיע לאפליקציה או לנתונים. אפשר להזין כתובת תיקייה או כתובת מלאה של register.html.')
+    ];
+    ['registration','trial'].forEach(function(fk){
+      var url = publicFormUrl(fk);
+      linkKids.push(el('div', { class:'link-row' }, [ el('b', {}, [FORM_NAMES[fk]]), el('a', { href:url, target:'_blank', rel:'noopener' }, [url]), el('button', { class:'btn-ghost', style:'padding:4px 12px;font-size:12.5px;', onclick:function(){ copyText(url); } }, ['העתק']) ]));
+    });
+    linkKids.push(el('div', { class:'fhint' }, ['הקישורים עובדים רק אחרי שהעלית את register.html לכתובת שהזנת, ואחרי "פרסם".']));
+    wrap.appendChild(panelCard('🔗', 'איפה הטפסים יושבים והקישורים ללקוחות', null, linkKids));
+    return wrap;
+  }
+
+  // ---- the whole forms area ----
+  function renderFormsSection(app){
+    var wrap = el('div', { class:'forms-view' });
+    var rec = formsRecord();
+    wrap.appendChild(el('div', { class:'fv-hero' }, [ el('h2', {}, ['📝 טפסי הרשמה']), el('p', {}, ['כאן בונים את הטפסים שההורים ממלאים, קובעים לאן הם ממשיכים (למשל לדף תשלום), ורואים מי נרשם.']) ]));
+    var tabs = [
+      ['inbox', '📥', 'נרשמים חדשים', state.inbox.newCount ? String(state.inbox.newCount) : ''],
+      ['registration', '📋', 'שאלון הרשמה', ''], ['trial', '🥋', 'אימון ניסיון', ''], ['groups', '👥', 'קבוצות', ''], ['general', '⚙️', 'הגדרות', '']
+    ];
+    wrap.appendChild(el('div', { class:'fv-tabs' }, tabs.map(function(t){
+      return el('button', { class:'fv-tab' + (state.formsTab === t[0] ? ' on' : ''), onclick:function(){ state.formsTab = t[0]; if (t[0] === 'inbox'){ loadInbox(); } render(); } }, [ el('span', {}, [t[1]]), el('span', {}, [t[2]]), t[3] ? el('span', { class:'fv-badge' }, [t[3]]) : null ]);
+    })));
+    if (state.formsTab === 'inbox'){ app.appendChild(wrap); renderInboxTab(wrap); return; }
+
+    if (!rec){
+      wrap.appendChild(el('div', { class:'welcome' }, [
+        el('h3', {}, ['בואו נקים את הטפסים']),
+        el('div', { class:'welcome-steps' }, [
+          el('div', {}, [el('b', {}, ['1']), 'בונים את השאלות וקובעים לאיזו שכבה מוצגת כל קבוצה']),
+          el('div', {}, [el('b', {}, ['2']), 'קובעים לאן ההורה ממשיך אחרי השליחה (קישור תשלום)']),
+          el('div', {}, [el('b', {}, ['3']), 'בודקים בתצוגה מקדימה, מפרסמים ושולחים את הקישור'])
+        ]),
+        el('p', {}, ['אפשר להתחיל מתבנית שנבנתה לפי השאלון הנוכחי שלך (שאלות, 35 קבוצות לפי שכבה, וניתוב לפי שכבה וכמות אימונים) ולהתאים אותה, או להתחיל מאפס.']),
+        el('div', { class:'welcome-btns' }, [
+          el('button', { class:'btn-primary', onclick:function(){ createFormsRecord(true); } }, ['התחל מהתבנית']),
+          el('button', { class:'btn-ghost', onclick:function(){ createFormsRecord(false); } }, ['התחל מאפס'])
+        ])
+      ]));
+      app.appendChild(wrap); return;
+    }
+    var c = rec.config, dirty = formsDirty();
+    var status = rec.publishedVersion
+      ? (dirty ? el('span', { class:'pub-chip dirty' }, ['● יש שינויים שלא פורסמו']) : el('span', { class:'pub-chip ok' }, ['✓ מפורסם · ' + new Date(rec.publishedAt).toLocaleString('he-IL', { day:'numeric', month:'numeric', hour:'2-digit', minute:'2-digit' })]))
+      : el('span', { class:'pub-chip dirty' }, ['● עדיין לא פורסם — ההורים לא יכולים למלא']);
+    var pubBtn = el('button', { class:'btn-primary pub-btn', onclick:publishForms }, [state.formsPublishing ? 'מפרסם…' : '🚀 פרסום']);
+    if (state.formsPublishing){ pubBtn.disabled = true; }
+    var fkNow = (state.formsTab === 'trial') ? 'trial' : 'registration';
+    wrap.appendChild(el('div', { class:'publish-bar' }, [
+      status, el('span', { style:'flex:1' }),
+      el('button', { class:'btn-preview', onclick:function(){ state.formsPreviewForm = fkNow; openModal({ type:'formPreview', form:fkNow }); } }, ['👁 תצוגה מקדימה']),
+      pubBtn
+    ]));
+    if (state.formsTab === 'registration' || state.formsTab === 'trial'){ wrap.appendChild(renderFormEditor(c, state.formsTab)); }
+    else if (state.formsTab === 'groups'){ wrap.appendChild(renderGroupsTab(c)); }
+    else { wrap.appendChild(renderFormsGeneral(c)); }
+    app.appendChild(wrap);
+  }
+
+  // ---- modals: issues before publishing, and the live preview ----
+  var formPreviewListener = null;
+  function buildFormIssuesModal(m){
+    var kids = [ el('h2', {}, [m.blocking ? 'צריך לתקן לפני הפרסום' : 'כמה דברים לבדוק לפני הפרסום']) ];
+    function list(items, cls, title){
+      if (!items.length) return;
+      kids.push(el('div', { class:'iss-title ' + cls }, [title + ' (' + items.length + ')']));
+      kids.push(el('ul', { class:'iss-list ' + cls }, items.map(function(it){ return el('li', {}, [ el('b', {}, [it.where + ': ']), it.msg ]); })));
+    }
+    list(m.issues.errors, 'err', 'חייבים לתקן');
+    list(m.issues.warnings, 'warn', 'כדאי לבדוק');
+    kids.push(el('div', { class:'modal-actions' }, m.blocking
+      ? [ el('button', { class:'btn-primary', onclick:closeModal }, ['חזרה לעריכה']) ]
+      : [ el('button', { class:'btn-ghost', onclick:closeModal }, ['חזרה לעריכה']), el('button', { class:'btn-primary', onclick:function(){ closeModal(); doPublishForms(); } }, ['פרסם בכל זאת']) ]));
+    return el('div', { class:'modal' }, kids);
+  }
+  function buildFormPreviewModal(m){
+    var fk = m.form || state.formsPreviewForm || 'registration', phone = state.formsPreviewDevice !== 'desktop';
+    var frame = el('iframe', { class:'fpv-frame' + (phone ? ' phone' : ''), src:publicFormUrl(fk) + '&preview=1', title:'תצוגה מקדימה' });
+    if (formPreviewListener){ window.removeEventListener('message', formPreviewListener); }
+    formPreviewListener = function(ev){
+      if (!ev.data || ev.data.type !== 'tatami-form-ready' || ev.source !== frame.contentWindow) return;
+      frame.contentWindow.postMessage({ type:'tatami-config', config:formsCfg() }, '*');
+    };
+    window.addEventListener('message', formPreviewListener);
+    var ctrl = el('div', { class:'fpv-ctrl' }, [
+      el('div', { class:'seg' }, ['registration','trial'].map(function(k){ return el('button', { class:'seg-b' + (fk === k ? ' on' : ''), onclick:function(){ state.formsPreviewForm = k; state.modal = { type:'formPreview', form:k }; render(); } }, [FORM_NAMES[k]]); })),
+      el('div', { class:'seg' }, [
+        el('button', { class:'seg-b' + (phone ? ' on' : ''), onclick:function(){ state.formsPreviewDevice = 'phone'; render(); } }, ['📱 טלפון']),
+        el('button', { class:'seg-b' + (!phone ? ' on' : ''), onclick:function(){ state.formsPreviewDevice = 'desktop'; render(); } }, ['💻 מחשב'])
+      ]),
+      el('button', { class:'btn-ghost', onclick:function(){ render(); } }, ['↻ התחל מחדש'])
+    ]);
+    return el('div', { class:'modal fpv-modal' + (phone ? '' : ' wide') }, [
+      el('h2', {}, ['👁 תצוגה מקדימה']),
+      el('div', { class:'fhint', style:'margin:-6px 0 10px;' }, ['זה בדיוק מה שההורה רואה, לפי הגרסה הנוכחית (גם אם עוד לא פורסמה). אפשר למלא ולשלוח בלי לשמור כלום: בסוף יוצג לאן ההורה היה מופנה.']),
+      ctrl, el('div', { class:'fpv-stage' }, [frame]),
+      el('div', { class:'modal-actions' }, [ el('button', { class:'btn-primary', onclick:closeModal }, ['סגירה']) ])
+    ]);
+  }
+
+  // ---------------- new registrants (answers waiting in the sheet) ----------------
+  function digitsOf(p){ var d = String(p || '').replace(/\D/g, ''); if (d.indexOf('972') === 0){ d = '0' + d.slice(3); } return d; }
+  function normNameKey(n){ return String(n || '').replace(/[\s"'׳״\-]/g, '').toLowerCase(); }
+  function waLinkFor(phone){ var d = digitsOf(phone); return d ? 'https://wa.me/972' + d.slice(1) : ''; }
+  function findExistingStudent(name, phone, groupId){
+    var pd = digitsOf(phone), nn = normNameKey(name);
+    return state.students.find(function(x){ return !x.trashed && x.groupId === groupId && normNameKey(x.name) === nn && (!pd || !x.phone || digitsOf(x.phone) === pd); }) || null;
+  }
+  async function loadInbox(quiet){
+    var ib = state.inbox;
+    var rec = formsRecord();
+    if (!rec || !USE_SHEETS_BACKEND) return;
+    if (!quiet){ ib.loading = true; render(); }
+    var before = ib.newCount;
+    try{
+      var d = await sheetsCall('&action=listResponses&status=' + (ib.showAll ? 'all' : 'new'));
+      if (!d || !d.responses){ ib.supported = false; ib.items = []; }
+      else { ib.supported = true; ib.items = d.responses; }
+      ib.error = '';
+      ib.newCount = ib.items.filter(function(i){ return i.status === 'new'; }).length;
+      ib.loadedAt = Date.now();
+    }catch(e){ ib.error = 'לא הצלחתי לטעון את הנרשמים. בדוק חיבור ונסה שוב.'; }
+    ib.loading = false;
+    if (!quiet || ib.newCount !== before || state.section === 'forms'){ render(); }
+  }
+  function maybeCheckInbox(){
+    var rec = formsRecord();
+    if (!state.loaded || state.readOnly || !rec || !rec.publishedVersion) return;
+    if (Date.now() - (state.inbox.loadedAt || 0) < 120000) return;
+    loadInbox(true);
+  }
+  async function markHandled(item, status, note){
+    await sheetsPostAction({ action:'markResponse', form:item.form, id:item.id, status:status, note:note || '' });
+    for (var i = 0; i < 5; i++){                                     // confirm it really changed in the sheet
+      var d = await sheetsCall('&action=listResponses&status=all');
+      var cur = (d.responses || []).find(function(x){ return x.id === item.id; });
+      if (cur && cur.status === status) return true;
+      await new Promise(function(r){ setTimeout(r, 900); });
+    }
+    return false;
+  }
+
+  function renderInboxTab(wrap){
+    var ib = state.inbox, rec = formsRecord();
+    var bar = el('div', { class:'ib-bar' }, [
+      el('button', { class:'btn-ghost', onclick:function(){ loadInbox(); }}, ['🔄 רענן']),
+      fCheck('הצג גם מה שכבר טופל', ib.showAll, function(v){ ib.showAll = v; loadInbox(); })
+    ]);
+    var sel = Object.keys(ib.selected).filter(function(k){ return ib.selected[k] && ib.items.some(function(i){ return i.id === k; }); });
+    if (sel.length){
+      bar.appendChild(el('button', { class:'btn-primary', onclick:function(){ openFormTransfer(ib.items.filter(function(i){ return sel.indexOf(i.id) !== -1; })); }}, ['➕ הוסף את '+sel.length+' המסומנים לקבוצות']));
+    }
+    wrap.appendChild(bar);
+    if (!rec || !rec.publishedVersion){
+      wrap.appendChild(el('div', { class:'rc-notice' }, ['הטפסים עדיין לא פורסמו, ולכן אין נרשמים. אחרי שתפרסם (בלשונית "שאלון הרשמה") ותשלח את הקישורים, כל מי שימלא טופס יופיע כאן.']));
+      return;
+    }
+    if (ib.supported === false){
+      wrap.appendChild(el('div', { class:'rc-notice' }, [el('b', {}, ['הסקריפט בגיליון עוד לא עודכן לגרסה שתומכת בטפסים. ']), 'הדבק את apps_script_backend.gs החדש ופרסם גרסה חדשה (Deploy ← Manage deployments ← New version).']));
+      return;
+    }
+    if (ib.error){ wrap.appendChild(el('div', { class:'error-text' }, [ib.error])); }
+    if (ib.loading && !ib.items.length){ wrap.appendChild(el('p', {}, ['טוען…'])); return; }
+    if (!ib.items.length){ wrap.appendChild(el('p', { class:'lesson-empty', style:'padding:30px;text-align:center;' }, [ib.showAll ? 'עדיין לא התקבלו הרשמות.' : '🎉 אין נרשמים חדשים שממתינים לטיפול.'])); return; }
+
+    var thead = el('thead', {}, [ el('tr', {}, ['','התקבל','סוג','שם הילד/ה','הורה וטלפון','כיתה','קבוצות שנבחרו','ניתוב','',''].map(function(t){ return el('th', {}, [t]); })) ]);
+    var tbody = el('tbody', {});
+    ib.items.forEach(function(it){
+      var fx = (it.data && it.data.fixed) || {};
+      var when = it.at ? new Date(it.at).toLocaleString('he-IL', { day:'numeric', month:'numeric', hour:'2-digit', minute:'2-digit' }) : it.time;
+      var wa = waLinkFor(it.phone);
+      var cb = el('input', { type:'checkbox' }); if (ib.selected[it.id]){ cb.setAttribute('checked', 'checked'); }
+      if (it.status !== 'new'){ cb.disabled = true; }
+      cb.addEventListener('change', function(e){ ib.selected[it.id] = e.target.checked; render(); });
+      var open = !!(ib.openIds && ib.openIds[it.id]);
+      var tr = el('tr', { class:(it.status !== 'new' ? 'ib-done' : '') }, [
+        el('td', {}, [cb]),
+        el('td', { style:'white-space:nowrap;' }, [when]),
+        el('td', {}, [ el('span', { class:'lesson-chip' + (it.form === 'trial' ? ' free' : '') }, [it.form === 'trial' ? 'ניסיון' : 'הרשמה']) ]),
+        el('td', { class:'name-cell' }, [it.child || '—']),
+        el('td', {}, [ (it.parent || '—') + ' · ', wa ? el('a', { href:wa, target:'_blank', rel:'noopener', title:'פתח וואטסאפ' }, [it.phone]) : (it.phone || '') ]),
+        el('td', {}, [it.grade || '—']),
+        el('td', { class:'ib-groups' }, (it.groups || '—').split(' | ').map(function(g){ return el('div', {}, [g]); })),
+        el('td', { class:'rc-note' }, [it.route || '']),
+        el('td', { style:'white-space:nowrap;' }, it.status === 'new'
+          ? [ el('button', { class:'btn-primary', style:'padding:4px 12px;', onclick:function(){ openFormTransfer([it]); }}, ['➕ הוסף לקבוצה']),
+              el('button', { class:'btn-text', title:'סמן כטופל בלי להוסיף', onclick:async function(){ var ok = await markHandled(it, 'handled', 'סומן ידנית'); showToast(ok ? 'סומן כטופל.' : 'לא הצלחתי לסמן — נסה שוב.'); loadInbox(true); }}, ['✓ טופל']) ]
+          : [ el('span', { class:'lesson-meta' }, [it.handledAt || 'טופל']), el('button', { class:'btn-text', onclick:async function(){ await markHandled(it, 'new', ''); loadInbox(true); }}, ['↩ החזר']) ]),
+        el('td', {}, [ el('button', { class:'btn-text', onclick:function(){ ib.openIds = ib.openIds || {}; ib.openIds[it.id] = !open; render(); }}, [open ? '▴' : '▾ פרטים']) ])
+      ]);
+      tbody.appendChild(tr);
+      if (open){
+        var lab = (it.data && it.data.labeled) || {};
+        tbody.appendChild(el('tr', { class:'ib-details' }, [ el('td', { colspan:'10' }, [ el('div', { class:'ib-detail-grid' }, Object.keys(lab).map(function(k){ return el('div', {}, [ el('b', {}, [k + ': ']), String(lab[k]) ]); })) ]) ]));
+      }
+    });
+    wrap.appendChild(el('div', { class:'table-wrap' }, [ el('table', { class:'ib-table' }, [thead, tbody]) ]));
+  }
+
+  // ---- moving registrants into the studio's groups ----
+  function openFormTransfer(items){
+    var c = formsCfg() || { groups:[] }, groupsById = {};
+    (c.groups || []).forEach(function(g){ groupsById[g.id] = g; });
+    var rows = items.map(function(it){
+      var d = it.data || {}, fx = d.fixed || {};
+      var labels = (fx.groups || it.groups || '').split(' | ').filter(Boolean);
+      var ids = (fx.groupIds || []).slice();
+      var entries = ids.length ? ids.map(function(id, i){
+        var g = groupsById[id];
+        var tid = g && g.tatamiGroupId && state.groups.some(function(x){ return x.id === g.tatamiGroupId; }) ? g.tatamiGroupId : '';
+        return { label: g ? g.name : (labels[i] || id), tatamiId: tid, include: true };
+      }) : (labels.length ? labels.map(function(l){ return { label:l, tatamiId:'', include:true }; }) : [{ label:'(לא נבחרה קבוצה)', tatamiId:'', include:true }]);
+      var row = {
+        item: it, child: fx.childName || it.child || '', parent: fx.parentName || it.parent || '', phone: fx.phone || it.phone || '',
+        classGrade: fx.classGrade || it.grade || '', shirt: fx.shirtSize || '', daycare: fx.daycare === 'כן',
+        female: /נקבה|בת/.test(fx.gender || ''), status: it.form === 'trial' ? 'trial' : 'joined', entries: entries, markHandled: true
+      };
+      return row;
+    });
+    state.modal = { type:'formTransfer', rows:rows, busy:false, error:'' };
+    refreshTransferDuplicates(state.modal);
+    render();
+  }
+  function refreshTransferDuplicates(m){
+    m.rows.forEach(function(r){ r.entries.forEach(function(e){
+      var dup = e.tatamiId ? findExistingStudent(r.child, r.phone, e.tatamiId) : null;
+      var wasDup = !!e.dup; e.dup = !!dup;
+      if (e.dup && !wasDup){ e.include = false; }              // already there: don't add twice unless asked
+    }); });
+  }
+  async function confirmFormTransfer(){
+    var m = state.modal; if (!m || m.type !== 'formTransfer' || m.busy) return;
+    var problems = [];
+    m.rows.forEach(function(r){
+      var chosen = r.entries.filter(function(e){ return e.include; });
+      if (chosen.length && !r.child.trim()) problems.push('חסר שם מתאמן/ת לרשומה של ' + (r.parent || r.phone));
+      chosen.forEach(function(e){ if (!e.tatamiId) problems.push('בחר קבוצה בטטאמי עבור "' + e.label + '" (' + (r.child || '?') + ')'); });
+    });
+    if (problems.length){ m.error = problems[0] + (problems.length > 1 ? ' (ועוד ' + (problems.length - 1) + ')' : ''); render(); return; }
+    m.busy = true; m.error = ''; render();
+    var added = 0, handledFailed = 0, today = shortDate(todayISO());
+    for (var i = 0; i < m.rows.length; i++){
+      var r = m.rows[i], names = [];
+      r.entries.filter(function(e){ return e.include; }).forEach(function(e){
+        var g = state.groups.find(function(x){ return x.id === e.tatamiId; });
+        addStudent({
+          name:r.child.trim(), phone:r.phone, groupId:e.tatamiId, status:r.status, classGrade:normalizeClassGrade(r.classGrade.trim()),
+          shirtSize:r.shirt.trim(), daycare:r.daycare, isFemale:r.female,
+          note:'נרשם/ה בטופס ' + (r.item.form === 'trial' ? 'אימון ניסיון' : 'הרשמה') + ' ב-' + today + (r.parent ? ' · הורה: ' + r.parent : '')
+        });
+        added++; names.push(g ? g.name : '');
+      });
+      if (r.markHandled){
+        var ok = await markHandled(r.item, 'handled', names.length ? 'נוסף ל: ' + names.join(', ') : 'טופל');
+        if (!ok) handledFailed++;
+      }
+    }
+    state.modal = null;
+    state.inbox.selected = {};
+    showToast(added ? 'נוספו ' + added + ' מתאמנים לקבוצות.' + (handledFailed ? ' (לא הצלחתי לסמן חלק מההרשמות כטופלו — אפשר לסמן ידנית.)' : '') : 'לא נוסף אף מתאמן.');
+    loadInbox(true);
+  }
+  function buildFormTransferModal(m){
+    var kids = [ el('h2', {}, ['הוספה לקבוצות']), el('div', { class:'fhint', style:'margin:-6px 0 10px;' }, ['בדוק, תקן אם צריך, ואשר. כל קבוצה שנבחרה יוצרת מתאמן/ת בקבוצה. ברירת המחדל "הצטרף כמנוי" מסמנת גם את החודש הנוכחי כשולם — אם עדיין לא שילמו, בחר "במעקב" או "שיעור ניסיון".']) ];
+    m.rows.forEach(function(r){
+      var b = el('div', { class:'ft-block' });
+      b.appendChild(el('div', { class:'ft-head' }, [ el('b', {}, [r.child || '(ללא שם)']), el('span', { class:'lesson-meta' }, [ ' · הורה: ' + (r.parent || '—') + ' · ' + (r.phone || '') + ' · ' + (r.item.form === 'trial' ? 'אימון ניסיון' : 'הרשמה') ]) ]));
+      b.appendChild(el('div', { class:'ft-fields' }, [
+        el('label', {}, ['שם ', fInput(r.child, function(v){ r.child = v; refreshTransferDuplicates(m); render(); })]),
+        el('label', {}, ['כיתה ', fInput(r.classGrade, function(v){ r.classGrade = v; }, { style:'max-width:80px;' })]),
+        el('label', {}, ['חולצה ', fInput(r.shirt, function(v){ r.shirt = v; }, { style:'max-width:70px;' })]),
+        fCheck('צהרון', r.daycare, function(v){ r.daycare = v; }),
+        fCheck('נקבה', r.female, function(v){ r.female = v; }),
+        el('label', {}, ['סטטוס ', fSelect(STATUSES.map(function(st){ return { key:st.key, label:st.label }; }), r.status, function(v){ r.status = v; })])
+      ]));
+      r.entries.forEach(function(e){
+        b.appendChild(el('div', { class:'ft-entry' + (e.dup ? ' dup' : '') }, [
+          fCheck('', e.include, function(v){ e.include = v; render(); }),
+          el('span', { class:'ft-label' }, [e.label]),
+          el('span', {}, ['←']),
+          fSelect([{ key:'', label:'— בחר קבוצה בטטאמי —' }].concat(state.groups.map(function(g){ return { key:g.id, label:g.name }; })), e.tatamiId, function(v){ e.tatamiId = v; if (v){ e.include = true; e.dup = false; } refreshTransferDuplicates(m); render(); }, { class:'ft-select' }),
+          e.dup ? el('span', { class:'ft-dup' }, ['כבר קיים/ת בקבוצה'+(e.include ? '' : ' — לא יתווסף')]) : null
+        ]));
+      });
+      b.appendChild(fCheck('סמן את ההרשמה כטופלה', r.markHandled, function(v){ r.markHandled = v; }));
+      kids.push(b);
+    });
+    if (m.error){ kids.push(el('div', { class:'error-text' }, [m.error])); }
+    var total = m.rows.reduce(function(n, r){ return n + r.entries.filter(function(e){ return e.include; }).length; }, 0);
+    kids.push(el('div', { class:'modal-actions' }, [
+      el('button', { class:'btn-ghost', onclick:closeModal }, ['ביטול']),
+      el('button', { class:'btn-primary', onclick:confirmFormTransfer }, [m.busy ? 'מוסיף…' : 'הוסף ' + total + ' ' + (total === 1 ? 'מתאמן/ת' : 'רשומות')])
+    ]));
+    return el('div', { class:'modal ft-modal' }, kids);
+  }
+
 
   function renderTechModeBar(){
     return el('div',{class:'tech-mode-bar'},[
@@ -5829,6 +7108,9 @@
       setTimeout(function(){ importTechText.focus(); },0);
     }
 
+    else if (m.type === 'formIssues'){ content = buildFormIssuesModal(m); }
+    else if (m.type === 'formPreview'){ content = buildFormPreviewModal(m); }
+    else if (m.type === 'formTransfer'){ content = buildFormTransferModal(m); }
     else if (m.type === 'guardDialog'){
       content = el('div',{class:'modal'},[
         el('h2',{},[m.title]),
@@ -6211,8 +7493,10 @@
 
   // Test hook — only active when the page is opened with ?tatamiTest=1 (used by automated tests, not by normal use).
   if (/[?&]tatamiTest=1/.test(window.location.search)){
-    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); } };
+    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox }, forms: { create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
   }
+
+  window.addEventListener('focus', function(){ maybeCheckInbox(); });
 
   loadData();
 })();
