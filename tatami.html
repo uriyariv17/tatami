@@ -221,6 +221,7 @@
   .ft-block{ border:1px solid var(--line); border-radius:6px; padding:10px 12px; margin-bottom:10px; background:#fff; }
   .ft-head{ margin-bottom:8px; } .ft-fields{ display:flex; gap:10px 14px; flex-wrap:wrap; align-items:center; margin-bottom:8px; font-size:13.5px; } .ft-fields input[type=text]{ padding:5px 7px; border:1px solid var(--line); border-radius:4px; font-family:inherit; } .ft-fields select{ padding:5px; border:1px solid var(--line); border-radius:4px; font-family:inherit; }
   .ft-entry{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:4px 0; } .ft-entry.dup{ background:#FFF6E0; border-radius:4px; padding:4px 6px; }
+  .ft-note{ margin:4px 0 8px; } .ft-note label{ display:block; font-size:12.5px; color:var(--muted); margin-bottom:3px; } .ft-note textarea{ width:100%; box-sizing:border-box; padding:7px 9px; border:1px solid var(--line); border-radius:6px; font-family:inherit; font-size:13.5px; }
   .ft-label{ flex:1; min-width:180px; font-size:13.5px; } .ft-select{ min-width:200px; padding:5px; border:1px solid var(--line); border-radius:4px; font-family:inherit; } .ft-dup{ color:#B26A00; font-size:12.5px; font-weight:700; }
   .group-note-box{ margin:0 0 14px; background:#FFFBEA; border:1px solid #E8DCA8; border-radius:6px; padding:8px 12px; }
   .group-note-label{ font-size:12px; font-weight:700; color:#7A6A1F; margin-bottom:4px; }
@@ -1046,7 +1047,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-10-23 19:00';
+  var APP_VERSION = '2026-10-24 09:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -5277,10 +5278,10 @@
     info:{ ic:'ℹ️', name:'טקסט הסבר', desc:'הודעה למילוי, בלי שאלה' }
   };
   var MAPTO_FRIENDLY = [
-    { key:'', label:'לא מועבר (נשמר רק בגיליון)' }, { key:'childName', label:'שם המתאמן/ת' }, { key:'parentName', label:'שם ההורה' }, { key:'phone', label:'טלפון' },
-    { key:'classGrade', label:'כיתה' }, { key:'shirtSize', label:'מידת חולצה' }, { key:'daycare', label:'צהרון (כן/לא)' }, { key:'gender', label:'מין' }, { key:'email', label:'אימייל' }
+    { key:'', label:'לא מועבר (נשמר רק בגיליון)' }, { key:'childName', label:'שם המתאמן/ת' }, { key:'parentName', label:'שם ההורה (נשמר בגיליון בלבד)' }, { key:'phone', label:'טלפון' },
+    { key:'classGrade', label:'כיתה' }, { key:'shirtSize', label:'מידת חולצה (מועברת רק לפי בחירה בכל פעם)' }, { key:'daycare', label:'צהרון (כן/לא)' }, { key:'gender', label:'מין' }, { key:'email', label:'אימייל (נשמר בגיליון בלבד)' }
   ];
-  function mapToLabel(k){ var m = MAPTO_FRIENDLY.filter(function(x){ return x.key === k; })[0]; return m ? m.label : (k === 'groups' ? 'קבוצות' : k); }
+  function mapToLabel(k){ var m = MAPTO_FRIENDLY.filter(function(x){ return x.key === k; })[0]; return m ? m.label.replace(/\s*\([^)]*\)\s*$/, '') : (k === 'groups' ? 'קבוצות' : k); }
   var OPS_FRIENDLY = [ { key:'in', label:'היא אחת מ' }, { key:'notIn', label:'אינה' }, { key:'notEmpty', label:'מולאה' }, { key:'empty', label:'לא מולאה' } ];
 
   // ---- "show only if…" / "when…" conditions, written as a sentence ----
@@ -5424,7 +5425,7 @@
     if (isInputQ(q)){
       ed.appendChild(fSwitch('חובה למלא', !!q.required, function(v){ editForms(function(){ q.required = v; }); }, 'ההורה לא יוכל לשלוח בלי לענות'));
       if (q.type !== 'groups'){
-        ed.appendChild(fField('איפה זה יופיע בכרטיס המתאמן?', fSelect(MAPTO_FRIENDLY, q.mapTo || '', function(v){ editForms(function(){ q.mapTo = v; }); }), 'כשתוסיף נרשם לקבוצה, השדה ימולא לבד. "לא מועבר" אומר שהתשובה נשמרת רק בגיליון.'));
+        ed.appendChild(fField('איפה זה יופיע בכרטיס המתאמן?', fSelect(MAPTO_FRIENDLY, q.mapTo || '', function(v){ editForms(function(){ q.mapTo = v; }); }), 'מה שמועבר לכרטיס כשמוסיפים נרשם לקבוצה: שם, טלפון, כיתה, צהרון ומין. מידת חולצה מועברת רק אם תסמן זאת בחלון ההעברה. כל השאר (גם שם ההורה) נשמר בגיליון בלבד.'));
       }
     }
     // when to show it
@@ -6124,7 +6125,7 @@
       }) : (labels.length ? labels.map(function(l){ return { label:l, tatamiId:'', include:true }; }) : [{ label:'(לא נבחרה קבוצה)', tatamiId:'', include:true }]);
       var row = {
         item: it, child: fx.childName || it.child || '', parent: fx.parentName || it.parent || '', phone: fx.phone || it.phone || '',
-        classGrade: fx.classGrade || it.grade || '', shirt: fx.shirtSize || '', daycare: fx.daycare === 'כן',
+        classGrade: fx.classGrade || it.grade || '', shirtAnswer: fx.shirtSize || '', useShirt: false, daycare: fx.daycare === 'כן',
         female: /נקבה|בת/.test(fx.gender || ''), status: it.form === 'trial' ? 'trial' : 'joined', entries: entries, markHandled: true
       };
       return row;
@@ -6157,8 +6158,7 @@
         var g = state.groups.find(function(x){ return x.id === e.tatamiId; });
         addStudent({
           name:r.child.trim(), phone:r.phone, groupId:e.tatamiId, status:r.status, classGrade:normalizeClassGrade(r.classGrade.trim()),
-          shirtSize:r.shirt.trim(), daycare:r.daycare, isFemale:r.female,
-          note:'נרשם/ה בטופס ' + (r.item.form === 'trial' ? 'אימון ניסיון' : 'הרשמה') + ' ב-' + today + (r.parent ? ' · הורה: ' + r.parent : '')
+          shirtSize:(r.useShirt ? r.shirtAnswer : ''), daycare:r.daycare, isFemale:r.female
         });
         added++; names.push(g ? g.name : '');
       });
@@ -6173,14 +6173,14 @@
     loadInbox(true);
   }
   function buildFormTransferModal(m){
-    var kids = [ el('h2', {}, ['הוספה לקבוצות']), el('div', { class:'fhint', style:'margin:-6px 0 10px;' }, ['בדוק, תקן אם צריך, ואשר. כל קבוצה שנבחרה יוצרת מתאמן/ת בקבוצה. ברירת המחדל "הצטרף כמנוי" מסמנת גם את החודש הנוכחי כשולם — אם עדיין לא שילמו, בחר "במעקב" או "שיעור ניסיון".']) ];
+    var kids = [ el('h2', {}, ['הוספה לקבוצות']), el('div', { class:'fhint', style:'margin:-6px 0 10px;' }, ['בדוק, תקן אם צריך, ואשר. כל קבוצה שנבחרה יוצרת מתאמן/ת בקבוצה. מעבירים רק: שם, טלפון, כיתה, צהרון ומין (מידת חולצה רק אם תסמן). ברירת המחדל "הצטרף כמנוי" מסמנת גם את החודש הנוכחי כשולם — אם עדיין לא שילמו, בחר "במעקב" או "שיעור ניסיון".']) ];
     m.rows.forEach(function(r){
       var b = el('div', { class:'ft-block' });
       b.appendChild(el('div', { class:'ft-head' }, [ el('b', {}, [r.child || '(ללא שם)']), el('span', { class:'lesson-meta' }, [ ' · הורה: ' + (r.parent || '—') + ' · ' + (r.phone || '') + ' · ' + (r.item.form === 'trial' ? 'אימון ניסיון' : 'הרשמה') ]) ]));
       b.appendChild(el('div', { class:'ft-fields' }, [
         el('label', {}, ['שם ', fInput(r.child, function(v){ r.child = v; refreshTransferDuplicates(m); render(); })]),
         el('label', {}, ['כיתה ', fInput(r.classGrade, function(v){ r.classGrade = v; }, { style:'max-width:80px;' })]),
-        el('label', {}, ['חולצה ', fInput(r.shirt, function(v){ r.shirt = v; }, { style:'max-width:70px;' })]),
+        r.shirtAnswer ? fCheck('להעביר גם מידת חולצה (' + r.shirtAnswer + ')', r.useShirt, function(v){ r.useShirt = v; }) : null,
         fCheck('צהרון', r.daycare, function(v){ r.daycare = v; }),
         fCheck('נקבה', r.female, function(v){ r.female = v; }),
         el('label', {}, ['סטטוס ', fSelect(STATUSES.map(function(st){ return { key:st.key, label:st.label }; }), r.status, function(v){ r.status = v; })])
