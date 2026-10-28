@@ -210,6 +210,8 @@
   .new-reg-banner{ display:flex; align-items:center; gap:12px; background:#B91717; color:#fff; padding:11px 18px; position:sticky; top:0; z-index:60; box-shadow:0 3px 12px rgba(0,0,0,.25); }
   .nrb-ic{ font-size:22px; } .nrb-tx{ flex:1; font-size:15px; line-height:1.4; } .nrb-tx span{ opacity:.9; font-size:13px; }
   .nrb-btn{ background:#fff; color:#B91717; border:none; border-radius:8px; padding:7px 16px; font-family:inherit; font-weight:800; font-size:14px; cursor:pointer; }
+  .adv-attach-btn{ display:block; margin-top:6px; background:#1B8A8F; color:#fff; border:none; border-radius:8px; padding:6px 12px; font-family:inherit; font-size:12.5px; font-weight:800; cursor:pointer; } .adv-attach-btn:hover{ background:#146A6E; } .adv-attach-btn.off{ background:#9A968A; }
+  .adv-attached{ margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; } .adv-att-chip{ background:#E1F3F3; color:#146A6E; border-radius:999px; padding:3px 11px; font-size:12.5px; font-weight:700; }
   .gcard-more{ border-top:1px dashed var(--line); padding-top:10px; display:flex; flex-direction:column; gap:10px; } .gcard-more input[type=text]{ width:100%; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; box-sizing:border-box; } .gcard-btns{ display:flex; gap:10px; align-items:center; }
   .color-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .swatches{ display:flex; gap:8px; } .swatch{ width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; } .swatch.on{ box-shadow:0 0 0 3px var(--ink); } .color-in{ width:44px; height:34px; border:1.5px solid var(--line); border-radius:8px; padding:2px; background:#fff; cursor:pointer; }
   .link-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; word-break:break-all; font-size:13.5px; }
@@ -1050,7 +1052,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-10-24 09:00';
+  var APP_VERSION = '2026-10-28 13:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -4187,6 +4189,7 @@
   var ADV_STATUSES = [
     { key:'candidate', label:'מועמד — טרם הוזמן',      color:'#9A968A' },
     { key:'invited',   label:'הוזמן לשיעור ניסיון',     color:'#3A6EA5' },
+    { key:'confirmed', label:'אישר הגעה לאימון ניסיון',  color:'#1B8A8F' },
     { key:'came',      label:'הגיע לשיעור ניסיון',      color:'#D97F3D' },
     { key:'approved',  label:'אושר — ממתין להצטרפות',   color:'#8B5FBF' },
     { key:'joined',    label:'הצטרף למתקדמים',          color:'#4B7F52' },
@@ -4195,6 +4198,28 @@
   function advStatusInfo(key){
     for (var i=0;i<ADV_STATUSES.length;i++){ if (ADV_STATUSES[i].key === (key||'candidate')) return ADV_STATUSES[i]; }
     return ADV_STATUSES[0];
+  }
+
+  // The trial record that was created in the target group for a candidate (so he appears in that group's attendance list).
+  function advAttachedCopy(s){
+    if (!s.advTrialId) return null;
+    var c = state.students.find(function(x){ return x.id === s.advTrialId && !x.trashed && !x.archived; });
+    return (c && c.groupId === s.advGroupId) ? c : null;
+  }
+  function attachAdvCandidate(id){
+    var s = state.students.find(function(x){ return x.id === id; }); if (!s) return;
+    var g = state.groups.find(function(x){ return x.id === s.advGroupId; });
+    if (!g){ showToast('בחר קודם "קבוצה מיועדת" למועמד/ת.'); return; }
+    var ex = findExistingStudent(s.name, s.phone, g.id);
+    if (ex){                                  // already on that group's list: just remember the link, never duplicate
+      updateStudent(s.id, { advTrialId: ex.id });
+      var st = STATUSES.filter(function(x){ return x.key === ex.status; })[0];
+      showToast('"' + s.name + '" כבר רשום/ה ב-"' + g.name + '"' + (st ? ' (' + st.label + ')' : '') + ', לא נוסף/ה שוב.');
+      return;
+    }
+    var copy = addStudent({ name:s.name, phone:s.phone, groupId:g.id, status:'trial', classGrade:s.classGrade, shirtSize:s.shirtSize, daycare:s.daycare, isFemale:s.isFemale });
+    updateStudent(s.id, { advTrialId: copy.id });
+    showToast('"' + s.name + '" נוסף/ה לנוכחות של "' + g.name + '" בסטטוס אימון ניסיון.');
   }
 
   function renderAdvancedView(){
@@ -4267,13 +4292,23 @@
           return o;
         }));
       stageSel.addEventListener('change', function(e){ updateStudent(s.id, { advStatus: e.target.value }); });
+      var attached = advAttachedCopy(s), attachCtl = null;
+      if (attached){
+        var ag = state.groups.find(function(x){ return x.id === attached.groupId; });
+        attachCtl = el('div', { class:'adv-attached' }, [
+          el('span', { class:'adv-att-chip' }, ['✓ ' + (attached.status === 'trial' ? 'צורף/ה לנוכחות · ' : 'רשום/ה בקבוצה · ') + (ag ? ag.name : '')]),
+          el('button', { class:'btn-text', onclick:function(){ state.view = 'group'; state.selectedGroupId = attached.groupId; render(); window.scrollTo(0, 0); } }, ['פתח בקבוצה'])
+        ]);
+      } else if (ast.key === 'confirmed'){
+        attachCtl = el('button', { class:'adv-attach-btn' + (s.advGroupId ? '' : ' off'), title:(s.advGroupId ? 'מצרף את המועמד/ת לרשימת הנוכחות של הקבוצה המיועדת, בסטטוס אימון ניסיון' : 'קודם בחר "קבוצה מיועדת"'), onclick:function(){ attachAdvCandidate(s.id); } }, ['➕ צרף לנוכחות (אימון ניסיון)']);
+      }
 
       tbody.appendChild(el('tr',{},[
         el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name]),
         el('td',{class:'phone-cell'},[s.phone || '—']),
         el('td',{},[g ? g.name : '—']),
         el('td',{},[ tgtSel ]),
-        el('td',{},[ stageSel ]),
+        el('td',{},[ stageSel, attachCtl ]),
         el('td',{class:'adv-note-cell'},[ noteBox(s, 'advNote', 'הערות על המועמדות…', 'adv-note-area') ]),
         el('td',{},[ statusSelectFor(s) ]),
         el('td',{class:'att-cell'},[
