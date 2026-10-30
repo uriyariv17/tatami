@@ -1055,7 +1055,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-10-29 12:00';
+  var APP_VERSION = '2026-10-30 12:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -4225,17 +4225,35 @@
     showToast('"' + s.name + '" נוסף/ה לנוכחות של "' + g.name + '" בסטטוס אימון ניסיון.');
   }
 
+  // Dragging a candidate between the stage lists (own drag "kind", so the weekly grid never mistakes it for moving him to another group).
+  function onAdvDragStart(e, id){
+    dragState = { kind:'advcand', id:id };
+    e.dataTransfer.effectAllowed = 'move';
+    try{ e.dataTransfer.setData('text/plain', 'advcand:' + id); }catch(err){}
+    e.currentTarget.classList.add('dragging');
+  }
+  function makeAdvDropHandlers(stageKey){
+    return {
+      ondragover: function(e){ var info = getDraggedInfo(e); if (info && info.kind === 'advcand'){ e.preventDefault(); e.currentTarget.classList.add('drag-over'); } },
+      ondragleave: function(e){ e.currentTarget.classList.remove('drag-over'); },
+      ondrop: function(e){
+        e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+        var info = getDraggedInfo(e);
+        if (info && info.kind === 'advcand' && info.id){ updateStudent(info.id, { advStatus: stageKey }); }
+      }
+    };
+  }
+
   function renderAdvancedView(){
     var wrap = el('div',{});
     wrap.appendChild(el('div',{class:'group-header'},[
       el('h2',{},['מועמדים למתקדמים']),
       el('p',{style:'color:var(--muted);font-size:13px;margin:4px 0 0;'},[
-        'כאן מנהלים את מסלול המועמדות של כל אחד: לאיזו קבוצה הוא מיועד, באיזה שלב הוא, והערות שמופיעות רק בדף הזה (לא ברשימה הרגילה של הקבוצה).'
+        'כל שלב הוא רשימה. גרור מועמד (⠿) מרשימה לרשימה, או בחר שלב בשורה שלו. הערות המועמדות מופיעות רק כאן, לא ברשימה הרגילה של הקבוצה.'
       ])
     ]));
 
     var all = state.students.filter(function(s){ return s.advanced && !s.archived && !s.trashed; });
-
     if (!all.length){
       wrap.appendChild(el('p',{style:'color:var(--muted);font-size:14px;'},[
         'עדיין לא סימנת אף אחד. סמן וי בעמודת "מתקדמים" בטבלה של כל קבוצה כדי שהמתאמן יופיע כאן.'
@@ -4243,40 +4261,8 @@
       return wrap;
     }
 
-    // ---- filter by candidacy stage ----
-    var counts = {}; all.forEach(function(s){ var k = advStatusInfo(s.advStatus).key; counts[k] = (counts[k]||0) + 1; });
-    var filterBar = el('div',{class:'tech-filter-bar'});
-    filterBar.appendChild(el('span',{class:'tech-filter-label'},['שלב מועמדות:']));
-    filterBar.appendChild(el('button',{
-      class:'tech-filter-pill'+(state.advStatusFilter===null?' active':''),
-      onclick:function(){ state.advStatusFilter = null; render(); }
-    },['הכל ('+all.length+')']));
-    ADV_STATUSES.forEach(function(st){
-      if (!counts[st.key] && state.advStatusFilter !== st.key) return;   // only stages that are in use
-      filterBar.appendChild(el('button',{
-        class:'tech-filter-pill'+(state.advStatusFilter===st.key?' active':''),
-        onclick:function(){ state.advStatusFilter = st.key; render(); }
-      },[st.label+' ('+(counts[st.key]||0)+')']));
-    });
-    wrap.appendChild(filterBar);
-
-    var candidates = state.advStatusFilter ? all.filter(function(s){ return advStatusInfo(s.advStatus).key === state.advStatusFilter; }) : all;
-    if (!candidates.length){
-      wrap.appendChild(el('p',{style:'color:var(--muted);font-size:14px;margin-top:10px;'},['אין מועמדים בשלב הזה.']));
-      return wrap;
-    }
-
-    var thead = el('thead',{},[ el('tr',{},[
-      el('th',{},['שם']), el('th',{},['טלפון']), el('th',{},['קבוצה נוכחית']),
-      el('th',{},['קבוצה מיועדת']), el('th',{},['שלב מועמדות']), el('th',{},['הערות למתקדמים']),
-      el('th',{class:'col-narrow'},['סטטוס מנוי']), el('th',{class:'col-narrow'},['מתקדמים']), el('th',{class:'col-narrow'},[''])
-    ])]);
-
-    var tbody = el('tbody',{});
-    candidates.forEach(function(s){
+    function candidateRow(s){
       var g = state.groups.find(function(x){return x.id===s.groupId;});
-
-      // target group
       var tgtSel = el('select',{class:'status-select-inline adv-target-select'}, [ el('option',{value:''},['— לא נקבעה —']) ].concat(
         state.groups.map(function(gr){
           var o = el('option',{value:gr.id},[gr.name]);
@@ -4286,9 +4272,8 @@
       if (!s.advGroupId || !state.groups.some(function(gr){ return gr.id === s.advGroupId; })){ tgtSel.firstChild.setAttribute('selected','selected'); }
       tgtSel.addEventListener('change', function(e){ updateStudent(s.id, { advGroupId: e.target.value }); });
 
-      // candidacy stage
       var ast = advStatusInfo(s.advStatus);
-      var stageSel = el('select',{class:'status-select-inline adv-stage-select', style:'border-inline-start:4px solid '+ast.color+';'},
+      var stageSel = el('select',{class:'status-select-inline adv-stage-select', title:'העבר לשלב אחר', style:'border-inline-start:4px solid '+ast.color+';'},
         ADV_STATUSES.map(function(opt){
           var o = el('option',{value:opt.key},[opt.label]);
           if (opt.key === ast.key){ o.setAttribute('selected','selected'); }
@@ -4305,23 +4290,45 @@
       } else if (ast.key === 'confirmed'){
         attachCtl = el('button', { class:'adv-attach-btn' + (s.advGroupId ? '' : ' off'), title:(s.advGroupId ? 'מצרף את המועמד/ת לרשימת הנוכחות של הקבוצה המיועדת, בסטטוס אימון ניסיון' : 'קודם בחר "קבוצה מיועדת"'), onclick:function(){ attachAdvCandidate(s.id); } }, ['➕ צרף לנוכחות (אימון ניסיון)']);
       }
-
-      tbody.appendChild(el('tr',{},[
+      return el('tr',{ draggable:'true', ondragstart:function(e){ onAdvDragStart(e, s.id); }, ondragend:onRowDragEnd },[
+        el('td',{class:'drag-cell', title:'גרירה לשלב אחר'},['⠿']),
         el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name]),
         el('td',{class:'phone-cell'},[s.phone || '—']),
         el('td',{},[g ? g.name : '—']),
-        el('td',{},[ tgtSel ]),
-        el('td',{},[ stageSel, attachCtl ]),
+        el('td',{},[ tgtSel, attachCtl ]),
+        el('td',{},[ stageSel ]),
         el('td',{class:'adv-note-cell'},[ noteBox(s, 'advNote', 'הערות על המועמדות…', 'adv-note-area') ]),
         el('td',{},[ statusSelectFor(s) ]),
         el('td',{class:'att-cell'},[
           el('button',{class:'adv-box checked', title:'ביטול סימון', onclick:function(){ toggleAdvanced(s.id); }},['✓'])
         ]),
         el('td',{},[ el('button',{class:'icon-btn', title:'עריכת פרטים', style:'margin-inline-end:4px;', onclick:function(){ openModal({type:'editStudent', studentId:s.id}); }},['✏️']), el('button',{class:'icon-btn', title:'העברה לארכיון', onclick:function(){ archiveStudent(s.id); }},['🗄']) ])
-      ]));
-    });
+      ]);
+    }
 
-    wrap.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[thead, tbody]) ]));
+    var thead = el('thead',{},[ el('tr',{},[
+      el('th',{class:'col-narrow'},['']), el('th',{},['שם']), el('th',{},['טלפון']), el('th',{},['קבוצה נוכחית']),
+      el('th',{},['קבוצה מיועדת']), el('th',{},['העבר לשלב']), el('th',{},['הערות למתקדמים']),
+      el('th',{class:'col-narrow'},['סטטוס מנוי']), el('th',{class:'col-narrow'},['מתקדמים']), el('th',{class:'col-narrow'},[''])
+    ])]);
+
+    // one list per stage, always shown (like the statuses in a group's attendance), so a candidate can be dropped into an empty stage too
+    ADV_STATUSES.forEach(function(st){
+      var list = sortByClass(all.filter(function(s){ return advStatusInfo(s.advStatus).key === st.key; }));
+      var dh = makeAdvDropHandlers(st.key);
+      var block = el('div',{
+        class:'status-block adv-section', 'data-stage':st.key,
+        style:'border-inline-start:6px solid '+st.color+';padding-inline-start:14px;',
+        ondragover: dh.ondragover, ondragleave: dh.ondragleave, ondrop: dh.ondrop
+      });
+      block.appendChild(el('div',{class:'status-block-head'},[ el('h3',{},[st.label]), el('span',{class:'status-count'},['('+list.length+')']) ]));
+      if (!list.length){
+        block.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[ el('tbody',{},[ el('tr',{class:'empty-row'},[ el('td',{},['אין מועמדים בשלב זה כרגע. אפשר לגרור לכאן.']) ]) ]) ]) ]));
+      } else {
+        block.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[ thead.cloneNode(true), el('tbody',{}, list.map(candidateRow)) ]) ]));
+      }
+      wrap.appendChild(block);
+    });
     return wrap;
   }
 
