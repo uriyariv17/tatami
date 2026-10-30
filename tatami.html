@@ -215,6 +215,7 @@
   .fv-tab.fv-new{ border-style:dashed; color:var(--accent); background:#FFFBFB; }
   .prod-ed{ display:flex; flex-direction:column; gap:10px; } .prod-card{ background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:10px 12px; display:flex; flex-direction:column; gap:8px; } .prod-top{ display:flex; gap:6px; align-items:center; } .prod-name{ flex:1; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14.5px; font-weight:700; }
   .oq-search{ flex:1; min-width:200px; padding:8px 12px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14px; } .oq-items div{ margin-bottom:2px; } .oq-table th, .oq-table td{ text-align:right; }
+  .adv-joined-tag{ display:inline-block; margin-inline-start:8px; background:#E4F3E6; color:#2F7A3B; border-radius:999px; padding:1px 9px; font-size:11.5px; font-weight:700; vertical-align:middle; }
   .gcard-more{ border-top:1px dashed var(--line); padding-top:10px; display:flex; flex-direction:column; gap:10px; } .gcard-more input[type=text]{ width:100%; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; box-sizing:border-box; } .gcard-btns{ display:flex; gap:10px; align-items:center; }
   .color-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .swatches{ display:flex; gap:8px; } .swatch{ width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; } .swatch.on{ box-shadow:0 0 0 3px var(--ink); } .color-in{ width:44px; height:34px; border:1.5px solid var(--line); border-radius:8px; padding:2px; background:#fff; cursor:pointer; }
   .link-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; word-break:break-all; font-size:13.5px; }
@@ -1055,7 +1056,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-10-30 12:00';
+  var APP_VERSION = '2026-10-30 16:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1814,6 +1815,7 @@
       if (!!b.isLead !== !!c.isLead){ add('sFlag', c.isLead ? '📈 '+c.name+' סומן כליד' : '📈 '+c.name+' הוסר מסימון ליד'); }
       if ((b.advGroupId||'') !== (c.advGroupId||'')){ add('sAdv', '🎓 '+c.name+': קבוצה מיועדת למתקדמים — '+(c.advGroupId ? gName(c.advGroupId) : 'לא נקבעה')); }
       if ((b.advStatus||'candidate') !== (c.advStatus||'candidate')){ add('sAdv', '🎓 '+c.name+': שלב מועמדות — '+advStatusInfo(c.advStatus).label); }
+      if (!!b.advJoined !== !!c.advJoined){ add('sAdv', '🎓 '+c.name+': '+(c.advJoined ? 'סומן כמי שהצטרף למתקדמים' : 'בוטל הסימון "הצטרף למתקדמים"')); }
       if ((b.advNote||'') !== (c.advNote||'')){ add('sAdv', c.advNote ? ('🎓 '+c.name+': הערת מועמדות — "'+snippet(c.advNote)+'"') : ('🎓 '+c.name+': הערת המועמדות נמחקה')); }
       var edits = [];
       if (b.name !== c.name){ add('sEdit', '✏️ שם תלמיד שונה: '+b.name+' ← '+c.name); }
@@ -4190,17 +4192,28 @@
 
   // Stages of an advanced-group candidate (separate from the membership status).
   var ADV_STATUSES = [
-    { key:'candidate', label:'מועמד — טרם הוזמן',      color:'#9A968A' },
-    { key:'invited',   label:'הוזמן לשיעור ניסיון',     color:'#3A6EA5' },
-    { key:'confirmed', label:'אישר הגעה לאימון ניסיון',  color:'#1B8A8F' },
-    { key:'came',      label:'הגיע לשיעור ניסיון',      color:'#D97F3D' },
-    { key:'approved',  label:'אושר — ממתין להצטרפות',   color:'#8B5FBF' },
-    { key:'joined',    label:'הצטרף למתקדמים',          color:'#4B7F52' },
-    { key:'declined',  label:'לא מעוניין / לא מתאים',   color:'#B91717' }
+    { key:'confirmed', label:'אישר הגעה לאימון ניסיון', color:'#1B8A8F' },
+    { key:'invited',   label:'הוזמן לאימון ניסיון',     color:'#3A6EA5' },
+    { key:'candidate', label:'עוד לא הוזמן',            color:'#9A968A' },
+    { key:'wontcome',  label:'הוזמן ולא יגיע',          color:'#B91717' }
   ];
+  // Stages from the earlier version are mapped, never lost: "came" / "approved" / "joined" sit under "confirmed" ("joined" with the tick), "declined" under "won't come".
+  var ADV_LEGACY = { came:'confirmed', approved:'confirmed', joined:'confirmed', declined:'wontcome' };
   function advStatusInfo(key){
-    for (var i=0;i<ADV_STATUSES.length;i++){ if (ADV_STATUSES[i].key === (key||'candidate')) return ADV_STATUSES[i]; }
-    return ADV_STATUSES[0];
+    var k = ADV_LEGACY[key] || key || 'candidate';
+    for (var i = 0; i < ADV_STATUSES.length; i++){ if (ADV_STATUSES[i].key === k) return ADV_STATUSES[i]; }
+    return ADV_STATUSES[2];
+  }
+  function advJoinedOf(s){ return s.advJoined !== undefined ? !!s.advJoined : s.advStatus === 'joined'; }
+  function moveAdvCandidate(id, key){
+    var s = state.students.find(function(x){ return x.id === id; }); if (!s) return;
+    var patch = { advStatus: key };
+    if (key !== 'confirmed' && advJoinedOf(s)){ patch.advJoined = false; }      // the tick only belongs to the "confirmed" list
+    updateStudent(id, patch);
+  }
+  function toggleAdvJoined(id){
+    var s = state.students.find(function(x){ return x.id === id; }); if (!s) return;
+    updateStudent(id, { advJoined: !advJoinedOf(s), advStatus: 'confirmed' });
   }
 
   // The trial record that was created in the target group for a candidate (so he appears in that group's attendance list).
@@ -4239,7 +4252,7 @@
       ondrop: function(e){
         e.preventDefault(); e.currentTarget.classList.remove('drag-over');
         var info = getDraggedInfo(e);
-        if (info && info.kind === 'advcand' && info.id){ updateStudent(info.id, { advStatus: stageKey }); }
+        if (info && info.kind === 'advcand' && info.id){ moveAdvCandidate(info.id, stageKey); }
       }
     };
   }
@@ -4249,7 +4262,7 @@
     wrap.appendChild(el('div',{class:'group-header'},[
       el('h2',{},['מועמדים למתקדמים']),
       el('p',{style:'color:var(--muted);font-size:13px;margin:4px 0 0;'},[
-        'כל שלב הוא רשימה. גרור מועמד (⠿) מרשימה לרשימה, או בחר שלב בשורה שלו. הערות המועמדות מופיעות רק כאן, לא ברשימה הרגילה של הקבוצה.'
+        'גרור מועמד (⠿) מרשימה לרשימה, או בחר שלב בשורה שלו. מי שאישר הגעה ושגם הצטרף מסומן בוי בשורה שלו. הערות המועמדות מופיעות רק כאן, לא ברשימה הרגילה של הקבוצה.'
       ])
     ]));
 
@@ -4261,7 +4274,7 @@
       return wrap;
     }
 
-    function candidateRow(s){
+    function candidateRow(s, st){
       var g = state.groups.find(function(x){return x.id===s.groupId;});
       var tgtSel = el('select',{class:'status-select-inline adv-target-select'}, [ el('option',{value:''},['— לא נקבעה —']) ].concat(
         state.groups.map(function(gr){
@@ -4279,7 +4292,7 @@
           if (opt.key === ast.key){ o.setAttribute('selected','selected'); }
           return o;
         }));
-      stageSel.addEventListener('change', function(e){ updateStudent(s.id, { advStatus: e.target.value }); });
+      stageSel.addEventListener('change', function(e){ moveAdvCandidate(s.id, e.target.value); });
       var attached = advAttachedCopy(s), attachCtl = null;
       if (attached){
         var ag = state.groups.find(function(x){ return x.id === attached.groupId; });
@@ -4290,13 +4303,18 @@
       } else if (ast.key === 'confirmed'){
         attachCtl = el('button', { class:'adv-attach-btn' + (s.advGroupId ? '' : ' off'), title:(s.advGroupId ? 'מצרף את המועמד/ת לרשימת הנוכחות של הקבוצה המיועדת, בסטטוס אימון ניסיון' : 'קודם בחר "קבוצה מיועדת"'), onclick:function(){ attachAdvCandidate(s.id); } }, ['➕ צרף לנוכחות (אימון ניסיון)']);
       }
+      var joined = advJoinedOf(s), joinCell = null;
+      if (st.key === 'confirmed'){
+        joinCell = el('td',{class:'att-cell'},[ el('button',{class:'adv-box adv-joined-box'+(joined ? ' checked' : ''), title:(joined ? 'סומן כמי שהצטרף — לחץ לביטול' : 'סמן שהצטרף'), onclick:function(){ toggleAdvJoined(s.id); }},[joined ? '✓' : '']) ]);
+      }
       return el('tr',{ draggable:'true', ondragstart:function(e){ onAdvDragStart(e, s.id); }, ondragend:onRowDragEnd },[
         el('td',{class:'drag-cell', title:'גרירה לשלב אחר'},['⠿']),
-        el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name]),
+        el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name, (st.key === 'confirmed' && joined) ? el('span',{class:'adv-joined-tag'},['✓ הצטרף']) : null]),
         el('td',{class:'phone-cell'},[s.phone || '—']),
         el('td',{},[g ? g.name : '—']),
         el('td',{},[ tgtSel, attachCtl ]),
         el('td',{},[ stageSel ]),
+        joinCell,
         el('td',{class:'adv-note-cell'},[ noteBox(s, 'advNote', 'הערות על המועמדות…', 'adv-note-area') ]),
         el('td',{},[ statusSelectFor(s) ]),
         el('td',{class:'att-cell'},[
@@ -4306,11 +4324,13 @@
       ]);
     }
 
-    var thead = el('thead',{},[ el('tr',{},[
-      el('th',{class:'col-narrow'},['']), el('th',{},['שם']), el('th',{},['טלפון']), el('th',{},['קבוצה נוכחית']),
-      el('th',{},['קבוצה מיועדת']), el('th',{},['העבר לשלב']), el('th',{},['הערות למתקדמים']),
-      el('th',{class:'col-narrow'},['סטטוס מנוי']), el('th',{class:'col-narrow'},['מתקדמים']), el('th',{class:'col-narrow'},[''])
-    ])]);
+    function headFor(st){
+      return el('thead',{},[ el('tr',{},[
+        el('th',{class:'col-narrow'},['']), el('th',{},['שם']), el('th',{},['טלפון']), el('th',{},['קבוצה נוכחית']),
+        el('th',{},['קבוצה מיועדת']), el('th',{},['העבר לשלב']), st.key === 'confirmed' ? el('th',{class:'col-narrow'},['הצטרף']) : null, el('th',{},['הערות למתקדמים']),
+        el('th',{class:'col-narrow'},['סטטוס מנוי']), el('th',{class:'col-narrow'},['מתקדמים']), el('th',{class:'col-narrow'},[''])
+      ])]);
+    }
 
     // one list per stage, always shown (like the statuses in a group's attendance), so a candidate can be dropped into an empty stage too
     ADV_STATUSES.forEach(function(st){
@@ -4325,7 +4345,7 @@
       if (!list.length){
         block.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[ el('tbody',{},[ el('tr',{class:'empty-row'},[ el('td',{},['אין מועמדים בשלב זה כרגע. אפשר לגרור לכאן.']) ]) ]) ]) ]));
       } else {
-        block.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[ thead.cloneNode(true), el('tbody',{}, list.map(candidateRow)) ]) ]));
+        block.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[ headFor(st), el('tbody',{}, list.map(function(x){ return candidateRow(x, st); })) ]) ]));
       }
       wrap.appendChild(block);
     });
