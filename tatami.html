@@ -1056,7 +1056,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-10-30 16:00';
+  var APP_VERSION = '2026-10-30 18:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1223,6 +1223,7 @@
     lessonPickerQuery: '',
     lessonPickerCat: 'all',
     lessonShowHistory: false,
+    advJoinedOpen: false,       // the collapsible "joined" list on the candidates page
     advStatusFilter: null,   // candidacy-stage filter on the advanced-candidates page
     tombstones: [],             // ids of records that were explicitly deleted ({id, at}) — so a merely-missing record is never mistaken for a deletion
     saveBlocked: null,          // {type} while saving is deliberately disabled to protect data (stale app version / unreadable sheet / mass delete)
@@ -4205,15 +4206,19 @@
     return ADV_STATUSES[2];
   }
   function advJoinedOf(s){ return s.advJoined !== undefined ? !!s.advJoined : s.advStatus === 'joined'; }
+  function advIsJoined(s){ return advStatusInfo(s.advStatus).key === 'confirmed' && advJoinedOf(s); }
   function moveAdvCandidate(id, key){
     var s = state.students.find(function(x){ return x.id === id; }); if (!s) return;
+    if (key === 'joined'){ updateStudent(id, { advStatus:'confirmed', advJoined:true }); return; }     // dropped on the "joined" list
     var patch = { advStatus: key };
-    if (key !== 'confirmed' && advJoinedOf(s)){ patch.advJoined = false; }      // the tick only belongs to the "confirmed" list
+    if (advJoinedOf(s)){ patch.advJoined = false; }       // moving to any list (including back to "confirmed") takes him out of "joined"
     updateStudent(id, patch);
   }
   function toggleAdvJoined(id){
     var s = state.students.find(function(x){ return x.id === id; }); if (!s) return;
-    updateStudent(id, { advJoined: !advJoinedOf(s), advStatus: 'confirmed' });
+    var now = !advJoinedOf(s);
+    updateStudent(id, { advJoined: now, advStatus: 'confirmed' });
+    showToast(now ? '"' + s.name + '" עבר/ה לרשימה "הצטרפו למתקדמים" (בתחתית הדף).' : '"' + s.name + '" חזר/ה לרשימה "אישר הגעה".');
   }
 
   // The trial record that was created in the target group for a candidate (so he appears in that group's attendance list).
@@ -4303,13 +4308,13 @@
       } else if (ast.key === 'confirmed'){
         attachCtl = el('button', { class:'adv-attach-btn' + (s.advGroupId ? '' : ' off'), title:(s.advGroupId ? 'מצרף את המועמד/ת לרשימת הנוכחות של הקבוצה המיועדת, בסטטוס אימון ניסיון' : 'קודם בחר "קבוצה מיועדת"'), onclick:function(){ attachAdvCandidate(s.id); } }, ['➕ צרף לנוכחות (אימון ניסיון)']);
       }
-      var joined = advJoinedOf(s), joinCell = null;
+      var joined = advIsJoined(s), joinCell = null;
       if (st.key === 'confirmed'){
         joinCell = el('td',{class:'att-cell'},[ el('button',{class:'adv-box adv-joined-box'+(joined ? ' checked' : ''), title:(joined ? 'סומן כמי שהצטרף — לחץ לביטול' : 'סמן שהצטרף'), onclick:function(){ toggleAdvJoined(s.id); }},[joined ? '✓' : '']) ]);
       }
       return el('tr',{ draggable:'true', ondragstart:function(e){ onAdvDragStart(e, s.id); }, ondragend:onRowDragEnd },[
         el('td',{class:'drag-cell', title:'גרירה לשלב אחר'},['⠿']),
-        el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name, (st.key === 'confirmed' && joined) ? el('span',{class:'adv-joined-tag'},['✓ הצטרף']) : null]),
+        el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name]),
         el('td',{class:'phone-cell'},[s.phone || '—']),
         el('td',{},[g ? g.name : '—']),
         el('td',{},[ tgtSel, attachCtl ]),
@@ -4334,7 +4339,7 @@
 
     // one list per stage, always shown (like the statuses in a group's attendance), so a candidate can be dropped into an empty stage too
     ADV_STATUSES.forEach(function(st){
-      var list = sortByClass(all.filter(function(s){ return advStatusInfo(s.advStatus).key === st.key; }));
+      var list = sortByClass(all.filter(function(s){ return advStatusInfo(s.advStatus).key === st.key && !(st.key === 'confirmed' && advIsJoined(s)); }));
       var dh = makeAdvDropHandlers(st.key);
       var block = el('div',{
         class:'status-block adv-section', 'data-stage':st.key,
@@ -4349,6 +4354,25 @@
       }
       wrap.appendChild(block);
     });
+
+    // A separate list for everyone who joined: folded by default so it takes no room, opens on click.
+    var joinedList = sortByClass(all.filter(advIsJoined)), jopen = !!state.advJoinedOpen, jdh = makeAdvDropHandlers('joined');
+    var jblock = el('div',{
+      class:'status-block adv-section adv-joined-section', 'data-stage':'joined',
+      style:'border-inline-start:6px solid #4B7F52;padding-inline-start:14px;',
+      ondragover: jdh.ondragover, ondragleave: jdh.ondragleave, ondrop: jdh.ondrop
+    });
+    jblock.appendChild(el('div',{class:'status-block-head adv-joined-head', title:(jopen ? 'לחץ לצמצום' : 'לחץ לפתיחה'), style:'cursor:pointer;', onclick:function(){ state.advJoinedOpen = !state.advJoinedOpen; render(); }},[
+      el('h3',{},[(jopen ? '▾ ' : '◂ ') + 'הצטרפו למתקדמים']), el('span',{class:'status-count'},['('+joinedList.length+')'])
+    ]));
+    if (jopen){
+      if (!joinedList.length){
+        jblock.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[ el('tbody',{},[ el('tr',{class:'empty-row'},[ el('td',{},['עדיין אף אחד. מסמנים וי בעמודת "הצטרף" ברשימה "אישר הגעה", או גוררים לכאן.']) ]) ]) ]) ]));
+      } else {
+        jblock.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[ headFor({key:'confirmed'}), el('tbody',{}, joinedList.map(function(x){ return candidateRow(x, {key:'confirmed'}); })) ]) ]));
+      }
+    }
+    wrap.appendChild(jblock);
     return wrap;
   }
 
