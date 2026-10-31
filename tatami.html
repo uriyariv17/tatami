@@ -219,6 +219,7 @@
   .fu-summary{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:10px 0 12px; font-size:14px; } .fu-summary select{ padding:6px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; }
   .fu-tags{ display:flex; gap:4px; flex-wrap:wrap; margin-top:3px; } .fu-tag{ font-size:11px; font-weight:700; padding:1px 8px; border-radius:999px; background:#F1EFEA; color:#5B5750; }
   .fu-tag.fu-leads{ background:#FDE9E7; color:#A92F1E; } .fu-tag.fu-trial{ background:#E7F1FB; color:#1F5C99; } .fu-tag.fu-review{ background:#EEE8F7; color:#6B3FA0; } .fu-tag.fu-follow{ background:#FFF1D6; color:#B26A00; }
+  .fu-day-row td{ background:#F3EFE7; font-weight:800; font-size:13.5px; padding:6px 12px; border-top:2px solid var(--ink); } .fu-day-n{ font-weight:600; color:var(--muted); }
   .fu-note{ min-width:220px; } .fu-wa{ text-decoration:none; }
   .gcard-more{ border-top:1px dashed var(--line); padding-top:10px; display:flex; flex-direction:column; gap:10px; } .gcard-more input[type=text]{ width:100%; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; box-sizing:border-box; } .gcard-btns{ display:flex; gap:10px; align-items:center; }
   .color-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .swatches{ display:flex; gap:8px; } .swatch{ width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; } .swatch.on{ box-shadow:0 0 0 3px var(--ink); } .color-in{ width:44px; height:34px; border:1.5px solid var(--line); border-radius:8px; padding:2px; background:#fff; cursor:pointer; }
@@ -1060,7 +1061,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-10-31 11:00';
+  var APP_VERSION = '2026-10-31 14:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1229,6 +1230,7 @@
     lessonShowHistory: false,
     followFilters: { leads:true, trial:true, review:true, follow:false },   // "who to contact" view: what is included
     followSort: 'wait',
+    followByDay: true,          // separate the "who to contact" list by the day of the child's group
     followPrefsLoaded: false,
     advJoinedOpen: false,       // the collapsible "joined" list on the candidates page
     advStatusFilter: null,   // candidacy-stage filter on the advanced-candidates page
@@ -4028,10 +4030,11 @@
         var saved = JSON.parse(localStorage.getItem('tatami-followup-prefs') || 'null');
         if (saved && saved.filters){ FOLLOW_FILTERS.forEach(function(f){ if (typeof saved.filters[f.key] === 'boolean'){ state.followFilters[f.key] = saved.filters[f.key]; } }); }
         if (saved && saved.sort){ state.followSort = saved.sort; }
+        if (saved && typeof saved.byDay === 'boolean'){ state.followByDay = saved.byDay; }
       }catch(e){}
     }
   }
-  function saveFollowPrefs(){ try{ localStorage.setItem('tatami-followup-prefs', JSON.stringify({ filters:state.followFilters, sort:state.followSort })); }catch(e){} }
+  function saveFollowPrefs(){ try{ localStorage.setItem('tatami-followup-prefs', JSON.stringify({ filters:state.followFilters, sort:state.followSort, byDay:state.followByDay })); }catch(e){} }
   function followList(){
     var act = state.students.filter(function(s){ return !s.archived && !s.trashed; });
     return act.filter(function(s){ return FOLLOW_FILTERS.some(function(f){ return state.followFilters[f.key] && f.test(s); }); });
@@ -4059,7 +4062,7 @@
 
     var list = followList();
     var sortSel = fSelect([{ key:'wait', label:'המתנה ארוכה קודם' }, { key:'name', label:'לפי שם' }, { key:'group', label:'לפי קבוצה' }], state.followSort, function(v){ state.followSort = v; saveFollowPrefs(); render(); });
-    wrap.appendChild(el('div', { class:'fu-summary' }, [ el('b', {}, [list.length + (list.length === 1 ? ' ילד/ה' : ' ילדים')]), el('span', {}, [' · מיון: ']), sortSel ]));
+    wrap.appendChild(el('div', { class:'fu-summary' }, [ el('b', {}, [list.length + (list.length === 1 ? ' ילד/ה' : ' ילדים')]), el('span', {}, [' · מיון: ']), sortSel, fCheck('הפרדה לפי ימי הקבוצות', state.followByDay, function(v){ state.followByDay = v; saveFollowPrefs(); render(); }) ]));
 
     if (!list.length){
       wrap.appendChild(el('p', { class:'lesson-empty', style:'text-align:center;padding:28px;' }, [Object.keys(state.followFilters).some(function(k){ return state.followFilters[k]; }) ? '🎉 אין כרגע ילדים שדורשים פנייה לפי הבחירה.' : 'לא נבחר מה להציג. סמן למעלה לפחות אפשרות אחת.']));
@@ -4076,19 +4079,37 @@
     });
     var thead = el('thead', {}, [ el('tr', {}, ['שם','טלפון','כיתה','קבוצה','סטטוס','הערה','ממתין מאז',''].map(function(t){ return el('th', {}, [t]); })) ]);
     var tbody = el('tbody', {});
-    list.forEach(function(s){
+    function followRow(s){
       var tags = FOLLOW_FILTERS.filter(function(f){ return state.followFilters[f.key] && f.test(s); }).map(function(f){ return el('span', { class:'fu-tag fu-' + f.key }, [f.tag]); });
       var wa = waLinkFor(s.phone), days = daysSinceISO(followSince(s));
-      tbody.appendChild(el('tr', {}, [
+      return el('tr', {}, [
         el('td', { class:'name-cell' + (s.isFemale ? ' name-female' : '') }, [ s.name, el('div', { class:'fu-tags' }, tags) ]),
         el('td', { class:'phone-cell', style:'white-space:nowrap;' }, [ s.phone || '—', wa ? el('a', { href:wa, target:'_blank', rel:'noopener', title:'פתח וואטסאפ', class:'fu-wa' }, [' 💬']) : null ]),
         el('td', {}, [s.classGrade || '—']),
-        el('td', {}, [gName2(s.groupId) || '(ללא קבוצה)']),
+        el('td', {}, [gName2(s.groupId) || '(ללא קבוצה)', (function(){ var gg = state.groups.find(function(x){ return x.id === s.groupId; }); var ds = gg ? groupDays(gg) : []; return ds.length > 1 ? el('div', { class:'fhint' }, [ds.join(' + ')]) : null; })()]),
         el('td', {}, [statusSelectFor(s)]),
         el('td', { class:'fu-note' }, [noteBox(s, 'note', 'הערה…', '')]),
         el('td', { style:'white-space:nowrap;' }, [ days === null ? '—' : (days === 0 ? 'היום' : 'לפני ' + days + ' ימים'), days !== null ? el('div', { class:'fhint' }, [shortDate(String(followSince(s)).slice(0, 10))]) : null ]),
         el('td', {}, [ el('button', { class:'icon-btn', title:'עריכת פרטים', onclick:function(){ openModal({ type:'editStudent', studentId:s.id }); } }, ['✏️']) ])
-      ]));
+      ]);
+    }
+
+    // days in the same order as the weekly grid; groups without a day, and children without a group, come last
+    var NODAY = '__noday', NOGROUP = '__nogroup', buckets = {}, order = [];
+    list.forEach(function(s){
+      var gg = state.groups.find(function(x){ return x.id === s.groupId; });
+      var key = !state.followByDay ? '__all' : (gg ? (groupDay(gg) || NODAY) : NOGROUP);
+      if (!buckets[key]){ buckets[key] = []; }
+      buckets[key].push(s);
+    });
+    if (!state.followByDay){ order = ['__all']; }
+    else { order = WEEK_DAYS.filter(function(d){ return buckets[d]; }).concat(buckets[NODAY] ? [NODAY] : [], buckets[NOGROUP] ? [NOGROUP] : []); }
+    var DAY_TITLE = {}; DAY_TITLE[NODAY] = 'ללא יום מוגדר'; DAY_TITLE[NOGROUP] = 'ללא קבוצה';
+    order.forEach(function(key){
+      if (state.followByDay){
+        tbody.appendChild(el('tr', { class:'fu-day-row' }, [ el('td', { colspan:'8' }, [ (DAY_TITLE[key] || ('יום ' + key)) + ' ', el('span', { class:'fu-day-n' }, ['(' + buckets[key].length + ')']) ]) ]));
+      }
+      buckets[key].forEach(function(s){ tbody.appendChild(followRow(s)); });
     });
     wrap.appendChild(el('div', { class:'table-wrap' }, [ el('table', {}, [thead, tbody]) ]));
     return wrap;
