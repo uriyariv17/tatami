@@ -221,6 +221,25 @@
   .fu-tag.fu-leads{ background:#FDE9E7; color:#A92F1E; } .fu-tag.fu-trial{ background:#E7F1FB; color:#1F5C99; } .fu-tag.fu-review{ background:#EEE8F7; color:#6B3FA0; } .fu-tag.fu-follow{ background:#FFF1D6; color:#B26A00; }
   .fu-day-row td{ background:#F3EFE7; font-weight:800; font-size:13.5px; padding:6px 12px; border-top:2px solid var(--ink); } .fu-day-n{ font-weight:600; color:var(--muted); }
   .fu-note{ min-width:220px; } .fu-wa{ text-decoration:none; }
+  .calc-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(310px,1fr)); gap:14px; align-items:start; }
+  .calc-card{ background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:14px 16px 16px; position:relative; } .calc-card.best{ border-color:#2F9E44; box-shadow:0 0 0 3px rgba(47,158,68,.15); }
+  .calc-badge{ position:absolute; top:-11px; inset-inline-start:14px; background:#2F9E44; color:#fff; font-size:12px; font-weight:800; border-radius:999px; padding:2px 12px; } .calc-badge:empty{ display:none; }
+  .calc-head{ display:flex; gap:8px; align-items:center; margin-bottom:10px; } .calc-name{ flex:1; padding:9px 11px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:15px; font-weight:800; }
+  .calc-field{ margin-bottom:10px; } .calc-field label{ display:block; font-size:12.8px; color:#4A4742; font-weight:700; margin-bottom:4px; } .calc-two{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .calc-row{ display:flex; gap:6px; align-items:center; } .calc-in{ flex:1; min-width:0; padding:9px 11px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:15px; text-align:right; direction:ltr; } .calc-in:focus, .calc-name:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(185,23,23,.12); }
+  .calc-sel{ padding:9px 8px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14px; background:#fff; } .calc-sel-wide{ width:100%; } .calc-unit{ font-size:12.5px; color:var(--muted); min-width:36px; }
+  .calc-res{ background:#F7F5F0; border-radius:12px; padding:12px 14px; margin-top:12px; } .calc-res-label{ font-size:12.5px; color:var(--muted); font-weight:700; }
+  .calc-big{ font-size:34px; font-weight:800; line-height:1.2; margin:2px 0 8px; color:#9A968A; } .calc-big.pos{ color:#2F7A3B; } .calc-big.neg, .calc-cmp-row .neg{ color:#B00020; }
+  .calc-money, .calc-big{ direction:ltr; unicode-bidi:isolate; } .calc-big{ text-align:right; }
+  .calc-line{ display:flex; justify-content:space-between; gap:8px; font-size:13px; padding:3px 0; border-top:1px dashed #E2DFD8; }
+  .calc-compare{ background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:12px 16px; margin-bottom:10px; } .calc-compare:empty{ display:none; } .calc-compare h3{ margin:0 0 8px; font-size:15px; }
+  .calc-cmp-row{ display:flex; align-items:center; gap:10px; margin:6px 0; } .calc-cmp-name{ min-width:130px; font-weight:700; font-size:14px; } .calc-cmp-bar{ flex:1; height:14px; background:#ECE9E3; border-radius:7px; overflow:hidden; } .calc-cmp-fill{ height:100%; background:#2F9E44; border-radius:7px; } .calc-cmp-fill.neg{ background:#B00020; }
+  .calc-how{ margin-top:8px; } .calc-how summary{ cursor:pointer; font-weight:700; font-size:13.5px; }
+  .shirt-total{ background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:10px 16px; margin:10px 0 14px; font-size:15px; }
+  .shirt-day{ background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:4px 16px 10px; margin-bottom:12px; } .shirt-day.today{ border-color:var(--accent); box-shadow:0 0 0 3px rgba(185,23,23,.10); }
+  .shirt-day-head{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; border-bottom:2px solid var(--ink); padding:10px 0 8px; margin-bottom:4px; } .shirt-day-head h3{ margin:0; font-size:17px; } .shirt-day-n{ font-size:13px; color:var(--muted); } .shirt-day-sum{ font-weight:800; font-size:14px; }
+  .shirt-today{ background:var(--accent); color:#fff; font-size:11.5px; border-radius:999px; padding:2px 10px; margin-inline-start:8px; vertical-align:middle; }
+  .shirt-group{ margin:10px 0 4px; } .shirt-group-name{ font-weight:800; font-size:14px; margin-bottom:2px; } .shirt-group-name small{ color:var(--muted); font-weight:400; } .shirt-size{ font-size:17px; font-weight:800; text-align:center; min-width:48px; } .shirt-give{ padding:4px 12px; font-size:13px; }
   .gcard-more{ border-top:1px dashed var(--line); padding-top:10px; display:flex; flex-direction:column; gap:10px; } .gcard-more input[type=text]{ width:100%; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; box-sizing:border-box; } .gcard-btns{ display:flex; gap:10px; align-items:center; }
   .color-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .swatches{ display:flex; gap:8px; } .swatch{ width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; } .swatch.on{ box-shadow:0 0 0 3px var(--ink); } .color-in{ width:44px; height:34px; border:1.5px solid var(--line); border-radius:8px; padding:2px; background:#fff; cursor:pointer; }
   .link-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; word-break:break-all; font-size:13.5px; }
@@ -1061,7 +1080,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-10-31 14:00';
+  var APP_VERSION = '2026-11-03 10:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -3097,6 +3116,8 @@
         el('button',{class:'more-menu-item'+(state.view==='leads'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='leads'; render(); }},['📈 לידים לניתוח ROI ('+leadsCount+')']),
         el('button',{class:'more-menu-item'+(state.view==='archive'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='archive'; render(); }},['🗄 ארכיון ('+archivedCount+')']),
         el('button',{class:'more-menu-item'+(state.view==='byStatus'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='byStatus'; render(); }},['📋 כל התלמידים לפי סטטוס']),
+        el('button',{class:'more-menu-item'+(state.view==='shirts'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='shirts'; render(); }},['👕 חולצות להביא השבוע ('+shirtsNeeded().length+')']),
+        el('button',{class:'more-menu-item'+(state.view==='calc'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='calc'; render(); }},['🧮 מחשבון כדאיות עבודה']),
         el('button',{class:'more-menu-item'+(state.view==='followup'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='followup'; render(); }},['📞 לפנות אליהם ('+(function(){ followPrefs(); return followList().length; })()+')']),
         el('button',{class:'more-menu-item'+(state.view==='pastYears'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='pastYears'; render(); }},['📅 שנים קודמות ('+(state.yearArchives?state.yearArchives.length:0)+')']),
         el('div',{class:'more-menu-divider'}),
@@ -3146,7 +3167,7 @@
       main.appendChild(renderLeadsView());
     } else if (state.view === 'archive'){
       main.appendChild(renderArchiveView());
-    } else if (state.view === 'followup'){ main.appendChild(renderFollowupView()); } else if (state.view === 'byStatus'){
+    } else if (state.view === 'shirts'){ main.appendChild(renderShirtsView()); } else if (state.view === 'calc'){ main.appendChild(renderCalcView()); } else if (state.view === 'followup'){ main.appendChild(renderFollowupView()); } else if (state.view === 'byStatus'){
       main.appendChild(renderByStatusView());
     } else if (state.view === 'pastYears'){
       main.appendChild(renderPastYearsView());
@@ -4115,6 +4136,195 @@
     return wrap;
   }
 
+  // ---------------- job profitability calculator: compare up to 3 jobs ----------------
+  var CALC_WPM = 52 / 12;      // weeks in a month
+  function calcNum(v){ var x = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isNaN(x) ? 0 : x; }
+  function newCalcJob(){ return { name:'', students:'', price:'', pricePer:'month', minutes:'60', perWeek:'1', extraMin:'', rent:'', rentPer:'month', taxPct:'', taxOn:'profit' }; }
+  function calcJob(j){
+    var students = calcNum(j.students), price = calcNum(j.price), minutes = calcNum(j.minutes), perWeek = calcNum(j.perWeek);
+    var extra = calcNum(j.extraMin), rent = calcNum(j.rent), taxPct = Math.min(100, Math.max(0, calcNum(j.taxPct)));
+    var lessons = perWeek * CALC_WPM;                                                       // lessons a month
+    var income = students * price * (j.pricePer === 'lesson' ? lessons : 1);                // gross income a month
+    var rentM = rent * (j.rentPer === 'lesson' ? lessons : 1);                              // overhead / rent a month
+    var profit = income - rentM;
+    var taxBase = j.taxOn === 'income' ? income : Math.max(0, profit);
+    var tax = taxBase * taxPct / 100;
+    var net = profit - tax;
+    var hours = lessons * (minutes + extra) / 60;                                           // working hours a month
+    var priceM = price * (j.pricePer === 'lesson' ? lessons : 1);                           // what one student pays a month
+    return {
+      ok: hours > 0 && students > 0 && price > 0,
+      lessons: lessons, income: income, rent: rentM, profit: profit, tax: tax, taxPct: taxPct, net: net, hours: hours,
+      perHour: hours > 0 ? net / hours : null, grossPerHour: hours > 0 ? income / hours : null,
+      breakEven: (rentM > 0 && priceM > 0) ? Math.ceil(rentM / priceM) : null
+    };
+  }
+  function calcLoad(){
+    if (state.calc) return;
+    state.calc = { jobs:[newCalcJob()] };
+    try{
+      var saved = JSON.parse(localStorage.getItem('tatami-calc-v1') || 'null');
+      if (saved && Array.isArray(saved.jobs) && saved.jobs.length){ state.calc.jobs = saved.jobs.slice(0, 3).map(function(j){ return Object.assign(newCalcJob(), j); }); }
+    }catch(e){}
+  }
+  function calcSave(){ try{ localStorage.setItem('tatami-calc-v1', JSON.stringify({ jobs:state.calc.jobs })); }catch(e){} }
+  function fmtShekel(n){ return (n < 0 ? '−' : '') + '₪' + Math.abs(Math.round(n)).toLocaleString('he-IL'); }
+
+  function renderCalcView(){
+    calcLoad();
+    var jobs = state.calc.jobs, wrap = el('div', {});
+    wrap.appendChild(el('div', { class:'group-header' }, [
+      el('h2', {}, ['🧮 מחשבון כדאיות עבודה']),
+      el('p', { style:'color:var(--muted);font-size:13px;margin:4px 0 0;' }, ['חשב כמה נשאר לך נטו לשעה מכל עבודה, והשווה עד שלוש עבודות זו לצד זו. הנתונים נשמרים במכשיר הזה.'])
+    ]));
+    var refs = [], grid = el('div', { class:'calc-grid' });
+
+    function field(j, label, key, opts){
+      opts = opts || {};
+      var inp = el('input', { type:'text', inputmode: opts.text ? null : 'decimal', class:'calc-in', value: j[key] == null ? '' : j[key], placeholder: opts.ph || '', 'data-k': key });
+      inp.addEventListener('input', function(e){ j[key] = e.target.value; calcSave(); update(); });
+      var kids = [inp];
+      if (opts.per){
+        var sel = el('select', { class:'calc-sel', 'data-k': opts.per.key }, opts.per.options.map(function(o){ var op = el('option', { value:o.key }, [o.label]); if (o.key === j[opts.per.key]){ op.setAttribute('selected', 'selected'); } return op; }));
+        sel.addEventListener('change', function(e){ j[opts.per.key] = e.target.value; calcSave(); update(); });
+        kids.push(sel);
+      } else if (opts.unit){ kids.push(el('span', { class:'calc-unit' }, [opts.unit])); }
+      return el('div', { class:'calc-field' }, [ el('label', {}, [label]), el('div', { class:'calc-row' }, kids), opts.hint ? el('div', { class:'fhint' }, [opts.hint]) : null ]);
+    }
+    var PER = [{ key:'month', label:'לחודש' }, { key:'lesson', label:'לשיעור' }];
+
+    jobs.forEach(function(j, i){
+      var r = { perHour: el('div', { class:'calc-big' }, ['—']), badge: el('div', { class:'calc-badge' }), rows: {} };
+      function line(key, label){ var v = el('b', { class:(['net','income','rent','tax','gross'].indexOf(key) !== -1 ? 'calc-money' : '') }, ['—']); r.rows[key] = v; return el('div', { class:'calc-line' }, [ el('span', {}, [label]), v ]); }
+      var res = el('div', { class:'calc-res' }, [
+        el('div', { class:'calc-res-label' }, ['נטו לשעה']), r.perHour,
+        line('net', 'נטו לחודש'), line('income', 'הכנסה ברוטו לחודש'), line('rent', 'תקורה / שכירות לחודש'), line('tax', 'מס'),
+        line('hours', 'שעות עבודה בחודש'), line('gross', 'ברוטו לשעה (לפני תקורה ומס)'), line('even', 'נקודת איזון (תלמידים שמכסים את התקורה)')
+      ]);
+      var head = el('div', { class:'calc-head' }, [ el('input', { type:'text', class:'calc-name', value:j.name || '', placeholder:'שם העבודה ' + (i + 1) + ' (למשל: מתנ"ס בגין)', 'data-k':'name' }), jobs.length > 1 ? el('button', { class:'icon-btn', title:'הסר את העבודה', onclick:function(){ jobs.splice(i, 1); calcSave(); render(); } }, ['✕']) : null ]);
+      head.firstChild.addEventListener('input', function(e){ j.name = e.target.value; calcSave(); update(); });
+      var card = el('div', { class:'calc-card' }, [
+        r.badge, head,
+        field(j, 'מחיר לתלמיד (₪)', 'price', { per:{ key:'pricePer', options:PER }, ph:'0' }),
+        field(j, 'מספר תלמידים', 'students', { ph:'0' }),
+        el('div', { class:'calc-two' }, [ field(j, 'משך שיעור', 'minutes', { unit:'דקות' }), field(j, 'שיעורים בשבוע', 'perWeek', { ph:'1' }) ]),
+        field(j, 'תקורה / שכירות למקום (₪)', 'rent', { per:{ key:'rentPer', options:PER }, ph:'0' }),
+        field(j, 'אחוז מס (%)', 'taxPct', { unit:'%', ph:'0' }),
+        el('div', { class:'calc-field' }, [ el('label', {}, ['המס מחושב על']), el('select', { class:'calc-sel calc-sel-wide', 'data-k':'taxOn' }, [ { key:'profit', label:'הרווח אחרי תקורה' }, { key:'income', label:'ההכנסה לפני תקורה' } ].map(function(o){ var op = el('option', { value:o.key }, [o.label]); if (o.key === j.taxOn){ op.setAttribute('selected', 'selected'); } return op; })) ]),
+        field(j, 'זמן נוסף לכל שיעור: נסיעה / הכנה (לא חובה)', 'extraMin', { unit:'דקות', ph:'0', hint:'נכנס לחישוב השעות. כך עבודה רחוקה לא נראית משתלמת יותר ממה שהיא.' }),
+        res
+      ]);
+      card.querySelector('select[data-k="taxOn"]').addEventListener('change', function(e){ j.taxOn = e.target.value; calcSave(); update(); });
+      r.card = card; refs.push(r); grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+    var compare = el('div', { class:'calc-compare' });
+    if (jobs.length < 3){ wrap.appendChild(el('button', { class:'btn-ghost', style:'margin:12px 0;', onclick:function(){ jobs.push(newCalcJob()); calcSave(); render(); } }, ['➕ הוסף עבודה להשוואה (עד 3)'])); }
+    wrap.appendChild(compare);
+    wrap.appendChild(el('details', { class:'calc-how' }, [ el('summary', {}, ['איך זה מחושב?']), el('div', { class:'fhint', style:'font-size:13px;line-height:1.8;' }, [
+      'חודש = 4.33 שבועות. הכנסה = תלמידים × מחיר (אם המחיר "לשיעור", מוכפל במספר השיעורים בחודש). תקורה = שכירות (גם כן לפי חודש או שיעור). ',
+      'מס = האחוז שהוזן, על הרווח אחרי התקורה או על ההכנסה, לפי הבחירה (ואם הרווח שלילי, אין מס). נטו = הכנסה פחות תקורה פחות מס. ',
+      'נטו לשעה = נטו לחודש ÷ שעות העבודה בחודש (שיעורים בחודש × משך השיעור, ועוד הזמן הנוסף אם הוזן). זו הערכה, לא ייעוץ מס.'
+    ]) ]));
+
+    function update(){
+      var calc = jobs.map(calcJob), best = -1, bestVal = -Infinity;
+      calc.forEach(function(c, i){ if (c.ok && c.perHour > bestVal){ bestVal = c.perHour; best = i; } });
+      var okCount = calc.filter(function(c){ return c.ok; }).length;
+      calc.forEach(function(c, i){
+        var r = refs[i];
+        r.perHour.textContent = c.ok ? fmtShekel(c.perHour) : '—';
+        r.perHour.className = 'calc-big' + (c.ok ? (c.perHour < 0 ? ' neg' : ' pos') : '');
+        r.rows.net.textContent = c.ok ? fmtShekel(c.net) : '—';
+        r.rows.income.textContent = c.ok ? fmtShekel(c.income) : '—';
+        r.rows.rent.textContent = c.ok ? fmtShekel(-c.rent) : '—';
+        r.rows.tax.textContent = c.ok ? (c.tax > 0 ? fmtShekel(-c.tax) + ' (' + c.taxPct + '%)' : '₪0') : '—';
+        r.rows.hours.textContent = c.ok ? (Math.round(c.hours * 10) / 10) + ' ש\'' : '—';
+        r.rows.gross.textContent = c.ok ? fmtShekel(c.grossPerHour) : '—';
+        r.rows.even.textContent = (c.ok && c.breakEven) ? c.breakEven + ' תלמידים' : '—';
+        var isBest = okCount >= 2 && i === best;
+        r.card.classList.toggle('best', isBest);
+        r.badge.textContent = isBest ? '🏆 הכי משתלמת לשעה' : '';
+      });
+      compare.innerHTML = '';
+      if (okCount >= 2){
+        var list = calc.map(function(c, i){ return { c:c, name:jobs[i].name || ('עבודה ' + (i + 1)) }; }).filter(function(x){ return x.c.ok; }).sort(function(a, b){ return b.c.perHour - a.c.perHour; });
+        var top = Math.max(list[0].c.perHour, 1);
+        compare.appendChild(el('h3', {}, ['השוואה: נטו לשעה']));
+        list.forEach(function(x, k){
+          compare.appendChild(el('div', { class:'calc-cmp-row' }, [
+            el('span', { class:'calc-cmp-name' }, [(k === 0 ? '🏆 ' : '') + x.name]),
+            el('div', { class:'calc-cmp-bar' }, [ el('div', { class:'calc-cmp-fill' + (x.c.perHour < 0 ? ' neg' : ''), style:'width:' + Math.max(0, Math.min(100, x.c.perHour / top * 100)) + '%;' }) ]),
+            el('b', { class:'calc-money' + (x.c.perHour < 0 ? ' neg' : '') }, [fmtShekel(x.c.perHour)])
+          ]));
+        });
+        compare.appendChild(el('div', { class:'fhint', style:'margin-top:6px;' }, ['ההפרש בין הטובה ביותר לפחות טובה: ' + fmtShekel(list[0].c.perHour - list[list.length - 1].c.perHour) + ' לשעה.']));
+      } else if (jobs.length > 1){
+        compare.appendChild(el('div', { class:'fhint' }, ['מלא מחיר, מספר תלמידים ומשך שיעור בשתי עבודות לפחות כדי לראות השוואה.']));
+      }
+    }
+    update();
+    return wrap;
+  }
+
+  // ---------------- shirts to bring this week, by day ----------------
+  var SHIRT_ORDER = ['4','6','8','10','12','14','16','XS','S','M','L','XL','XXL'];
+  function shirtKey(s){ return String(s.shirtSize || '').trim().toUpperCase(); }
+  function shirtRank(k){ var i = SHIRT_ORDER.indexOf(k); return i === -1 ? 999 : i; }
+  function sizeSummary(list){
+    var c = {}; list.forEach(function(s){ var k = shirtKey(s); c[k] = (c[k] || 0) + 1; });
+    return Object.keys(c).sort(function(a, b){ return shirtRank(a) - shirtRank(b) || a.localeCompare(b); }).map(function(k){ return c[k] + '×' + k; }).join('  ·  ');
+  }
+  function shirtsNeeded(){
+    return state.students.filter(function(s){ return !s.archived && !s.trashed && s.status !== 'out' && String(s.shirtSize || '').trim() && !s.shirtReceived; });
+  }
+  function renderShirtsView(){
+    var wrap = el('div', {}), list = shirtsNeeded();
+    wrap.appendChild(el('div', { class:'group-header' }, [
+      el('h2', {}, ['👕 חולצות להביא השבוע']),
+      el('p', { style:'color:var(--muted);font-size:13px;margin:4px 0 0;' }, ['כל הילדים שיש להם מידת חולצה ועוד לא סומנה שהחולצה נמסרה, לפי היום של הקבוצה שלהם. לחיצה על "✓ נמסרה" מסירה אותם מהרשימה.'])
+    ]));
+    if (!list.length){
+      wrap.appendChild(el('p', { class:'lesson-empty', style:'text-align:center;padding:30px;' }, ['🎉 אין כרגע חולצות להביא.']));
+      return wrap;
+    }
+    wrap.appendChild(el('div', { class:'shirt-total' }, [ el('b', {}, [list.length + (list.length === 1 ? ' חולצה' : ' חולצות')]), el('span', {}, ['  —  ' + sizeSummary(list)]) ]));
+    var NODAY = '__noday', NOGROUP = '__nogroup', byDay = {};
+    list.forEach(function(s){
+      var g = state.groups.find(function(x){ return x.id === s.groupId; });
+      var key = g ? (groupDay(g) || NODAY) : NOGROUP;
+      (byDay[key] = byDay[key] || []).push(s);
+    });
+    var order = WEEK_DAYS.filter(function(d){ return byDay[d]; }).concat(byDay[NODAY] ? [NODAY] : [], byDay[NOGROUP] ? [NOGROUP] : []);
+    var today = WEEK_DAYS[new Date().getDay()];
+    order.forEach(function(key){
+      var kids = byDay[key], title = key === NODAY ? 'ללא יום מוגדר' : (key === NOGROUP ? 'ללא קבוצה' : 'יום ' + key);
+      var box = el('div', { class:'shirt-day' + (key === today ? ' today' : '') }, [
+        el('div', { class:'shirt-day-head' }, [ el('h3', {}, [title, key === today ? el('span', { class:'shirt-today' }, ['היום']) : null]), el('span', { class:'shirt-day-n' }, [kids.length + ' חולצות']), el('span', { class:'shirt-day-sum' }, [sizeSummary(kids)]) ])
+      ]);
+      var groups = [], byGroup = {};
+      kids.forEach(function(s){ var g = state.groups.find(function(x){ return x.id === s.groupId; }), gk = g ? g.id : '__none'; if (!byGroup[gk]){ byGroup[gk] = { name:g ? g.name : '(ללא קבוצה)', kids:[] }; groups.push(byGroup[gk]); } byGroup[gk].kids.push(s); });
+      groups.forEach(function(gr){
+        gr.kids.sort(function(a, b){ return shirtRank(shirtKey(a)) - shirtRank(shirtKey(b)) || a.name.localeCompare(b.name, 'he'); });
+        box.appendChild(el('div', { class:'shirt-group' }, [
+          el('div', { class:'shirt-group-name' }, [gr.name + ' ', el('small', {}, ['(' + gr.kids.length + ')'])]),
+          el('div', { class:'table-wrap' }, [ el('table', {}, [ el('tbody', {}, gr.kids.map(function(s){
+            var st = STATUSES.filter(function(x){ return x.key === s.status; })[0];
+            return el('tr', {}, [
+              el('td', { class:'name-cell' + (s.isFemale ? ' name-female' : '') }, [s.name]),
+              el('td', {}, [s.classGrade || '—']),
+              el('td', { class:'shirt-size' }, [shirtKey(s)]),
+              el('td', {}, [ st ? el('span', { class:'lesson-chip' }, [st.label]) : null ]),
+              el('td', {}, [ el('button', { class:'btn-ghost shirt-give', onclick:function(){ toggleShirtReceived(s.id); showToast('"' + s.name + '": החולצה סומנה כנמסרה.'); } }, ['✓ נמסרה']) ])
+            ]);
+          })) ]) ])
+        ]));
+      });
+      wrap.appendChild(box);
+    });
+    return wrap;
+  }
+
   function renderByStatusView(){
     var wrap = el('div',{});
     wrap.appendChild(el('div',{class:'group-header'},[
@@ -4753,6 +4963,8 @@
     }catch(e){
       return { ok:false, error:'הטקסט שהודבק אינו JSON תקין.' };
     }
+    // the automatic Drive backup wraps the studio data together with the form answers: use the studio data part
+    if (data && data.data && typeof data.data === 'object' && Array.isArray(data.data.groups) && Array.isArray(data.data.students)){ data = data.data; }
     if (!data || !Array.isArray(data.groups) || !Array.isArray(data.students)){
       return { ok:false, error:'המבנה של הקובץ לא תואם לגיבוי של האפליקציה.' };
     }
@@ -4797,6 +5009,21 @@
     if (!s) return;
     s.daycare = !s.daycare;
     scheduleSave();
+  }
+  // Duplicate a student into another group. Copies the person's details only: NOT attendance, NOT payments and NOT the shirt size
+  // (a copied size would be flagged as "shirt not delivered"). Never creates a second entry for someone already on that group's list.
+  function duplicateStudentTo(src, groupId, status, quiet){
+    var g = state.groups.find(function(x){ return x.id === groupId; });
+    if (!g) return null;
+    if (findExistingStudent(src.name, src.phone, groupId)){
+      if (!quiet){ showToast('"' + src.name + '" כבר רשום/ה ב-"' + g.name + '". לא נוצר רישום כפול.'); }
+      return null;
+    }
+    var copy = addStudent({ name:src.name, phone:src.phone, groupId:groupId, status:status, classGrade:src.classGrade, billingNumber:src.billingNumber, daycare:src.daycare, isFemale:src.isFemale, note:src.note });
+    // A new "joined" student normally gets the current month marked as paid; a copy has paid nothing in the new group yet, so it starts with no payments at all.
+    copy.monthlyPayments = freshMonthlyPayments();
+    scheduleSave();
+    return copy;
   }
   function toggleShirtReceived(studentId){
     var s = state.students.find(function(x){return x.id===studentId;});
@@ -7256,9 +7483,9 @@
           el('label',{class:'day-check-label'},[femaleCheck2, 'נקבה (ברירת מחדל: זכר)'])
         ]),
         el('div',{class:'field'},[
-          el('label',{},['גם לקבוצה נוספת (אופציונלי)']),
+          el('label',{},['גם לעוד קבוצה — לאימון ניסיון (אופציונלי)']),
           extraGroupSelect2,
-          el('div',{style:'font-size:11.5px;color:var(--muted);margin-top:3px;'},['ייווצר רישום זהה (שם/כיתה/מס\' חיוב/מידה) בקבוצה הנוספת, ללא נוכחות — כי ימי המפגש שם שונים.'])
+          el('div',{style:'font-size:11.5px;color:var(--muted);margin-top:3px;'},['ייווצר רישום נוסף בקבוצה הזו בסטטוס "שיעור ניסיון", עם אותם פרטים (שם, טלפון, כיתה, מס\' חיוב, צהרון ומין). לא מועתקים: מידת חולצה ונוכחות.'])
         ]),
         el('div',{class:'modal-actions'},[
           el('button',{class:'btn-ghost', onclick:closeModal},['ביטול']),
@@ -7279,17 +7506,7 @@
                 isFemale: femaleCheck2.checked
               });
               if (extraGroupSelect2.value){
-                addStudent({
-                  name:name,
-                  phone: names.length===1 ? phoneInput2.value.trim() : '',
-                  groupId:extraGroupSelect2.value,
-                  status:statusSel.value,
-                  classGrade: normalizedClass,
-                  daycare: daycareCheck2.checked,
-                  billingNumber: billingInput2.value.trim(),
-                  shirtSize: shirtInput2.value.trim(),
-                  isFemale: femaleCheck2.checked
-                });
+                duplicateStudentTo({ name:name, phone:(names.length===1 ? phoneInput2.value.trim() : ''), classGrade:normalizedClass, daycare:daycareCheck2.checked, billingNumber:billingInput2.value.trim(), isFemale:femaleCheck2.checked }, extraGroupSelect2.value, 'trial', names.length > 1);
               }
             });
             closeModal();
@@ -7335,6 +7552,14 @@
       })));
 
       var eLeadDateInput = el('input',{type:'date', value: editS.leadMarkedDate || ''});
+      function eDupDo(status){
+        if (!eDupGroupSelect.value){ showToast('בחר קודם קבוצה לשכפול.'); return; }
+        var g = state.groups.find(function(x){ return x.id === eDupGroupSelect.value; });
+        var copy = duplicateStudentTo({ name:eNameInput.value.trim() || editS.name, phone:ePhoneInput.value.trim(), classGrade:normalizeClassGrade(eClassInput.value.trim()), billingNumber:eBillingInput.value.trim(), daycare:!!editS.daycare, isFemale:eFemaleCheck.checked, note:eNoteInput.value.trim() }, eDupGroupSelect.value, status, false);
+        if (!copy) return;
+        showToast('"' + editS.name + '" נוסף/ה ל-"' + (g ? g.name : '') + '" ' + (status === 'trial' ? 'לאימון ניסיון' : 'כנרשם/ת') + '.');
+        closeModal();
+      }
 
       content = el('div',{class:'modal'},[
         el('h2',{},['עריכת פרטי מתאמן']),
@@ -7357,26 +7582,13 @@
         ]),
         el('div',{class:'field'},[el('label',{},['תאריך סימון כליד']), eLeadDateInput]),
         el('div',{class:'field', style:'border-top:1px solid var(--line);padding-top:12px;margin-top:4px;'},[
-          el('label',{},['שכפול גם לקבוצה נוספת']),
-          el('div',{style:'display:flex;gap:8px;'},[
-            eDupGroupSelect,
-            el('button',{class:'btn-ghost', type:'button', onclick:function(){
-              if (!eDupGroupSelect.value){ return; }
-              addStudent({
-                name: eNameInput.value.trim() || editS.name,
-                phone: ePhoneInput.value.trim(),
-                groupId: eDupGroupSelect.value,
-                status: eStatusSel.value,
-                classGrade: normalizeClassGrade(eClassInput.value.trim()),
-                shirtSize: eShirtInput.value.trim(),
-                billingNumber: eBillingInput.value.trim()
-              });
-              var dupGroupName = (state.groups.find(function(g){return g.id===eDupGroupSelect.value;})||{}).name || '';
-              showToast('נוצר רישום זהה עבור "'+editS.name+'" בקבוצת "'+dupGroupName+'".');
-              closeModal();
-            }},['שכפול'])
+          el('label',{},['שכפול לקבוצה נוספת']),
+          eDupGroupSelect,
+          el('div',{style:'display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;'},[
+            el('button',{class:'btn-ghost', type:'button', onclick:function(){ eDupDo('trial'); }},['שכפל לאימון ניסיון']),
+            el('button',{class:'btn-ghost', type:'button', onclick:function(){ eDupDo('joined'); }},['שכפל כנרשם'])
           ]),
-          el('div',{style:'font-size:11.5px;color:var(--muted);margin-top:3px;'},['ייווצר רישום נפרד עם אותם פרטים, ללא נוכחות — כי ימי המפגש שם שונים.'])
+          el('div',{style:'font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.5;'},['מועתקים: שם, טלפון, כיתה, מס\' חיוב, צהרון, מין והערה. לא מועתקים: נוכחות, תשלומים ומידת חולצה. לא נוצר רישום כפול למי שכבר ברשימה של הקבוצה.'])
         ]),
         el('div',{class:'modal-actions'},[
           el('button',{class:'btn-text danger', onclick:function(){ closeModal(); archiveStudent(editS.id); }},['העברה לארכיון']),
@@ -8030,7 +8242,7 @@
 
   // Test hook — only active when the page is opened with ?tatamiTest=1 (used by automated tests, not by normal use).
   if (/[?&]tatamiTest=1/.test(window.location.search)){
-    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
+    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
   }
 
   window.addEventListener('focus', function(){ maybeCheckInbox(); });
