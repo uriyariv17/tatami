@@ -1081,7 +1081,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-03 14:00';
+  var APP_VERSION = '2026-11-05 10:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1846,6 +1846,7 @@
       if ((b.advGroupId||'') !== (c.advGroupId||'')){ add('sAdv', '🎓 '+c.name+': קבוצה מיועדת למתקדמים — '+(c.advGroupId ? gName(c.advGroupId) : 'לא נקבעה')); }
       if ((b.advStatus||'candidate') !== (c.advStatus||'candidate')){ add('sAdv', '🎓 '+c.name+': שלב מועמדות — '+advStatusInfo(c.advStatus).label); }
       if (!!b.advJoined !== !!c.advJoined){ add('sAdv', '🎓 '+c.name+': '+(c.advJoined ? 'סומן כמי שהצטרף למתקדמים' : 'בוטל הסימון "הצטרף למתקדמים"')); }
+      if (JSON.stringify(b.payExempt || {}) !== JSON.stringify(c.payExempt || {})){ var nb = Object.keys(b.payExempt || {}).length, nc = Object.keys(c.payExempt || {}).length; add('sPay', '💳 ' + c.name + (nc >= nb ? ': הוסר/ה מרשימת מי שלא שילם' : ': הוחזר/ה לרשימת מי שלא שילם')); }
       if (JSON.stringify(b.payNotes || {}) !== JSON.stringify(c.payNotes || {})){ add('sPay', '💳 עודכנה הערת תשלום: ' + c.name); }
       if ((b.advNote||'') !== (c.advNote||'')){ add('sAdv', c.advNote ? ('🎓 '+c.name+': הערת מועמדות — "'+snippet(c.advNote)+'"') : ('🎓 '+c.name+': הערת המועמדות נמחקה')); }
       var edits = [];
@@ -3467,6 +3468,26 @@
     return wrap;
   }
 
+  // ---------------- "who is missing" message for the club coordinators ----------------
+  var MISSING_STATUSES = ['joined', 'trial', 'follow', 'review'];
+  function missingStudents(group, dateISO, keys){
+    return sortByClass(state.students.filter(function(s){
+      return s.groupId === group.id && !s.archived && !s.trashed && keys.indexOf(s.status) !== -1 && (s.attendance || []).indexOf(dateISO) === -1;
+    }));
+  }
+  function missingMessage(list){
+    if (!list.length) return '';
+    return 'היי,\nחסרים לי:\n' + list.map(function(s){ return s.name + (s.classGrade ? ' - ' + s.classGrade : ''); }).join('\n');
+  }
+  function defaultMissingDate(group){
+    var t = todayISO(), all = (group.sessions || []).slice().sort(), past = all.filter(function(d){ return d <= t; });
+    return past.length ? past[past.length - 1] : all[all.length - 1];       // the latest lesson that already took place
+  }
+  function copyMessage(text){
+    try{ navigator.clipboard.writeText(text).then(function(){ showToast('ההודעה הועתקה.'); }, function(){ window.prompt('העתק את ההודעה:', text); }); }
+    catch(e){ window.prompt('העתק את ההודעה:', text); }
+  }
+
   function renderGroup(group){
     var wrap = el('div',{});
 
@@ -3474,6 +3495,10 @@
       el('h2',{},[group.name]),
       el('div',{class:'actions'},[
         el('button',{class:'btn-ghost', onclick:function(){ openModal({type:'renameGroup', groupId:group.id, value:group.name, days:groupDays(group)}); }},['עריכת קבוצה']),
+        el('button',{class:'btn-ghost', title:'הודעה לרכזות עם שמות הילדים שלא הגיעו', onclick:function(){
+          if (!(group.sessions || []).length){ showToast('אין עדיין מפגשים בקבוצה. הוסף מפגש וסמן נוכחות כדי ליצור הודעה.'); return; }
+          openModal({type:'missingMsg', groupId:group.id});
+        }},['📣 הודעה על חסרים']),
         el('button',{class:'btn-ghost', onclick:function(){ openModal({type:'addSession', groupId:group.id}); }},['הוספת מפגש']),
         el('button',{class:'btn-primary', onclick:function(){ openModal({type:'addStudent', groupId:group.id, status:'follow'}); }},['הוספת מתאמן'])
       ])
@@ -5210,6 +5235,13 @@
   }
 
   // ---- techniques section ----
+  // Taking someone out of this month's "who hasn't paid" list (e.g. exempt, on a break, pays another way). Month-specific and reversible; his payment status is NOT changed.
+  function setPayExempt(s, monthIdx, on){
+    var next = Object.assign({}, s.payExempt || {});
+    if (on){ next[monthIdx] = Date.now(); } else { delete next[monthIdx]; }
+    updateStudent(s.id, { payExempt: next });
+    showToast(on ? '"' + s.name + '" הוסר/ה מהרשימה של ' + ACADEMIC_MONTHS[monthIdx].label + '. אפשר להחזיר מהרשימה שמתחת.' : '"' + s.name + '" הוחזר/ה לרשימה.');
+  }
   function renderPaymentsSection(app){
     if (state.paymentsSelectedMonth === null){
       var jsMonth = new Date().getMonth();
@@ -5260,16 +5292,19 @@
 
     // ---- Who hasn't paid this month ----
     var activeJoined = state.students.filter(function(s){ return s.status==='joined' && !s.archived && !s.trashed; });
-    var unpaid = activeJoined.filter(function(s){
+    var unpaidAll = activeJoined.filter(function(s){
       var v = (s.monthlyPayments||[])[monthIdx];
       return v !== 'paid';
     });
+    var isExempt = function(s){ return !!(s.payExempt && s.payExempt[monthIdx]); };
+    var unpaid = unpaidAll.filter(function(s){ return !isExempt(s); });
+    var removedList = unpaidAll.filter(isExempt);
 
     var unpaidBox = el('div',{class:'campaign-analysis'});
-    unpaidBox.appendChild(el('h3',{style:'margin-top:0;'},['מי לא שילם ב'+ACADEMIC_MONTHS[monthIdx].label+' ('+unpaid.length+')']));
+    unpaidBox.appendChild(el('h3',{style:'margin-top:0;'},['מי לא שילם ב'+ACADEMIC_MONTHS[monthIdx].label+' ('+unpaid.length+')', removedList.length ? el('span',{style:'font-weight:400;font-size:13px;color:var(--muted);'},['  ·  '+removedList.length+' הוסרו מהרשימה']) : null]));
 
     if (!unpaid.length){
-      unpaidBox.appendChild(el('p',{style:'color:var(--muted);'},['כולם שילמו החודש הזה 🎉']));
+      unpaidBox.appendChild(el('p',{style:'color:var(--muted);'},[removedList.length ? 'כל מי שנשאר ברשימה שילם 🎉' : 'כולם שילמו החודש הזה 🎉']));
     } else {
       // grouped by group
       var byGroup = {};
@@ -5291,14 +5326,32 @@
             el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name]),
             el('td',{},[s.billingNumber || '(אין מס\' חיוב)']),
             el('td',{class: statusVal==='problem' ? 'bad' : ''},[statusLabel]),
-            el('td',{class:'pay-note-cell'},[payNoteBox(s, monthIdx)])
+            el('td',{class:'pay-note-cell'},[payNoteBox(s, monthIdx)]),
+            el('td',{style:'white-space:nowrap;'},[ el('button',{class:'btn-text', title:'מוציא את התלמיד מהרשימה של החודש הזה בלבד (אפשר להחזיר)', onclick:function(){ setPayExempt(s, monthIdx, true); }},['✕ הסר מהרשימה']) ])
           ]));
         });
-        list.appendChild(el('table',{},[ el('thead',{},[ el('tr',{},['שם','מס\' חיוב','סטטוס','הערת תשלום (לחודש הזה)'].map(function(t){ return el('th',{},[t]); })) ]), tbody ]));
+        list.appendChild(el('table',{},[ el('thead',{},[ el('tr',{},['שם','מס\' חיוב','סטטוס','הערת תשלום (לחודש הזה)',''].map(function(t){ return el('th',{},[t]); })) ]), tbody ]));
         unpaidBox.appendChild(list);
       });
     }
     wrap.appendChild(unpaidBox);
+
+    if (removedList.length){
+      var gName3 = function(id){ var g = state.groups.find(function(x){ return x.id === id; }); return g ? g.name : '(ללא קבוצה)'; };
+      wrap.appendChild(el('details',{class:'campaign-analysis pay-removed'},[
+        el('summary',{style:'cursor:pointer;font-weight:700;'},['הוסרו מהרשימה ב'+ACADEMIC_MONTHS[monthIdx].label+' ('+removedList.length+')']),
+        el('div',{class:'fhint',style:'margin:6px 0;'},['אלה מי שלא שילמו אבל הוצאת אותם מהרשימה של החודש הזה. סטטוס התשלום שלהם לא השתנה.']),
+        el('div',{class:'table-wrap'},[ el('table',{},[ el('tbody',{}, removedList.map(function(s){
+          var note = (s.payNotes && s.payNotes[monthIdx]) ? s.payNotes[monthIdx].t : '';
+          return el('tr',{},[
+            el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name]),
+            el('td',{},[gName3(s.groupId)]),
+            el('td',{class:'fhint'},[note]),
+            el('td',{},[ el('button',{class:'btn-ghost', onclick:function(){ setPayExempt(s, monthIdx, false); }},['↩ החזר לרשימה']) ])
+          ]);
+        })) ]) ])
+      ]));
+    }
 
     app.appendChild(wrap);
   }
@@ -7450,6 +7503,41 @@
         ])
       ]);
       setTimeout(function(){ rInput.focus(); },0);
+    }
+
+    else if (m.type === 'missingMsg'){
+      var mg = state.groups.find(function(g){ return g.id === m.groupId; });
+      if (!mg){ closeModal(); return; }
+      var sessDates = (mg.sessions || []).slice().sort().reverse(), keys = ['joined', 'trial'];
+      var dayLabel = function(d){ return WEEK_DAYS[new Date(d + 'T00:00:00').getDay()] + ' · ' + shortDate(d); };
+      var def = defaultMissingDate(mg);
+      var dateSel = el('select',{class:'missing-date'}, sessDates.map(function(d){ var o = el('option',{value:d},[dayLabel(d)]); if (d === def){ o.setAttribute('selected','selected'); } return o; }));
+      var ta = el('textarea',{class:'missing-msg-text', rows:'10', style:'width:100%;min-height:190px;font-family:inherit;font-size:15px;line-height:1.6;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;box-sizing:border-box;'});
+      var countLine = el('div',{class:'fhint missing-count', style:'margin:6px 0;'});
+      var copyBtn = el('button',{class:'btn-primary missing-copy', onclick:function(){ copyMessage(ta.value); }},['📋 העתק הודעה']);
+      var waBtn = el('button',{class:'btn-ghost missing-wa', onclick:function(){ window.open('https://wa.me/?text=' + encodeURIComponent(ta.value), '_blank', 'noopener'); }},['💬 פתח בוואטסאפ']);
+      function refreshMissing(){
+        var list = missingStudents(mg, dateSel.value, keys);
+        ta.value = missingMessage(list);
+        countLine.textContent = list.length ? (list.length + (list.length === 1 ? ' ילד/ה חסר/ה' : ' ילדים חסרים') + ' ב' + dayLabel(dateSel.value) + '. אפשר לערוך את ההודעה לפני ההעתקה.') : 'כולם הגיעו ב' + dayLabel(dateSel.value) + ' (או שלא סומנה נוכחות עדיין). אין הודעה ליצור.';
+        copyBtn.disabled = waBtn.disabled = !list.length;
+      }
+      dateSel.addEventListener('change', refreshMissing);
+      var chips = el('div',{class:'missing-chips', style:'display:flex;gap:14px;flex-wrap:wrap;margin:8px 0;font-size:13.5px;'}, MISSING_STATUSES.map(function(k){
+        var st = STATUSES.filter(function(x){ return x.key === k; })[0];
+        var cb = el('input',{type:'checkbox', 'data-status':k}); cb.checked = keys.indexOf(k) !== -1;
+        cb.addEventListener('change', function(){ keys = MISSING_STATUSES.filter(function(kk){ var c = chips.querySelector('[data-status="' + kk + '"]'); return c && c.checked; }); refreshMissing(); });
+        return el('label',{style:'display:flex;gap:5px;align-items:center;cursor:pointer;'},[cb, st ? st.label : k]);
+      }));
+      content = el('div',{class:'modal'},[
+        el('h2',{},['📣 הודעה על חסרים']),
+        el('div',{style:'font-size:12.5px;color:var(--muted);margin-bottom:8px;'},['הודעה לרכזות עם שמות הילדים של "' + mg.name + '" שלא סומנה להם נוכחות באותו יום.']),
+        el('div',{class:'field'},[el('label',{},['באיזה יום']), dateSel]),
+        el('div',{style:'font-size:12.5px;font-weight:700;margin-top:4px;'},['מי נחשב חסר:']), chips,
+        ta, countLine,
+        el('div',{class:'modal-actions'},[ el('button',{class:'btn-ghost', onclick:closeModal},['סגירה']), waBtn, copyBtn ])
+      ]);
+      refreshMissing();
     }
 
     else if (m.type === 'addSession'){
