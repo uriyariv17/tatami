@@ -240,6 +240,7 @@
   .shirt-day-head{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; border-bottom:2px solid var(--ink); padding:10px 0 8px; margin-bottom:4px; } .shirt-day-head h3{ margin:0; font-size:17px; } .shirt-day-n{ font-size:13px; color:var(--muted); } .shirt-day-sum{ font-weight:800; font-size:14px; }
   .shirt-today{ background:var(--accent); color:#fff; font-size:11.5px; border-radius:999px; padding:2px 10px; margin-inline-start:8px; vertical-align:middle; }
   .shirt-group{ margin:10px 0 4px; } .shirt-group-name{ font-weight:800; font-size:14px; margin-bottom:2px; } .shirt-group-name small{ color:var(--muted); font-weight:400; } .shirt-size{ font-size:17px; font-weight:800; text-align:center; min-width:48px; } .shirt-give{ padding:4px 12px; font-size:13px; }
+  .pay-note-cell{ min-width:260px; width:42%; }
   .gcard-more{ border-top:1px dashed var(--line); padding-top:10px; display:flex; flex-direction:column; gap:10px; } .gcard-more input[type=text]{ width:100%; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; box-sizing:border-box; } .gcard-btns{ display:flex; gap:10px; align-items:center; }
   .color-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .swatches{ display:flex; gap:8px; } .swatch{ width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; } .swatch.on{ box-shadow:0 0 0 3px var(--ink); } .color-in{ width:44px; height:34px; border:1.5px solid var(--line); border-radius:8px; padding:2px; background:#fff; cursor:pointer; }
   .link-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; word-break:break-all; font-size:13.5px; }
@@ -1080,7 +1081,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-03 10:00';
+  var APP_VERSION = '2026-11-03 14:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1845,6 +1846,7 @@
       if ((b.advGroupId||'') !== (c.advGroupId||'')){ add('sAdv', '🎓 '+c.name+': קבוצה מיועדת למתקדמים — '+(c.advGroupId ? gName(c.advGroupId) : 'לא נקבעה')); }
       if ((b.advStatus||'candidate') !== (c.advStatus||'candidate')){ add('sAdv', '🎓 '+c.name+': שלב מועמדות — '+advStatusInfo(c.advStatus).label); }
       if (!!b.advJoined !== !!c.advJoined){ add('sAdv', '🎓 '+c.name+': '+(c.advJoined ? 'סומן כמי שהצטרף למתקדמים' : 'בוטל הסימון "הצטרף למתקדמים"')); }
+      if (JSON.stringify(b.payNotes || {}) !== JSON.stringify(c.payNotes || {})){ add('sPay', '💳 עודכנה הערת תשלום: ' + c.name); }
       if ((b.advNote||'') !== (c.advNote||'')){ add('sAdv', c.advNote ? ('🎓 '+c.name+': הערת מועמדות — "'+snippet(c.advNote)+'"') : ('🎓 '+c.name+': הערת המועמדות נמחקה')); }
       var edits = [];
       if (b.name !== c.name){ add('sEdit', '✏️ שם תלמיד שונה: '+b.name+' ← '+c.name); }
@@ -1923,6 +1925,7 @@
       sEdit:'✏️ עודכנו פרטים של {n} תלמידים', sTrash:'🗄 {n} תלמידים הועברו/שוחזרו (ארכיון/פח)',
       lesson:'📓 עודכן יומן השיעורים ({n} שינויים)', forms:'📝 עודכנו הגדרות הטפסים ({n} שינויים)', gNote:'📌 עודכנו הערות קבוצה ({n} שינויים)',
       sAdv:'🎓 עודכנו נתוני מועמדות ל-{n} שינויים',
+      sPay:'💳 עודכנו הערות תשלום ({n} שינויים)',
       pay:'💳 עודכנו תשלומים ({n} שינויים)', att:'✅ עודכנה נוכחות ({n} שינויים)', session:'📅 עודכנו מפגשים ({n} שינויים)',
       tech:'📚 עודכנו טכניקות/קטגוריות ({n} שינויים)'
     };
@@ -2923,6 +2926,27 @@
       container.appendChild(el('div',{class:'note-date-tag'},['עודכן: '+stampOf(s.advNoteUpdatedAt)]));
     }
     return container;
+  }
+
+  // A note about a payment problem. One per student per MONTH (s.payNotes[monthIndex] = { t:text, at:ms }), shown only in the payments screen.
+  function payNoteBox(s, monthIdx){
+    var cur = (s.payNotes && s.payNotes[monthIdx]) || null, text = cur ? cur.t : '';
+    var ta = el('textarea',{ class:'inline-input note-area pay-note-area', placeholder:'הערה על בעיית התשלום…', rows:'1', value:text, title:text });
+    var key = 'pay' + monthIdx + ':' + s.id;
+    ta.dataset.sid = key;
+    ta.addEventListener('change', function(e){
+      var v = e.target.value.trim(), next = Object.assign({}, s.payNotes || {});
+      if (v){ next[monthIdx] = { t:v, at:Date.now() }; } else { delete next[monthIdx]; }
+      updateStudent(s.id, { payNotes: next });
+    });
+    ta.addEventListener('focus', function(){ fitNote(ta, true); });
+    ta.addEventListener('input', function(){ fitNote(ta, true); });
+    ta.addEventListener('blur', function(){ fitNote(ta, false); });
+    ta.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey && !e.isComposing){ e.preventDefault(); ta.blur(); } });
+    var moreBtn = el('button',{class:'note-more-btn', type:'button', onclick:function(){ expandedNotes[key] = !expandedNotes[key]; fitNote(ta, document.activeElement === ta); }},['▾ הצג הכל']);
+    var box = el('div',{class:'note-field-wrap'},[ta, moreBtn]);
+    if (cur && cur.at){ box.appendChild(el('div',{class:'note-date-tag'},['עודכן: '+stampOf(cur.at)])); }
+    return box;
   }
 
   function editableInput(s, field, placeholder, extraClass){
@@ -5266,10 +5290,11 @@
           tbody.appendChild(el('tr',{},[
             el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name]),
             el('td',{},[s.billingNumber || '(אין מס\' חיוב)']),
-            el('td',{class: statusVal==='problem' ? 'bad' : ''},[statusLabel])
+            el('td',{class: statusVal==='problem' ? 'bad' : ''},[statusLabel]),
+            el('td',{class:'pay-note-cell'},[payNoteBox(s, monthIdx)])
           ]));
         });
-        list.appendChild(el('table',{},[tbody]));
+        list.appendChild(el('table',{},[ el('thead',{},[ el('tr',{},['שם','מס\' חיוב','סטטוס','הערת תשלום (לחודש הזה)'].map(function(t){ return el('th',{},[t]); })) ]), tbody ]));
         unpaidBox.appendChild(list);
       });
     }
