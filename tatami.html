@@ -241,6 +241,13 @@
   .shirt-today{ background:var(--accent); color:#fff; font-size:11.5px; border-radius:999px; padding:2px 10px; margin-inline-start:8px; vertical-align:middle; }
   .shirt-group{ margin:10px 0 4px; } .shirt-group-name{ font-weight:800; font-size:14px; margin-bottom:2px; } .shirt-group-name small{ color:var(--muted); font-weight:400; } .shirt-size{ font-size:17px; font-weight:800; text-align:center; min-width:48px; } .shirt-give{ padding:4px 12px; font-size:13px; }
   .pay-note-cell{ min-width:260px; width:42%; }
+  .muni-err{ background:#FDECEE; color:#8A1C1C; border:1px solid #F1B8BD; border-radius:10px; padding:9px 14px; margin:8px 0; font-size:13.5px; }
+  .muni-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; } .muni-in{ width:100%; box-sizing:border-box; padding:9px 11px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14.5px; }
+  .muni-sheet{ display:flex; gap:10px; align-items:flex-start; flex-wrap:wrap; padding:8px 0; border-top:1px dashed var(--line); } .muni-sheet-n{ min-width:70px; font-weight:800; padding-top:8px; } .muni-sheet:not(.on) .muni-sheet-n{ color:var(--muted); font-weight:600; }
+  .muni-sheet-f{ display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; flex:1; } .muni-sheet-f .muni-in{ width:200px; } .muni-sheet-f .muni-price{ width:120px; } .muni-more summary{ cursor:pointer; font-size:12.5px; color:var(--muted); padding-top:9px; } .muni-yn{ display:flex; gap:14px; flex-wrap:wrap; padding:6px 0; font-size:13px; }
+  .muni-card{ background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:10px 14px 12px; margin-bottom:14px; } .muni-card-head{ display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom:6px; } .muni-card-head h3{ margin:0; font-size:16px; } .muni-card-head .neg, .neg{ color:#B00020; font-weight:800; }
+  .muni-table{ font-size:13px; } .muni-table th{ white-space:nowrap; } .muni-cell{ width:100%; min-width:70px; box-sizing:border-box; padding:5px 7px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13px; } .muni-amt{ min-width:62px; text-align:left; direction:ltr; } .muni-disc{ min-width:64px; } .muni-note{ min-width:150px; }
+  .muni-att{ font-size:10.5px; color:var(--muted); text-align:center; } .muni-tot{ white-space:nowrap; font-weight:700; } .muni-tag{ background:#EEE8F7; color:#6B3FA0; font-size:10.5px; border-radius:999px; padding:1px 7px; margin-inline-start:5px; } .muni-foot{ padding:8px 4px 0; font-size:14px; } .muni-once{ margin-top:6px; font-size:13px; }
   .gcard-more{ border-top:1px dashed var(--line); padding-top:10px; display:flex; flex-direction:column; gap:10px; } .gcard-more input[type=text]{ width:100%; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; box-sizing:border-box; } .gcard-btns{ display:flex; gap:10px; align-items:center; }
   .color-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .swatches{ display:flex; gap:8px; } .swatch{ width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; } .swatch.on{ box-shadow:0 0 0 3px var(--ink); } .color-in{ width:44px; height:34px; border:1.5px solid var(--line); border-radius:8px; padding:2px; background:#fff; cursor:pointer; }
   .link-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; word-break:break-all; font-size:13.5px; }
@@ -1081,7 +1088,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-05 10:00';
+  var APP_VERSION = '2026-11-05 15:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -3141,6 +3148,7 @@
         el('button',{class:'more-menu-item'+(state.view==='leads'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='leads'; render(); }},['📈 לידים לניתוח ROI ('+leadsCount+')']),
         el('button',{class:'more-menu-item'+(state.view==='archive'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='archive'; render(); }},['🗄 ארכיון ('+archivedCount+')']),
         el('button',{class:'more-menu-item'+(state.view==='byStatus'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='byStatus'; render(); }},['📋 כל התלמידים לפי סטטוס']),
+        el('button',{class:'more-menu-item'+(state.view==='muni'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='muni'; render(); }},['🏛️ דוח לעירייה']),
         el('button',{class:'more-menu-item'+(state.view==='shirts'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='shirts'; render(); }},['👕 חולצות להביא השבוע ('+shirtsNeeded().length+')']),
         el('button',{class:'more-menu-item'+(state.view==='calc'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='calc'; render(); }},['🧮 מחשבון כדאיות עבודה']),
         el('button',{class:'more-menu-item'+(state.view==='followup'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='followup'; render(); }},['📞 לפנות אליהם ('+(function(){ followPrefs(); return followList().length; })()+')']),
@@ -3192,7 +3200,7 @@
       main.appendChild(renderLeadsView());
     } else if (state.view === 'archive'){
       main.appendChild(renderArchiveView());
-    } else if (state.view === 'shirts'){ main.appendChild(renderShirtsView()); } else if (state.view === 'calc'){ main.appendChild(renderCalcView()); } else if (state.view === 'followup'){ main.appendChild(renderFollowupView()); } else if (state.view === 'byStatus'){
+    } else if (state.view === 'muni'){ main.appendChild(renderMuniView()); } else if (state.view === 'shirts'){ main.appendChild(renderShirtsView()); } else if (state.view === 'calc'){ main.appendChild(renderCalcView()); } else if (state.view === 'followup'){ main.appendChild(renderFollowupView()); } else if (state.view === 'byStatus'){
       main.appendChild(renderByStatusView());
     } else if (state.view === 'pastYears'){
       main.appendChild(renderPastYearsView());
@@ -4372,6 +4380,265 @@
       wrap.appendChild(box);
     });
     return wrap;
+  }
+
+  // ---------------- municipality report: fills the municipality's own Excel template ----------------
+  // The template's input cells are edited IN PLACE inside the uploaded file, so its formulas, drop-down lists, comments and protection stay exactly as they are.
+  var HEB_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+  var MUNI_NOTES_DEFAULT = ['עובדי עיריה','חד הוריות','אח נוסף באותו החוג','נכי צה"ל','אלמנות צה"ל','יתומי צה"ל ','עולים חדשים-עד 3 שנים בארץ','אחד ההורים גמלאי','ההורה חייל בשרות חובה','ברוכות ילדים- 4 ילדים ומעלה','מפתחות','פעם בשבוע','פעמיים בשבוע','100% הנחה באישור מנהל','השתתפות חלקית בחודש- התחלה מאוחרת ','השתתפות חלקית בחודש- פרישה'];
+  var MUNI_MAX_ROWS = 30, MUNI_FIRST_ROW = 8, MUNI_SHEETS = 7;
+
+  // ---- a tiny zip reader / writer (no library): xlsx files are zip files ----
+  var CRC_TABLE = null;
+  function crc32(bytes){
+    if (!CRC_TABLE){ CRC_TABLE = new Uint32Array(256); for (var n = 0; n < 256; n++){ var c = n; for (var k = 0; k < 8; k++){ c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1); } CRC_TABLE[n] = c >>> 0; } }
+    var crc = 0xFFFFFFFF; for (var i = 0; i < bytes.length; i++){ crc = CRC_TABLE[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8); } return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  async function inflateRaw(bytes){
+    var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  }
+  async function readZip(buf){
+    var dv = new DataView(buf), u8 = new Uint8Array(buf), i = u8.length - 22;
+    while (i >= 0 && dv.getUint32(i, true) !== 0x06054b50){ i--; }
+    if (i < 0){ throw new Error('הקובץ אינו קובץ Excel תקין (xlsx).'); }
+    var count = dv.getUint16(i + 10, true), p = dv.getUint32(i + 16, true), dec = new TextDecoder(), out = [];
+    for (var k = 0; k < count; k++){
+      if (dv.getUint32(p, true) !== 0x02014b50){ throw new Error('מבנה הקובץ אינו תקין.'); }
+      var method = dv.getUint16(p + 10, true), compSize = dv.getUint32(p + 20, true), nameLen = dv.getUint16(p + 28, true), extraLen = dv.getUint16(p + 30, true), cmtLen = dv.getUint16(p + 32, true), lho = dv.getUint32(p + 42, true);
+      var name = dec.decode(u8.subarray(p + 46, p + 46 + nameLen));
+      var start = lho + 30 + dv.getUint16(lho + 26, true) + dv.getUint16(lho + 28, true), raw = u8.subarray(start, start + compSize);
+      if (method !== 0 && method !== 8){ throw new Error('סוג דחיסה לא נתמך בקובץ.'); }
+      out.push({ name:name, data: method === 0 ? raw.slice() : await inflateRaw(raw) });
+      p += 46 + nameLen + extraLen + cmtLen;
+    }
+    return out;
+  }
+  function writeZip(files){
+    var enc = new TextEncoder(), parts = [], central = [], offset = 0, cdSize = 0;
+    files.forEach(function(f){
+      var nameB = enc.encode(f.name), crc = crc32(f.data), size = f.data.length;
+      var lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(12, 0x21, true);
+      lh.setUint32(14, crc, true); lh.setUint32(18, size, true); lh.setUint32(22, size, true); lh.setUint16(26, nameB.length, true);
+      parts.push(new Uint8Array(lh.buffer), nameB, f.data);
+      var ch = new DataView(new ArrayBuffer(46));
+      ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(14, 0x21, true);
+      ch.setUint32(16, crc, true); ch.setUint32(20, size, true); ch.setUint32(24, size, true); ch.setUint16(28, nameB.length, true); ch.setUint32(42, offset, true);
+      central.push(new Uint8Array(ch.buffer), nameB); cdSize += 46 + nameB.length; offset += 30 + nameB.length + size;
+    });
+    var eo = new DataView(new ArrayBuffer(22));
+    eo.setUint32(0, 0x06054b50, true); eo.setUint16(8, files.length, true); eo.setUint16(10, files.length, true); eo.setUint32(12, cdSize, true); eo.setUint32(16, offset, true);
+    return new Blob(parts.concat(central, [new Uint8Array(eo.buffer)]), { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  }
+  function xmlEsc(t){ return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  // Replaces one existing cell, keeping its style (s="…"); text is written inline, numbers as numbers, empty clears it.
+  function setCellXml(xml, ref, value){
+    var re = new RegExp('<c r="' + ref + '"([^>]*?)(?:/>|>[\\s\\S]*?</c>)'), m = xml.match(re);
+    if (!m){ throw new Error('התא ' + ref + ' לא נמצא בתבנית (האם זו התבנית הנכונה?)'); }
+    var sm = m[1].match(/\bs="(\d+)"/), sAttr = sm ? ' s="' + sm[1] + '"' : '', cell;
+    if (value === null || value === undefined || value === ''){ cell = '<c r="' + ref + '"' + sAttr + '/>'; }
+    else if (typeof value === 'number'){ cell = '<c r="' + ref + '"' + sAttr + '><v>' + value + '</v></c>'; }
+    else { cell = '<c r="' + ref + '"' + sAttr + ' t="inlineStr"><is><t xml:space="preserve">' + xmlEsc(value) + '</t></is></c>'; }
+    return xml.replace(re, function(){ return cell; });
+  }
+  function excelDate(iso){ var p = String(iso).split('-'); return Math.round((Date.UTC(+p[0], +p[1] - 1, +p[2]) - Date.UTC(1899, 11, 30)) / 86400000); }
+  async function zipSheetPaths(files){
+    var dec = new TextDecoder(), get = function(n){ var f = files.filter(function(x){ return x.name === n; })[0]; return f ? dec.decode(f.data) : ''; };
+    var wb = new DOMParser().parseFromString(get('xl/workbook.xml'), 'application/xml'), rels = new DOMParser().parseFromString(get('xl/_rels/workbook.xml.rels'), 'application/xml'), targets = {}, map = {};
+    Array.prototype.forEach.call(rels.getElementsByTagName('Relationship'), function(r){ targets[r.getAttribute('Id')] = r.getAttribute('Target'); });
+    Array.prototype.forEach.call(wb.getElementsByTagName('sheet'), function(sh){ var rid = sh.getAttribute('r:id') || sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id'); if (targets[rid]){ map[sh.getAttribute('name')] = 'xl/' + targets[rid].replace(/^\/?(xl\/)?/, ''); } });
+    return map;
+  }
+  function muniReadList(files, sheetPath, col, r1, r2){
+    var dec = new TextDecoder(), get = function(n){ var f = files.filter(function(x){ return x.name === n; })[0]; return f ? dec.decode(f.data) : ''; };
+    var sst = new DOMParser().parseFromString(get('xl/sharedStrings.xml'), 'application/xml'), strings = Array.prototype.map.call(sst.getElementsByTagName('si'), function(si){ return Array.prototype.map.call(si.getElementsByTagName('t'), function(t){ return t.textContent; }).join(''); });
+    var xml = get(sheetPath), out = [];
+    for (var r = r1; r <= r2; r++){
+      var m = xml.match(new RegExp('<c r="' + col + r + '"([^>]*)>\\s*<v>([^<]*)</v>')); if (!m) continue;
+      out.push(/\bt="s"/.test(m[1]) ? strings[+m[2]] : m[2]);
+    }
+    return out;
+  }
+  function b64FromBytes(u8){ var s = '', chunk = 0x8000; for (var i = 0; i < u8.length; i += chunk){ s += String.fromCharCode.apply(null, u8.subarray(i, i + chunk)); } return btoa(s); }
+  function bytesFromB64(b){ var s = atob(b), u = new Uint8Array(s.length); for (var i = 0; i < s.length; i++){ u[i] = s.charCodeAt(i); } return u; }
+
+  // ---- the rules ----
+  function muniMonths(start, count){
+    var out = [], p = String(start || '').split('-'), y = +p[0], m = +p[1]; if (!y || !m) return out;
+    for (var i = 0; i < Math.min(4, Math.max(1, count)); i++){ out.push(y + '-' + (m < 10 ? '0' + m : m)); m++; if (m > 12){ m = 1; y++; } }
+    return out;
+  }
+  function splitName(full){ var t = String(full || '').trim().split(/\s+/); return { first: t[0] || '', last: t.slice(1).join(' ') }; }
+  // How much a child pays for each month: attended at least twice -> price x (lessons attended / lessons held), never more than the full price.
+  function muniAmounts(s, g, months, price, denom){
+    var counts = months.map(function(m){ return (s.attendance || []).filter(function(d){ return String(d).slice(0, 7) === m; }).length; });
+    var held = months.map(function(m){ return (g.sessions || []).filter(function(d){ return String(d).slice(0, 7) === m; }).length; });
+    var amounts = counts.map(function(n, i){ if (n < 2) return 0; var D = denom === 'four' ? 4 : (held[i] || 4); return Math.round(price * Math.min(1, n / D) * 100) / 100; });
+    return { counts:counts, held:held, amounts:amounts };
+  }
+  function muniLoad(){
+    if (state.muni) return;
+    var d = new Date(), y = d.getFullYear(), mo = d.getMonth() + 1;
+    var cfg = { school:'', course:'', instructor:'', start: (mo >= 9 ? y : y - 1) + '-09', months:4, denom:'held', reportDate:todayISO(), sheets:[], prices:{} };
+    for (var i = 0; i < MUNI_SHEETS; i++){ cfg.sheets.push({ gid:'', name:'', vat:'לא', mat:'לא', ind:'לא' }); }
+    try{ var sv = JSON.parse(localStorage.getItem('tatami-muni-v1') || 'null'); if (sv){ Object.keys(cfg).forEach(function(k){ if (sv[k] !== undefined){ cfg[k] = sv[k]; } }); cfg.reportDate = todayISO(); } }catch(e){}
+    state.muni = { cfg:cfg, tpl:null, tplName:'', notes:MUNI_NOTES_DEFAULT.slice(), discounts:[0, 10, 100], preview:null, error:'' };
+    try{ var t = JSON.parse(localStorage.getItem('tatami-muni-tpl') || 'null'); if (t && t.b64){ state.muni.tpl = bytesFromB64(t.b64); state.muni.tplName = t.name || 'התבנית השמורה'; } }catch(e){}
+  }
+  function muniSave(){ try{ localStorage.setItem('tatami-muni-v1', JSON.stringify(state.muni.cfg)); }catch(e){} }
+  async function muniLoadTemplate(file){
+    var M = state.muni; M.error = '';
+    try{
+      var buf = await file.arrayBuffer(), files = await readZip(buf), paths = await zipSheetPaths(files);
+      var groupSheets = Object.keys(paths).filter(function(n){ return /^קבוצה \d+$/.test(n); });
+      if (!groupSheets.length){ throw new Error('לא מצאתי בקובץ לשוניות בשם "קבוצה 1", "קבוצה 2"… האם זה קובץ העירייה הנכון?'); }
+      var first = paths['קבוצה 1'] || paths[groupSheets[0]];
+      var notes = muniReadList(files, first, 'N', 3, 18), disc = muniReadList(files, first, 'O', 3, 5).map(Number);
+      M.notes = notes.length ? notes : MUNI_NOTES_DEFAULT.slice(); M.discounts = disc.length === 3 ? disc : [0, 10, 100];
+      M.tpl = new Uint8Array(buf); M.tplName = file.name; M.preview = null;
+      try{ localStorage.setItem('tatami-muni-tpl', JSON.stringify({ name:file.name, b64:b64FromBytes(M.tpl) })); }catch(e){}
+      showToast('הקובץ נטען: ' + groupSheets.length + ' לשוניות קבוצה.');
+    }catch(e){ M.error = e.message || String(e); M.tpl = null; }
+    render();
+  }
+  function muniBuildPreview(){
+    var M = state.muni, cfg = M.cfg, months = muniMonths(cfg.start, cfg.months), out = [];
+    cfg.sheets.forEach(function(sh, idx){
+      if (!sh.gid) return;
+      var g = state.groups.find(function(x){ return x.id === sh.gid; }); if (!g) return;
+      var price = calcNum(cfg.prices[sh.gid]), rows = [], once = [];
+      state.students.filter(function(s){ return s.groupId === g.id && !s.trashed; }).forEach(function(s){
+        var r = muniAmounts(s, g, months, price, cfg.denom), nm = splitName(s.name);
+        if (r.counts.some(function(n){ return n >= 2; })){
+          rows.push({ sid:s.id, include:true, first:nm.first, last:nm.last, disc:0, note:'', amounts:r.amounts, counts:r.counts, held:r.held, archived:!!s.archived, status:s.status });
+        } else if (r.counts.some(function(n){ return n === 1; })){ once.push(s.name); }
+      });
+      rows.sort(function(a, b){ return (a.last + ' ' + a.first).localeCompare(b.last + ' ' + b.first, 'he'); });
+      out.push({ sheetIdx: idx + 1, gid:g.id, gname: sh.name || g.name, price:price, rows:rows, once:once, months:months, vat:sh.vat, mat:sh.mat, ind:sh.ind });
+    });
+    M.preview = out;
+  }
+  async function muniDownload(){
+    var M = state.muni, cfg = M.cfg;
+    try{
+      var files = await readZip(M.tpl.buffer.slice(M.tpl.byteOffset, M.tpl.byteOffset + M.tpl.byteLength)), paths = await zipSheetPaths(files), dec = new TextDecoder(), enc = new TextEncoder();
+      var months = muniMonths(cfg.start, cfg.months), first = months[0] + '-01', lastP = months[months.length - 1].split('-'), last = months[months.length - 1] + '-' + new Date(+lastP[0], +lastP[1], 0).getDate();
+      var cols = ['E', 'F', 'G', 'H'], todo = M.preview || [];
+      todo.forEach(function(pv){
+        var path = paths['קבוצה ' + pv.sheetIdx], f = files.filter(function(x){ return x.name === path; })[0];
+        if (!f){ throw new Error('בתבנית אין לשונית "קבוצה ' + pv.sheetIdx + '".'); }
+        var xml = dec.decode(f.data), rows = pv.rows.filter(function(r){ return r.include; });
+        if (rows.length > MUNI_MAX_ROWS){ throw new Error('בקבוצה "' + pv.gname + '" יש ' + rows.length + ' ילדים, והטופס מכיל עד ' + MUNI_MAX_ROWS + '. הסר סימון מחלק מהם, או שייך אותם לקבוצה נוספת.'); }
+        xml = setCellXml(xml, 'B1', cfg.school); xml = setCellXml(xml, 'B3', cfg.course); xml = setCellXml(xml, 'B4', cfg.instructor); xml = setCellXml(xml, 'B5', pv.gname);
+        xml = setCellXml(xml, 'E2', excelDate(first)); xml = setCellXml(xml, 'H2', excelDate(last)); xml = setCellXml(xml, 'K2', excelDate(cfg.reportDate));
+        xml = setCellXml(xml, 'E3', pv.price || null); xml = setCellXml(xml, 'E5', rows.length);
+        xml = setCellXml(xml, 'H3', pv.ind); xml = setCellXml(xml, 'H4', pv.vat); xml = setCellXml(xml, 'H5', pv.mat);
+        cols.forEach(function(c, i){ xml = setCellXml(xml, c + '7', months[i] ? HEB_MONTHS[+months[i].split('-')[1] - 1] : ''); });
+        for (var i = 0; i < MUNI_MAX_ROWS; i++){            // these cells belong to this feature: rows not used are cleared
+          var r = rows[i], n = MUNI_FIRST_ROW + i;
+          xml = setCellXml(xml, 'B' + n, r ? r.last : ''); xml = setCellXml(xml, 'C' + n, r ? r.first : ''); xml = setCellXml(xml, 'D' + n, r ? r.disc : '');
+          cols.forEach(function(c, k){ xml = setCellXml(xml, c + n, r && months[k] ? (r.amounts[k] || 0) : ''); });
+          xml = setCellXml(xml, 'K' + n, r ? r.note : '');
+        }
+        f.data = enc.encode(xml);
+      });
+      var wbf = files.filter(function(x){ return x.name === 'xl/workbook.xml'; })[0], wbx = dec.decode(wbf.data);
+      wbx = /<calcPr[^>]*\/>/.test(wbx) ? wbx.replace(/<calcPr([^>]*?)\/>/, function(m0, a){ return /fullCalcOnLoad/.test(a) ? m0 : '<calcPr' + a + ' fullCalcOnLoad="1"/>'; }) : wbx.replace('</workbook>', '<calcPr fullCalcOnLoad="1"/></workbook>');
+      wbf.data = enc.encode(wbx);                                  // Excel recalculates all the template's formulas when the file opens
+      var blob = writeZip(files), a = document.createElement('a'), mlabel = HEB_MONTHS[+months[0].split('-')[1] - 1] + (months.length > 1 ? '-' + HEB_MONTHS[+months[months.length - 1].split('-')[1] - 1] : '');
+      a.href = URL.createObjectURL(blob); a.download = 'דוח לעירייה - ' + (cfg.school || 'בית ספר') + ' - ' + mlabel + '.xlsx'; document.body.appendChild(a); a.click();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+      showToast('הקובץ הורד. פתח אותו ב-Excel ועבור על הסכומים לפני ההגשה.');
+    }catch(e){ M.error = e.message || String(e); render(); }
+  }
+
+  function renderMuniView(){
+    muniLoad();
+    var M = state.muni, cfg = M.cfg, wrap = el('div', {});
+    wrap.appendChild(el('div', { class:'group-header' }, [
+      el('h2', {}, ['🏛️ דוח לעירייה']),
+      el('p', { style:'color:var(--muted);font-size:13px;margin:4px 0 0;' }, ['ממלא את הקובץ של העירייה מהנוכחות בטטאמי: שמות הילדים והסכום של כל חודש. הקובץ עצמו (נוסחאות, רשימות, התקורה) נשאר כמו שהוא.'])
+    ]));
+    if (M.error){ wrap.appendChild(el('div', { class:'muni-err' }, ['⚠ ' + M.error])); }
+
+    // 1) the municipality's file
+    var fileIn = el('input', { type:'file', accept:'.xlsx', class:'muni-file' });
+    fileIn.addEventListener('change', function(e){ if (e.target.files[0]){ muniLoadTemplate(e.target.files[0]); } });
+    wrap.appendChild(panelCard('📄', '1 · קובץ העירייה', M.tpl ? ('נטען: ' + M.tplName + '. נשמר במכשיר, ואפשר להשתמש בו שוב. להחלפה, בחר קובץ חדש.') : 'העלה את קובץ האקסל שקיבלת מהעירייה (פעם אחת, וגם ברבעון הבא אם הוא לא השתנה).', [ fileIn ]));
+
+    // 2) report details
+    var inp = function(key, ph, type){ var i = el('input', { type:type || 'text', class:'muni-in', value:cfg[key] == null ? '' : cfg[key], placeholder:ph || '', 'data-k':key }); i.addEventListener('change', function(e){ cfg[key] = e.target.value; muniSave(); M.preview = null; if (key === 'start' || key === 'reportDate'){ render(); } }); return i; };
+    var monthsSel = fSelect([1, 2, 3, 4].map(function(n){ return { key:String(n), label:n + (n === 1 ? ' חודש' : ' חודשים') }; }), String(cfg.months), function(v){ cfg.months = +v; muniSave(); M.preview = null; render(); });
+    var denomSel = fSelect([{ key:'held', label:'לפי המפגשים שהתקיימו בפועל באותו חודש' }, { key:'four', label:'תמיד 4 מפגשים (כמו מחשבון העזר בקובץ)' }], cfg.denom, function(v){ cfg.denom = v; muniSave(); M.preview = null; });
+    var mlist = muniMonths(cfg.start, cfg.months);
+    wrap.appendChild(panelCard('📝', '2 · פרטי הדוח', null, [
+      el('div', { class:'muni-grid' }, [
+        fField('שם בית הספר', inp('school')), fField('שם החוג', inp('course')), fField('שם המדריך/ה', inp('instructor')),
+        fField('החודש הראשון בדוח', inp('start', '', 'month')), fField('כמה חודשים', monthsSel), fField('תאריך ביצוע הדוח', inp('reportDate', '', 'date'))
+      ]),
+      el('div', { class:'fhint' }, ['חודשי הדוח: ' + (mlist.map(function(m){ return HEB_MONTHS[+m.split('-')[1] - 1] + ' ' + m.split('-')[0]; }).join(', ') || '—')]),
+      fField('סכום החודש לילד שהיה חלקית', denomSel, 'ילד ששילם חצי חודש: מחיר החודש × המפגשים שהיה ÷ המפגשים באותו חודש. נכלל בדוח מי שהיה לפחות פעמיים באותו חודש, בכל סטטוס.')
+    ]));
+
+    // 3) groups -> the template's group sheets
+    var kids = [];
+    cfg.sheets.forEach(function(sh, i){
+      var gsel = fSelect([{ key:'', label:'— לא בשימוש —' }].concat(state.groups.map(function(g){ return { key:g.id, label:g.name }; })), sh.gid, function(v){ sh.gid = v; var g = state.groups.find(function(x){ return x.id === v; }); sh.name = g ? g.name : ''; muniSave(); M.preview = null; render(); });
+      var nameIn = el('input', { type:'text', class:'muni-in', value:sh.name || '', placeholder:'שם הקבוצה בטופס', 'data-k':'gname' + i }); nameIn.addEventListener('change', function(e){ sh.name = e.target.value; muniSave(); M.preview = null; });
+      var priceIn = el('input', { type:'text', inputmode:'decimal', class:'muni-in muni-price', value:sh.gid && cfg.prices[sh.gid] != null ? cfg.prices[sh.gid] : '', placeholder:'₪ לחודש', 'data-k':'price' + i }); priceIn.addEventListener('change', function(e){ cfg.prices[sh.gid] = e.target.value; muniSave(); M.preview = null; });
+      var yn = function(key){ return fSelect([{ key:'לא', label:'לא' }, { key:'כן', label:'כן' }], sh[key], function(v){ sh[key] = v; muniSave(); M.preview = null; }); };
+      kids.push(el('div', { class:'muni-sheet' + (sh.gid ? ' on' : '') }, [
+        el('div', { class:'muni-sheet-n' }, ['קבוצה ' + (i + 1)]), gsel,
+        sh.gid ? el('div', { class:'muni-sheet-f' }, [ nameIn, priceIn, el('details', { class:'muni-more' }, [ el('summary', {}, ['הגדרות נוספות של העירייה']), el('div', { class:'muni-yn' }, [ el('label', {}, ['פרטני/ייחודי ', yn('ind')]), el('label', {}, ['הפחתת מע"מ ', yn('vat')]), el('label', {}, ['חומרים ', yn('mat')]) ]) ]) ]) : null
+      ]));
+    });
+    wrap.appendChild(panelCard('👥', '3 · קבוצות', 'בחר לכל לשונית בקובץ (קבוצה 1–7) איזו קבוצה מטטאמי תמלא אותה, ורשום מחיר חודש לילד.', kids));
+
+    // 4) preview and download
+    var ready = M.tpl && cfg.sheets.some(function(sh){ return sh.gid; });
+    wrap.appendChild(el('div', { style:'margin:12px 0;display:flex;gap:10px;flex-wrap:wrap;' }, [
+      el('button', Object.assign({ class:'btn-primary muni-preview-btn', onclick:function(){ muniBuildPreview(); render(); } }, ready ? {} : { disabled:'disabled' }), ['👁 הכן תצוגה מקדימה']),
+      !M.tpl ? el('span', { class:'fhint' }, ['קודם העלה את קובץ העירייה.']) : (!ready ? el('span', { class:'fhint' }, ['בחר לפחות קבוצה אחת.']) : null)
+    ]));
+    if (M.preview){ wrap.appendChild(renderMuniPreview()); }
+    return wrap;
+  }
+
+  function renderMuniPreview(){
+    var M = state.muni, cfg = M.cfg, box = el('div', { class:'muni-preview' });
+    box.appendChild(el('div', { class:'fhint', style:'margin-bottom:8px;' }, ['בדוק ותקן. אפשר לערוך שמות וסכומים, לבחור הנחה והערה, ולהסיר ילד מהדוח. ההנחה וההערה נבחרות כאן, כי הן לא שמורות בטטאמי.']));
+    var discOpts = function(sel){ return M.discounts.map(function(d){ return el('option', Object.assign({ value:String(d) }, d === sel ? { selected:'selected' } : {}), [d + '%']); }); };
+    M.preview.forEach(function(pv){
+      var card = el('div', { class:'muni-card' }), totalEl = el('b', {}), cnt = el('span', {}), tbody = el('tbody', {});
+      var recompute = function(){
+        var n = 0, a = 0, b = 0;
+        pv.rows.forEach(function(r){ if (r.include){ n++; var t = r.amounts.reduce(function(x, y){ return x + (+y || 0); }, 0) * (100 - r.disc) / 100; r.tb.textContent = fmtShekel(t); r.ta.textContent = fmtShekel(t / 1.18); a += t; b += t / 1.18; } else { r.tb.textContent = '—'; r.ta.textContent = '—'; } });
+        cnt.textContent = n + ' ילדים בדוח' + (n > MUNI_MAX_ROWS ? ' (מעל ' + MUNI_MAX_ROWS + '!)' : ''); cnt.className = n > MUNI_MAX_ROWS ? 'neg' : '';
+        totalEl.textContent = 'סה"כ לפני מע"מ ' + fmtShekel(a) + ' · אחרי מע"מ ' + fmtShekel(b);
+      };
+      pv.rows.forEach(function(r){
+        r.tb = el('td', { class:'muni-tot' }, ['']); r.ta = el('td', { class:'muni-tot' }, ['']);
+        var chk = el('input', { type:'checkbox', title:'כלול בדוח' }); chk.checked = r.include; chk.addEventListener('change', function(){ r.include = chk.checked; recompute(); });
+        var txt = function(key){ var i = el('input', { type:'text', class:'muni-cell', value:r[key] }); i.addEventListener('input', function(e){ r[key] = e.target.value; }); return i; };
+        var dsel = el('select', { class:'muni-cell muni-disc' }, discOpts(r.disc)); dsel.addEventListener('change', function(e){ r.disc = +e.target.value; recompute(); });
+        var nsel = el('select', { class:'muni-cell muni-note' }, [el('option', { value:'' }, ['—'])].concat(M.notes.map(function(t){ return el('option', { value:t }, [t]); }))); nsel.addEventListener('change', function(e){ r.note = e.target.value; });
+        var amt = pv.months.map(function(m, k){
+          var i = el('input', { type:'text', inputmode:'decimal', class:'muni-cell muni-amt', value:String(r.amounts[k]) }); i.addEventListener('input', function(e){ r.amounts[k] = calcNum(e.target.value); recompute(); });
+          return el('td', {}, [i, el('div', { class:'muni-att' }, [r.counts[k] + ' מתוך ' + (cfg.denom === 'four' ? 4 : (r.held[k] || 4))])]);
+        });
+        tbody.appendChild(el('tr', {}, [ el('td', {}, [chk]), el('td', {}, [txt('last')]), el('td', {}, [txt('first'), r.archived ? el('span', { class:'muni-tag' }, ['ארכיון']) : null]), el('td', {}, [dsel]) ].concat(amt, [ el('td', {}, [nsel]), r.tb, r.ta ])));
+      });
+      var head = el('thead', {}, [ el('tr', {}, ['', 'שם משפחה', 'שם פרטי', 'הנחה'].concat(pv.months.map(function(m){ return HEB_MONTHS[+m.split('-')[1] - 1]; }), ['הערה', 'לפני מע"מ', 'אחרי מע"מ']).map(function(t){ return el('th', {}, [t]); })) ]);
+      card.appendChild(el('div', { class:'muni-card-head' }, [ el('h3', {}, ['קבוצה ' + pv.sheetIdx + ' · ' + pv.gname]), el('span', { class:'fhint' }, ['מחיר חודש: ' + (pv.price ? fmtShekel(pv.price) : 'לא הוגדר!')]), cnt ]));
+      if (!pv.price){ card.appendChild(el('div', { class:'muni-err' }, ['לא הוגדר מחיר חודש לקבוצה הזו, ולכן כל הסכומים 0. חזור למעלה, הוסף מחיר והכן תצוגה מחדש.'])); }
+      if (!pv.rows.length){ card.appendChild(el('p', { class:'lesson-empty', style:'padding:14px;' }, ['אף ילד לא היה יותר מפעם אחת באף חודש בתקופה הזו (לפי הנוכחות בטטאמי).'])); }
+      else { card.appendChild(el('div', { class:'table-wrap' }, [ el('table', { class:'muni-table' }, [head, tbody]) ])); card.appendChild(el('div', { class:'muni-foot' }, [totalEl])); }
+      if (pv.once.length){ card.appendChild(el('details', { class:'muni-once' }, [ el('summary', {}, ['לא נכללו: היו רק פעם אחת באחד החודשים (' + pv.once.length + ')']), el('div', { class:'fhint' }, [pv.once.join(', ')]) ])); }
+      box.appendChild(card); recompute();
+    });
+    box.appendChild(el('button', { class:'btn-primary muni-download-btn', onclick:muniDownload }, ['⬇ הורד את קובץ העירייה']));
+    return box;
   }
 
   function renderByStatusView(){
@@ -8355,7 +8622,7 @@
 
   // Test hook — only active when the page is opened with ?tatamiTest=1 (used by automated tests, not by normal use).
   if (/[?&]tatamiTest=1/.test(window.location.search)){
-    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
+    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, muni: { amounts:muniAmounts, months:muniMonths, split:splitName }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
   }
 
   window.addEventListener('focus', function(){ maybeCheckInbox(); });
