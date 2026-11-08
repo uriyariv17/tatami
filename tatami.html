@@ -1126,7 +1126,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-08 14:00';
+  var APP_VERSION = '2026-11-08 16:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -4088,7 +4088,7 @@
     };
     box.appendChild(el('div', { class:'cg-card' }, [
       el('div', { class:'cg-grid' }, [
-        fld('שם הקמפיין', 'name'), fld('שם ב-Ads Manager', 'metaName', { ph:'כמו שמופיע ב-Meta' }), fld('קוד מעקב', 'code', { hint:'מופיע בהודעת הפתיחה לוואטסאפ' }),
+        fld('שם הקמפיין', 'name'), fld('שם הקמפיין ב-Ads Manager (לא חובה)', 'metaName', { ph:'כמו שמופיע ב-Meta', hint:'רק כדי שתמצא אותו שם' }), fld('קוד קמפיין (לא חובה)', 'code', { hint:'מילה קצרה בהודעת הפתיחה, כדי לדעת מאיזה קמפיין הגיעו. אפשר להשאיר.' }),
         fld('תקציב יומי (₪)', 'dailyBudget', { num:true }), fld('עלות מקסימלית לשיחה (₪)', 'maxCpl', { num:true, hint:'מהסעיף ״כמה אני מוכן לשלם״' }),
         fld('תאריך התחלה', 'startDate', { type:'date' }), fld('תאריך סיום (ריק = עדיין רץ)', 'endDate', { type:'date', nullEmpty:true }),
         fld('הוצאה כוללת עד עכשיו (₪)', 'cost', { num:true, hint:'Amount spent מ-Ads Manager' }), fld('שיחות לפי Meta', 'conversations', { num:true, hint:'Messaging conversations started' })
@@ -4129,7 +4129,8 @@
     var code = (cur.code || '').trim() || 'C1', msg = 'היי, הגעתי דרך הפרסום (קוד: ' + code + '). אשמח לקבל פרטים על החוגים 🙂';
     box.appendChild(el('div', { class:'cg-card' }, [
       el('h4', {}, ['💬 הודעת פתיחה לוואטסאפ, עם קוד מעקב']),
-      el('div', { class:'fhint' }, ['מדביקים אותה בהגדרות המודעה כהודעה שנכתבת מראש. מי שלוחץ על המודעה שולח לך אותה, וכך אתה יודע מאיזה קמפיין הוא הגיע ומשייך אותו.']),
+      el('div', { class:'fhint', style:'line-height:1.7;' }, ['לוחצים "העתק" ומדביקים אותה ברמת המודעה ב-Ads Manager (לשונית Ads ← Edit, באזור שבו נבחר וואטסאפ, בשדה בשם Message template או Pre-filled message). מי שלוחץ על המודעה שולח לך אותה, וכך אתה רואה "קוד: ' + code + '" ויודע מאיזה קמפיין הוא הגיע.']),
+      el('div', { class:'fhint', style:'line-height:1.7;' }, ['לא חובה: אם לא תדביק אותה, הכל עדיין עובד. הליד ישויך אוטומטית לקמפיין שרץ בתאריך שבו נכנס.']),
       el('div', { class:'cg-msg' }, [msg]),
       el('div', { class:'cg-msg-btns' }, [ el('button', { class:'btn-primary cg-copy-msg', onclick:function(){ copyMessage(msg); } }, ['📋 העתק הודעה']) ])
     ]));
@@ -5118,7 +5119,8 @@
     { key:'confirmed', label:'אישר הגעה לאימון ניסיון', color:'#1B8A8F' },
     { key:'invited',   label:'הוזמן לאימון ניסיון',     color:'#3A6EA5' },
     { key:'candidate', label:'עוד לא הוזמן',            color:'#9A968A' },
-    { key:'wontcome',  label:'הוזמן ולא יגיע',          color:'#B91717' }
+    { key:'wontcome',  label:'הוזמן ולא יגיע',          color:'#B91717' },
+    { key:'quit',      label:'היה ולא ימשיך',           color:'#8A5A2B' }
   ];
   // Stages from the earlier version are mapped, never lost: "came" / "approved" / "joined" sit under "confirmed" ("joined" with the tick), "declined" under "won't come".
   var ADV_LEGACY = { came:'confirmed', approved:'confirmed', joined:'confirmed', declined:'wontcome' };
