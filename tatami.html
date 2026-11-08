@@ -250,6 +250,28 @@
   .muni-card{ background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:10px 14px 12px; margin-bottom:14px; } .muni-card-head{ display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-bottom:6px; } .muni-card-head h3{ margin:0; font-size:16px; } .muni-card-head .neg, .neg{ color:#B00020; font-weight:800; }
   .muni-table{ font-size:13px; } .muni-table th{ white-space:nowrap; } .muni-cell{ width:100%; min-width:70px; box-sizing:border-box; padding:5px 7px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13px; } .muni-amt{ min-width:62px; text-align:left; direction:ltr; } .muni-disc{ min-width:64px; } .muni-note{ min-width:150px; }
   .muni-att{ font-size:10.5px; color:var(--muted); text-align:center; } .muni-tot{ white-space:nowrap; font-weight:700; } .muni-tag{ background:#EEE8F7; color:#6B3FA0; font-size:10.5px; border-radius:999px; padding:1px 7px; margin-inline-start:5px; } .muni-foot{ padding:8px 4px 0; font-size:14px; } .muni-once{ margin-top:6px; font-size:13px; }
+  .cg-box{ padding-bottom:6px; } .cg-bar{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; } .cg-bar label{ font-weight:700; font-size:14px; display:flex; gap:8px; align-items:center; }
+  .cg-new{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; align-items:end; background:#F7F5F0; border-radius:12px; padding:12px; margin-bottom:12px; }
+  .cg-card{ background:#fff; border:1.5px solid var(--line); border-radius:14px; padding:12px 14px; margin:12px 0; } .cg-card h4{ margin:0 0 6px; font-size:15px; }
+  .cg-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; } .cg-in{ width:100%; box-sizing:border-box; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14px; } .cg-notes{ resize:vertical; }
+  .cg-mode{ display:flex; gap:10px; align-items:center; margin-top:10px; flex-wrap:wrap; font-weight:700; font-size:14px; }
+  .cg-progress{ display:flex; align-items:center; gap:12px; margin:14px 0 8px; } .cg-progress-bar{ flex:1; height:12px; background:#ECE9E3; border-radius:6px; overflow:hidden; } .cg-progress-fill{ height:100%; background:#2F9E44; border-radius:6px; transition:width .2s; }
+  .cg-phase{ background:#fff; border:1.5px solid var(--line); border-radius:12px; margin:8px 0; overflow:hidden; } .cg-phase.complete{ border-color:#BFE0C4; background:#F6FBF7; }
+  .cg-phase-head{ width:100%; display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px 14px; background:transparent; border:none; font-family:inherit; font-size:15px; font-weight:800; cursor:pointer; text-align:right; } .cg-phase-head small{ color:var(--muted); font-weight:700; }
+  .cg-step{ padding:7px 14px 8px; border-top:1px dashed var(--line); } .cg-step-row{ display:flex; align-items:flex-start; gap:10px; } .cg-step-t{ flex:1; font-size:14px; line-height:1.55; } .cg-step.done .cg-step-t{ color:var(--muted); text-decoration:line-through; } .cg-step.note .cg-step-t{ color:#5B5750; font-style:italic; }
+  .cg-step input[type=checkbox]{ width:19px; height:19px; margin-top:2px; flex:0 0 auto; } .cg-help{ margin:6px 0 2px; padding:9px 12px; background:#F3F6FB; border-radius:10px; font-size:13.5px; line-height:1.7; white-space:pre-line; } .cg-help-btn{ font-size:12.5px; flex:0 0 auto; }
+  .cg-msg{ background:#F2F9F3; border:1.5px solid #BFE0C4; border-radius:10px; padding:10px 12px; margin:8px 0; font-size:14.5px; line-height:1.6; } .cg-msg-btns{ display:flex; gap:8px; }
+  .cg-rules-table{ width:100%; border-collapse:collapse; font-size:13.5px; margin-top:6px; } .cg-rules-table td{ padding:8px 8px; border-top:1px solid var(--line); vertical-align:top; } .cg-rule-if{ font-weight:700; width:42%; }
+  .cg-metrics{ display:grid; grid-template-columns:repeat(auto-fit,minmax(125px,1fr)); gap:8px; margin:10px 0; } .cg-metric{ background:#F7F5F0; border-radius:10px; padding:9px 10px; text-align:center; } .cg-metric-v{ font-size:20px; font-weight:800; direction:ltr; } .cg-metric-l{ font-size:12px; color:var(--muted); } .cg-metric.good .cg-metric-v{ color:#2F7A3B; } .cg-metric.bad .cg-metric-v{ color:#B00020; } .cg-leads summary{ cursor:pointer; font-weight:700; font-size:13.5px; }
+  .lead-camp-select{ max-width:200px; }
+  .cg-rules-table{ min-width:0 !important; }
+  .cg-bar label{ min-width:0; max-width:100%; flex-wrap:wrap; } .cg-bar select{ max-width:100%; min-width:0; } .cg-rules-table td{ white-space:normal !important; overflow-wrap:anywhere; } .cg-msg{ overflow-wrap:anywhere; }
+  @media (max-width: 720px){
+    .cg-bar label{ width:100%; } .cg-bar select{ width:100%; }
+    .cg-rules-table, .cg-rules-table tbody, .cg-rules-table tr, .cg-rules-table td{ display:block; width:100% !important; box-sizing:border-box; }
+    .cg-rules-table tr{ border-top:1px solid var(--line); padding:8px 0; } .cg-rules-table td{ border:none; padding:2px 0; } .cg-rule-if{ font-weight:800; }
+    .cg-step-row{ gap:8px; } .cg-card{ padding:10px 11px; }
+  }
   .gcard-more{ border-top:1px dashed var(--line); padding-top:10px; display:flex; flex-direction:column; gap:10px; } .gcard-more input[type=text]{ width:100%; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; box-sizing:border-box; } .gcard-btns{ display:flex; gap:10px; align-items:center; }
   .color-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .swatches{ display:flex; gap:8px; } .swatch{ width:30px; height:30px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; } .swatch.on{ box-shadow:0 0 0 3px var(--ink); } .color-in{ width:44px; height:34px; border:1.5px solid var(--line); border-radius:8px; padding:2px; background:#fff; cursor:pointer; }
   .link-row{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:8px 0; word-break:break-all; font-size:13.5px; }
@@ -1104,7 +1126,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-06 10:00';
+  var APP_VERSION = '2026-11-08 14:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1275,7 +1297,8 @@
     followSort: 'wait',
     followByDay: true,          // separate the "who to contact" list by the day of the child's group
     followPrefsLoaded: false,
-    advJoinedOpen: false,       // the collapsible "joined" list on the candidates page
+    advJoinedOpen: false,
+    showCampaignGuide: false, guideCampaignId: '', guideNew: false, guideOpen: {}, guideHelp: {},   // the Meta campaign guide in the ROI area       // the collapsible "joined" list on the candidates page
     advStatusFilter: null,   // candidacy-stage filter on the advanced-candidates page
     tombstones: [],             // ids of records that were explicitly deleted ({id, at}) — so a merely-missing record is never mistaken for a deletion
     saveBlocked: null,          // {type} while saving is deliberately disabled to protect data (stale app version / unreadable sheet / mass delete)
@@ -2553,19 +2576,42 @@
   function totalSpentAllTime(){
     return state.campaigns.reduce(function(sum, c){ return sum + (Number(c.cost)||0); }, 0);
   }
+  // A lead belongs to ONE campaign: the one you picked for him, or - when left on "automatic" - the latest campaign that was running on the day he came in.
+  // "none" = not from a campaign (organic). This stops overlapping campaigns from counting the same lead twice.
+  function leadDateOf(s){ return s.leadMarkedDate || s.dateAdded || null; }      // the day he came in as a lead (the date shown in the leads table)
+  function autoCampaignFor(s){
+    var d = leadDateOf(s); if (!d) return null;
+    var best = null;
+    state.campaigns.forEach(function(c){
+      if (!c.startDate || d < c.startDate) return;
+      if (c.endDate && d > c.endDate) return;
+      if (!best || c.startDate > best.startDate){ best = c; }
+    });
+    return best;
+  }
+  function leadAttributedTo(s, c){
+    var src = s.leadSource;
+    if (src === 'none') return false;
+    if (src && state.campaigns.some(function(x){ return x.id === src; })) return src === c.id;
+    var a = autoCampaignFor(s); return !!a && a.id === c.id;
+  }
+  function leadsForCampaign(c){ return state.students.filter(function(s){ return s.isLead && leadAttributedTo(s, c); }); }
   function campaignRevenue(campaign){
-    return state.students.filter(function(s){return s.isLead;}).reduce(function(sum, s){
-      var attrDate = effectiveJoinedDate(s);
-      if (!attrDate) return sum;
-      if (attrDate < campaign.startDate) return sum;
-      if (campaign.endDate && attrDate > campaign.endDate) return sum;
-      return sum + accumulatedValueFor(s);
-    }, 0);
+    return leadsForCampaign(campaign).reduce(function(sum, s){ return sum + accumulatedValueFor(s); }, 0);
+  }
+  function campaignStats(c){
+    var leads = leadsForCampaign(c), reg = leads.filter(function(s){ return s.status === 'joined'; }), trial = leads.filter(function(s){ return s.status === 'trial'; });
+    var cost = Number(c.cost) || 0, conv = Number(c.conversations) || 0, revenue = campaignRevenue(c);
+    return { leads:leads.length, registered:reg.length, trial:trial.length, cost:cost, conversations:conv, revenue:revenue, net:revenue - cost,
+      cpConv: conv ? cost / conv : null, cpLead: leads.length ? cost / leads.length : null, cpReg: reg.length ? cost / reg.length : null,
+      convToLead: conv ? leads.length / conv : null, roi: cost ? (revenue - cost) / cost : null };
   }
   function addCampaign(data){
     var c = { id: uid('camp'), name: data.name, cost: Number(data.cost)||0, startDate: data.startDate, endDate: data.endDate || null };
+    ['mode', 'metaName', 'code', 'dailyBudget', 'maxCpl', 'conversations', 'notes'].forEach(function(k){ if (data[k] !== undefined){ c[k] = data[k]; } });
     state.campaigns.push(c);
     scheduleSave();
+    return c;
   }
   function updateCampaign(id, patch){
     var c = state.campaigns.find(function(x){return x.id===id;});
@@ -3922,6 +3968,213 @@
     return wrap;
   }
 
+  // ---------------- Meta campaign guide + checklist (inside the ROI area) ----------------
+  var META_PHASES = [
+    { id:'prep', title:'0 · לפני שמתחילים', modes:['existing', 'new'], steps:[
+      { id:'prep_wa', t:'חשבון WhatsApp Business מחובר לעמוד הפייסבוק', h:'בלי החיבור אי אפשר לבחור וואטסאפ כיעד של המודעה. מחברים דרך Meta Business Suite ← Settings ← WhatsApp, או מתוך הגדרות המודעה כשבוחרים וואטסאפ כיעד. אם הקמפיין הקודם עבד, כנראה שהחיבור כבר קיים. בשלב המודעה תראה את המספר המחובר, ואז אפשר לוודא שהוא הנכון.' },
+      { id:'prep_pay', t:'אמצעי תשלום בתוקף בחשבון המודעות', h:'ב-Ads Manager: Billing / Payment settings. כרטיס שפג תוקפו או חיוב שנכשל עוצרים את כל המודעות, ולא תמיד יש אזהרה בולטת.' },
+      { id:'prep_budget', t:'החלטתי על תקציב יומי, תאריכי התחלה וסיום, וסכום מקסימלי להוצאה', h:'מלא את זה בכרטיס הקמפיין למעלה. כלל אצבע: לפחות 7 ימים, כדי שהמערכת תספיק ללמוד. אל תתחיל בתקציב שאתה לא מוכן להוציא במלואו.' },
+      { id:'prep_cpl', t:'קבעתי כמה אני מוכן לשלם לשיחה (עלות מקסימלית)', h:'עלות מקסימלית = מה שווה נרשם אחד × כמה מהשיחות הופכות לנרשם. למשל נרשם ששווה ₪1,000, ו-1 מכל 5 שיחות נרשם: עד ₪200 לשיחה, ועדיף הרבה פחות כדי להישאר ברווח. מלא את "עלות מקסימלית לשיחה" בכרטיס, והחוקים למטה יתמלאו במספרים שלך.' },
+      { id:'prep_creative', t:'טקסט מודעה, כותרת ותמונה או סרטון מוכנים', h:'טקסט קצר שמסביר מה מקבלים, וקריאה ללחוץ ולכתוב. אפשר להכין 2 או 3 גרסאות לבדיקה. תמונות של ילדים: רק עם הסכמה כתובה של ההורים.' },
+      { id:'prep_reply', t:'אני מוכן לענות להודעות בוואטסאפ מהר', h:'מי שכותב אחרי מודעה מצפה לתשובה תוך זמן קצר. הגדר ב-WhatsApp Business הודעת קבלת פנים ותשובות מהירות. תשובה בתוך שעה מעלה משמעותית את הסיכוי שיירשמו.' },
+      { id:'prep_code', t:'קוד המעקב והודעת הפתיחה (בהמשך) מוכנים להדבקה במודעה', h:'הקוד מופיע בהודעה שהלקוח שולח, וכך אתה יודע מאיזה קמפיין הוא הגיע. ראה "הודעת פתיחה לוואטסאפ" למטה.' }
+    ] },
+    { id:'ex_build', title:'1 · הקמה: שכפול קמפיין שעבד', modes:['existing'], steps:[
+      { id:'ex_find', t:'ב-Ads Manager, בלשונית Campaigns, מצאתי את הקמפיין שעבד', h:'אצלך מופיעים למשל ״קמפיין וואטסאפ | עדכון גילאים | אוגוסט 2026״ ו-״קמפיין וואטסאפ | קבוצות נוער | יולי 2026״ (תקציב ₪160 ליום, תוצאה: Messaging conversations started). קמפיין לידים עם טופס (Lead Form) הוא סוג אחר ולא מוביל לוואטסאפ. לפני שמשכפלים, שנה את Date range לתקופה שהוא רץ, והסתכל ב-Results וב-Cost per result.' },
+      { id:'ex_dup', t:'סימנתי את הקמפיין ולחצתי Duplicate', h:'סמן את התיבה משמאל לשם הקמפיין ולחץ Duplicate בשורת הכלים. מומלץ לשכפל ולא להפעיל מחדש את הישן: כך המספרים של הריצה החדשה נפרדים מהישנה, ואפשר לנתח כל ריצה לבד. בחלון שנפתח בחר שכפול באותו חשבון והעתק הכל (קמפיין, קבוצות מודעות ומודעות).' },
+      { id:'ex_name', t:'שיניתי את השם לפי התבנית', h:'תבנית: קמפיין וואטסאפ | קבוצות או גילאים | חודש ושנה. את אותו שם כתוב בשדה ״שם ב-Ads Manager״ בכרטיס הקמפיין כאן.' },
+      { id:'ex_dates', t:'עדכנתי תאריכי התחלה וסיום ואת הטקסט עם החודש', h:'בקבוצת המודעות (Ad set), ב-Schedule. קמפיין שהועתק יכול לשמור תאריך סיום שכבר עבר, ואז לא ירוץ.' },
+      { id:'ex_budget', t:'בדקתי תקציב יומי וקהל', h:'בקבוצת המודעות: Budget (Daily), Location (עיר ורדיוס), Age (גילאי ההורים) ו-Placements (אוטומטי). שנה רק מה שצריך.' },
+      { id:'ex_wa', t:'המודעה מובילה למספר הנכון, והודעת הפתיחה מכילה את הקוד', h:'ברמת המודעה (Ad): הכפתור ״Send WhatsApp message״, המספר הנכון, וההודעה שנכתבת מראש בצ׳אט (Greeting או Pre-filled message). הדבק את הודעת הפתיחה עם קוד הקמפיין, מהחלק למטה.' },
+      { id:'ex_alt', note:true, t:'אם בכל זאת מפעילים מחדש את הקמפיין הישן עצמו', h:'אפשר להפעיל אותו עם המתג On או Off. חובה לבדוק שתאריך הסיום לא עבר. התוצאות יתערבבו עם הריצה הקודמת, ולכן קשה יותר לנתח. אם עושים את זה, רשום בהערות בכרטיס מתי הופעל מחדש.' }
+    ] },
+    { id:'new_build', title:'1 · הקמה: קמפיין חדש לוואטסאפ', modes:['new'], steps:[
+      { id:'nb_create', t:'לחצתי Create ובחרתי מטרה שמובילה להודעות', h:'בממשק הנוכחי זה בדרך כלל Engagement, ואז Conversion location (מקום ההמרה) = Messaging apps, ואז WhatsApp. שמות השדות משתנים מדי פעם. המטרה: שאנשים ילחצו ויפתחו שיחה איתך בוואטסאפ.' },
+      { id:'nb_name', t:'נתתי שם לפי התבנית', h:'תבנית: קמפיין וואטסאפ | קבוצות או גילאים | חודש ושנה. את אותו שם כתוב בכרטיס הקמפיין.' },
+      { id:'nb_budget', t:'הגדרתי Daily budget ותאריכים', h:'מומלץ תקציב יומי (Daily) בהתחלה. תאריך סיום רק אם החלטת על משך מוגדר.' },
+      { id:'nb_audience', t:'קהל: עיר ורדיוס סביב הסטודיו וגילאי ההורים', h:'Location: העיר והאזור, ורדיוס סביר (למשל 10 עד 15 ק״מ). Age: הורים (למשל 28 עד 50). אל תצמצם יותר מדי בהתחלה, ותן למערכת למצוא את הקהל.' },
+      { id:'nb_place', t:'מיקומי הצגה אוטומטיים (פייסבוק ואינסטגרם)', h:'Placements: Advantage+ (אוטומטי), כדי שהמערכת תמקם את המודעה איפה שהיא עובדת הכי טוב.' },
+      { id:'nb_ad', t:'מודעה: עמוד פייסבוק, חשבון אינסטגרם, תמונה או סרטון, טקסט וכותרת', h:'ב-Identity בחר את עמוד הפייסבוק ואת חשבון האינסטגרם העסקי. הוסף את התמונה או הסרטון, Primary text וכותרת.' },
+      { id:'nb_cta', t:'כפתור ״Send WhatsApp message״ והודעת פתיחה עם קוד', h:'הדבק את הודעת הפתיחה עם קוד הקמפיין, מהחלק למטה.' }
+    ] },
+    { id:'verify', title:'2 · בדיקה לפני פרסום', modes:['existing', 'new'], steps:[
+      { id:'vf_preview', t:'בדקתי את התצוגה המקדימה (Preview) בפייסבוק ובאינסטגרם', h:'לחץ על תצוגה מקדימה לכל מיקום (פיד, סטורי, ריל) וודא שהתמונה והטקסט לא נחתכים.' },
+      { id:'vf_click', t:'לחצתי על הכפתור בטלפון: נפתח וואטסאפ של העסק עם ההודעה והקוד', h:'שלח לעצמך את המודעה או לחץ מתוך התצוגה המקדימה. וודא שנפתח הוואטסאפ של העסק עם הודעת הפתיחה הנכונה.' },
+      { id:'vf_errors', t:'אין שגיאות או אזהרות באדום לפני הפרסום', h:'ליד כל רמה (קמפיין, קבוצת מודעות, מודעה) יכולה להופיע נקודה אדומה או הודעה. קרא ותקן.' },
+      { id:'vf_publish', t:'לחצתי Review and publish ופרסמתי', h:'הכפתור נמצא למעלה מימין. אחרי הפרסום המודעה נכנסת לסקירה של מטא (In review).' },
+      { id:'vf_record', t:'רשמתי בכרטיס: תאריך התחלה, תקציב יומי ושם ב-Ads Manager', h:'כדי שהניתוח אחר כך יהיה לפי התאריכים הנכונים.' }
+    ] },
+    { id:'first72', title:'3 · 72 השעות הראשונות', modes:['existing', 'new'], steps:[
+      { id:'f_approved', t:'תוך שעות ספורות המודעה אושרה (Delivery = Active)', h:'In review = ממתין לאישור (שעות ספורות, לפעמים עד יממה). Rejected או Not delivering: לחץ על המודעה, קרא את הסיבה, תקן טקסט או תמונה ובקש סקירה מחדש.' },
+      { id:'f_spend', t:'תוך 24 שעות יש הצגות (Impressions) והוצאה', h:'אם הכל 0: בדוק אמצעי תשלום, אישור המודעה, שהקהל לא צר מדי, ושהקמפיין, קבוצת המודעות והמודעה במצב On.' },
+      { id:'f_nochange', t:'לא שיניתי תקציב, קהל או מודעות ב-72 השעות הראשונות', h:'שינויים גדולים מאפסים את תקופת הלמידה. תקן רק שגיאות (מודעה שנדחתה, מספר שגוי).' },
+      { id:'f_reply', t:'עניתי לכל הודעה ורשמתי כל ליד באפליקציה עם שיוך לקמפיין', h:'בדף הזה, ״+ הוספת ליד״, ובעמודה ״קמפיין״ בטבלת הלידים בחר את הקמפיין הזה (או השאר אוטומטי לפי תאריך).' },
+      { id:'f_check72', t:'אחרי 72 שעות רשמתי: הוצאה, שיחות שהתחילו ועלות לשיחה', h:'ב-Ads Manager: Date range = Last 3 days, ועמודות Amount spent, Results (Messaging conversations started), Cost per result. הכנס את מספר השיחות בשדה ״שיחות לפי Meta״ בכרטיס, וכך האפליקציה תחשב אחוז המרה.' }
+    ] },
+    { id:'weekly', title:'4 · מעקב שבועי', modes:['existing', 'new'], steps:[
+      { id:'w_day', t:'קבעתי יום קבוע בשבוע לבדיקה', h:'עדיף 10 דקות קבועות מדי שבוע, מאשר בדיקה כל כמה שעות.' },
+      { id:'w_cols', t:'בדקתי: Amount spent, Results, Cost per result, Frequency, Reach, CTR', h:'ב-Ads Manager: Date range = Last 7 days. אם חסרות עמודות: Columns ← Customize columns.' },
+      { id:'w_rules', t:'פעלתי לפי חוקי ההחלטה למטה', h:'עלות שיחה גבוהה, תדירות גבוהה, או אין שיחות כלל.' },
+      { id:'w_update', t:'עדכנתי בכרטיס את ההוצאה המצטברת ואת מספר השיחות', h:'השדות ״הוצאה כוללת״ ו״שיחות לפי Meta״ בכרטיס. בלעדיהם אין חישוב של עלות לליד.' },
+      { id:'w_leads', t:'כל הלידים של השבוע רשומים באפליקציה ומשויכים לקמפיין', h:'בטבלת הלידים. מי שלא מקמפיין: בחר ״לא מקמפיין״.' },
+      { id:'w_quality', t:'בדקתי כמה שיחות הפכו לליד ולנרשם', h:'ראה ״תוצאות״ למטה. הרבה שיחות ומעט נרשמים: הבעיה כנראה לא במודעה אלא במה שקורה אחרי: זמן תגובה, מחיר, או זמני הקבוצות.' }
+    ] },
+    { id:'close', title:'5 · סיום וניתוח', modes:['existing', 'new'], steps:[
+      { id:'c_off', t:'סגרתי את הקמפיין (Off) במועד שתכננתי', h:'כבה את הקמפיין ב-Ads Manager (לא רק את המודעה).' },
+      { id:'c_final', t:'רשמתי תאריך סיום, הוצאה סופית ושיחות', h:'בכרטיס הקמפיין.' },
+      { id:'c_leads', t:'כל הלידים מהתקופה מסומנים כלידים ומשויכים (או ״לא מקמפיין״)', h:'כדי שהחישוב לא ישוייך לקמפיין לא נכון.' },
+      { id:'c_analysis', t:'בדקתי את התוצאות: עלות לליד, עלות לנרשם, תמורה ונטו', h:'בחלק ״תוצאות״ למטה, ובניתוח עלות-תועלת של כל הקמפיינים.' },
+      { id:'c_decide', t:'החלטתי: להמשיך, לשכפל או לעצור, ורשמתי מסקנה בהערות', h:'שכפול של קמפיין שעבד (ללא שינויים גדולים) הוא בדרך כלל הדרך הבטוחה ביותר להמשיך.' }
+    ] }
+  ];
+  var META_TROUBLE = [
+    ['המודעה נדחתה (Rejected)', 'לחץ על המודעה וקרא את הסיבה. תקן טקסט או תמונה (תמונה עם הרבה טקסט, או ניסוח שנוגע בבריאות או בגוף, נדחים לפעמים) ובקש סקירה מחדש.'],
+    ['אין הוצאה בכלל', 'בדוק אמצעי תשלום, אישור המודעה, שהקמפיין וקבוצת המודעות והמודעה כולם במצב On, שתאריך הסיום לא עבר, ושהקהל לא צר מדי.'],
+    ['הכפתור לא פותח וואטסאפ, או המספר שגוי', 'בדוק את חיבור ה-WhatsApp Business לעמוד, ובחר מחדש את המספר ברמת המודעה.'],
+    ['״Learning limited״', 'בדרך כלל תקציב נמוך מדי או קהל קטן מדי. אל תשנה בימים הראשונים, ואם נשאר כך אחרי שבוע, הגדל מעט תקציב או הרחב קהל.'],
+    ['המספרים של Meta שונים מהאפליקציה', 'Meta סופרת ״שיחות שהתחילו״, וזה כולל גם מי שכתב ולא נרשם. האפליקציה סופרת לידים שרשמת. ההפרש הוא אחוז ההמרה.'],
+    ['הודעת Meta על שינוי בשיטת המדידה', 'לפי ההודעה שמוצגת אצלך (מ-5 בנובמבר 2026), ייתכן שמספרי תוצאות אחרי התאריך לא יהיו ניתנים להשוואה ישירה למספרים שלפניו. אל תסיק מסקנות מהשוואה בין תקופות על שני צדי התאריך בלי לשים לב.']
+  ];
+  function metaPhases(mode){ return META_PHASES.filter(function(p){ return p.modes.indexOf(mode) !== -1; }); }
+  function newCampaignCode(){
+    var n = state.campaigns.length + 1, code;
+    do { code = 'C' + n; n++; } while (state.campaigns.some(function(c){ return (c.code || '').toLowerCase() === code.toLowerCase(); }));
+    return code;
+  }
+  function campaignByCode(code){
+    code = String(code || '').trim().toLowerCase(); if (!code) return null;
+    return state.campaigns.filter(function(c){ return (c.code || '').trim().toLowerCase() === code; })[0] || null;
+  }
+  function fmtPct(x){ return x == null ? '—' : Math.round(x * 100) + '%'; }
+
+  function renderCampaignGuide(){
+    var box = el('div', { class:'campaign-analysis cg-box' });
+    box.appendChild(el('h3', { style:'margin-top:0;' }, ['🧭 מדריך להרצת קמפיין (Meta: פייסבוק ואינסטגרם → וואטסאפ)']));
+    box.appendChild(el('p', { class:'fhint', style:'margin:0 0 10px;line-height:1.7;' }, ['צ׳קליסט שלב אחר שלב להרצה וניתוח של קמפיין, לכל קמפיין בנפרד. המדריך מסביר מה לעשות בחשבון Meta שלך. האפליקציה עצמה לא מתחברת ל-Meta, ולכן את המספרים (הוצאה ושיחות) מעתיקים ידנית מ-Ads Manager.']));
+
+    // choose / create a campaign
+    var sorted = state.campaigns.slice().sort(function(a, b){ return a.startDate < b.startDate ? 1 : -1; });
+    var cur = state.campaigns.filter(function(c){ return c.id === state.guideCampaignId; })[0] || (state.guideNew ? null : sorted[0] || null);
+    var bar = el('div', { class:'cg-bar' });
+    if (sorted.length){
+      bar.appendChild(el('label', {}, ['קמפיין: ', fSelect(sorted.map(function(c){ return { key:c.id, label:c.name }; }), cur ? cur.id : '', function(v){ state.guideCampaignId = v; state.guideNew = false; render(); })]));
+    }
+    bar.appendChild(el('button', { class:'btn-ghost cg-new-btn', onclick:function(){ state.guideNew = !state.guideNew; render(); } }, [state.guideNew || !sorted.length ? 'ביטול' : '➕ קמפיין חדש']));
+    box.appendChild(bar);
+
+    if (state.guideNew || !sorted.length){
+      var nameI = el('input', { type:'text', class:'cg-in cg-new-name', placeholder:'שם הקמפיין (למשל: קמפיין וואטסאפ | קבוצות נוער | נובמבר 2026)' });
+      var startI = el('input', { type:'date', class:'cg-in cg-new-start', value:todayISO() });
+      var budI = el('input', { type:'text', inputmode:'decimal', class:'cg-in cg-new-budget', placeholder:'תקציב יומי ₪' });
+      var modeSel = fSelect([{ key:'existing', label:'שכפול של קמפיין שעבד' }, { key:'new', label:'קמפיין חדש' }], 'existing', function(){});
+      box.appendChild(el('div', { class:'cg-new' }, [
+        fField('שם', nameI), fField('תאריך התחלה', startI), fField('תקציב יומי (₪)', budI), fField('סוג', modeSel),
+        el('button', { class:'btn-primary cg-create', onclick:function(){
+          if (!nameI.value.trim() || !startI.value){ showToast('נא למלא שם ותאריך התחלה.'); return; }
+          var c = addCampaign({ name:nameI.value.trim(), cost:0, startDate:startI.value, endDate:null, mode:modeSel.value, dailyBudget:calcNum(budI.value) || '', code:newCampaignCode(), checklist:{} });
+          c.checklist = {}; state.guideCampaignId = c.id; state.guideNew = false; render();
+        } }, ['צור קמפיין והתחל'])
+      ]));
+      if (!cur) return box;
+    }
+
+    var mode = cur.mode === 'new' ? 'new' : 'existing', phases = metaPhases(mode), done = cur.checklist || {};
+    // the campaign card
+    var fld = function(label, key, opts){
+      opts = opts || {};
+      var inp = el('input', { type:opts.type || 'text', inputmode:opts.num ? 'decimal' : null, class:'cg-in', value:cur[key] == null ? '' : cur[key], placeholder:opts.ph || '', 'data-k':key });
+      inp.addEventListener('change', function(e){ var v = e.target.value; var patch = {}; patch[key] = opts.num ? (v === '' ? '' : calcNum(v)) : v; if (opts.nullEmpty && v === ''){ patch[key] = null; } updateCampaign(cur.id, patch); });
+      return fField(label, inp, opts.hint);
+    };
+    box.appendChild(el('div', { class:'cg-card' }, [
+      el('div', { class:'cg-grid' }, [
+        fld('שם הקמפיין', 'name'), fld('שם ב-Ads Manager', 'metaName', { ph:'כמו שמופיע ב-Meta' }), fld('קוד מעקב', 'code', { hint:'מופיע בהודעת הפתיחה לוואטסאפ' }),
+        fld('תקציב יומי (₪)', 'dailyBudget', { num:true }), fld('עלות מקסימלית לשיחה (₪)', 'maxCpl', { num:true, hint:'מהסעיף ״כמה אני מוכן לשלם״' }),
+        fld('תאריך התחלה', 'startDate', { type:'date' }), fld('תאריך סיום (ריק = עדיין רץ)', 'endDate', { type:'date', nullEmpty:true }),
+        fld('הוצאה כוללת עד עכשיו (₪)', 'cost', { num:true, hint:'Amount spent מ-Ads Manager' }), fld('שיחות לפי Meta', 'conversations', { num:true, hint:'Messaging conversations started' })
+      ]),
+      el('div', { class:'cg-mode' }, [
+        el('span', {}, ['מסלול:']),
+        el('div', { class:'seg' }, [ { k:'existing', t:'🔁 שכפול קמפיין שעבד' }, { k:'new', t:'🆕 קמפיין חדש' } ].map(function(m){ return el('button', { class:'seg-b cg-mode-' + m.k + (mode === m.k ? ' on' : ''), onclick:function(){ updateCampaign(cur.id, { mode:m.k }); } }, [m.t]); }))
+      ])
+    ]));
+
+    // the checklist
+    var total = 0, doneN = 0;
+    phases.forEach(function(ph){ ph.steps.forEach(function(st){ if (!st.note){ total++; if (done[st.id]){ doneN++; } } }); });
+    box.appendChild(el('div', { class:'cg-progress' }, [ el('div', { class:'cg-progress-bar' }, [ el('div', { class:'cg-progress-fill', style:'width:' + (total ? Math.round(doneN / total * 100) : 0) + '%;' }) ]), el('b', {}, [doneN + ' מתוך ' + total + ' שלבים']) ]));
+    var firstOpen = null;
+    phases.forEach(function(ph){ if (firstOpen === null && ph.steps.some(function(st){ return !st.note && !done[st.id]; })){ firstOpen = ph.id; } });
+    phases.forEach(function(ph){
+      var pDone = ph.steps.filter(function(st){ return !st.note && done[st.id]; }).length, pTot = ph.steps.filter(function(st){ return !st.note; }).length;
+      var isOpen = state.guideOpen[ph.id] === undefined ? ph.id === firstOpen : state.guideOpen[ph.id];
+      var sec = el('div', { class:'cg-phase' + (pDone === pTot ? ' complete' : '') }, [
+        el('button', { class:'cg-phase-head', onclick:function(){ state.guideOpen[ph.id] = !isOpen; render(); } }, [ el('span', {}, [(isOpen ? '▾ ' : '◂ ') + ph.title]), el('small', {}, [pDone + '/' + pTot + (pDone === pTot ? ' ✓' : '')]) ])
+      ]);
+      if (isOpen){
+        ph.steps.forEach(function(st){
+          var cb = el('input', { type:'checkbox', 'data-step':st.id }); cb.checked = !!done[st.id];
+          cb.addEventListener('change', function(){ var next = Object.assign({}, cur.checklist || {}); if (cb.checked){ next[st.id] = true; } else { delete next[st.id]; } updateCampaign(cur.id, { checklist:next }); });
+          var helpOpen = !!state.guideHelp[st.id];
+          sec.appendChild(el('div', { class:'cg-step' + (done[st.id] ? ' done' : '') + (st.note ? ' note' : '') }, [
+            el('div', { class:'cg-step-row' }, [ st.note ? el('span', { class:'cg-dot' }, ['ℹ️']) : cb, el('span', { class:'cg-step-t' }, [st.t]), el('button', { class:'btn-text cg-help-btn', onclick:function(){ state.guideHelp[st.id] = !helpOpen; render(); } }, [helpOpen ? 'סגור' : 'איך?']) ]),
+            helpOpen ? el('div', { class:'cg-help' }, [st.h]) : null
+          ]));
+        });
+      }
+      box.appendChild(sec);
+    });
+
+    // the opening WhatsApp message with the tracking code
+    var code = (cur.code || '').trim() || 'C1', msg = 'היי, הגעתי דרך הפרסום (קוד: ' + code + '). אשמח לקבל פרטים על החוגים 🙂';
+    box.appendChild(el('div', { class:'cg-card' }, [
+      el('h4', {}, ['💬 הודעת פתיחה לוואטסאפ, עם קוד מעקב']),
+      el('div', { class:'fhint' }, ['מדביקים אותה בהגדרות המודעה כהודעה שנכתבת מראש. מי שלוחץ על המודעה שולח לך אותה, וכך אתה יודע מאיזה קמפיין הוא הגיע ומשייך אותו.']),
+      el('div', { class:'cg-msg' }, [msg]),
+      el('div', { class:'cg-msg-btns' }, [ el('button', { class:'btn-primary cg-copy-msg', onclick:function(){ copyMessage(msg); } }, ['📋 העתק הודעה']) ])
+    ]));
+
+    // decision rules (filled with the user's own numbers)
+    var M = Number(cur.maxCpl) || 0, money = function(x){ return M ? fmtShekel(x) : '₪X'; };
+    var rules = [
+      ['אין שיחות כלל אחרי הוצאה של ' + money(M * 2), 'בדוק אישור מודעה, תשלום וקהל. אם אחרי ' + money(M * 3) + ' עדיין אין שיחות, עצור והחלף תמונה וטקסט.'],
+      ['עלות שיחה מעל ' + money(M) + ' במשך 3 ימים רצופים (אחרי 72 השעות הראשונות)', 'החלף תמונה או טקסט (במודעה חדשה, לא בעריכה של הקיימת), או הורד תקציב.'],
+      ['Frequency מעל 3', 'אותם אנשים רואים את המודעה שוב ושוב: רענן תמונה וטקסט, או הרחב קהל.'],
+      ['עלות שיחה מתחת ל-' + money(M * 0.6) + ' ויש שיחות יציבות', 'אפשר להעלות תקציב עד 20%, ולא יותר מפעם ב-3 ימים.'],
+      ['הרבה שיחות ומעט נרשמים', 'המודעה עובדת, והבעיה אחרי: זמן תגובה, המחיר, או זמני הקבוצות. בדוק את אחוז ההמרה בתוצאות.']
+    ];
+    box.appendChild(el('div', { class:'cg-card cg-rules' }, [
+      el('h4', {}, ['⚖️ חוקי החלטה']),
+      el('div', { class:'fhint' }, [M ? 'לפי עלות מקסימלית של ' + fmtShekel(M) + ' לשיחה. אלה כללי אצבע, לא מדע מדויק.' : 'מלא ״עלות מקסימלית לשיחה״ בכרטיס כדי שהמספרים יתמלאו. אלה כללי אצבע, לא מדע מדויק.']),
+      el('table', { class:'cg-rules-table' }, [ el('tbody', {}, rules.map(function(r){ return el('tr', {}, [ el('td', { class:'cg-rule-if' }, [r[0]]), el('td', {}, [r[1]]) ]); })) ])
+    ]));
+
+    // results
+    var st = campaignStats(cur), tile = function(label, value, cls){ return el('div', { class:'cg-metric' + (cls ? ' ' + cls : '') }, [ el('div', { class:'cg-metric-v' }, [value]), el('div', { class:'cg-metric-l' }, [label]) ]); };
+    var leadsList = leadsForCampaign(cur).slice().sort(function(a, b){ return (leadDateOf(a) || '') < (leadDateOf(b) || '') ? -1 : 1; });
+    box.appendChild(el('div', { class:'cg-card cg-results' }, [
+      el('h4', {}, ['📊 תוצאות הקמפיין']),
+      el('div', { class:'fhint' }, ['הלידים נספרים לפי העמודה ״קמפיין״ בטבלת הלידים. מי שנשאר על ״אוטומטי״ משויך לקמפיין האחרון שרץ בתאריך שבו נכנס כליד. התמורה היא הערכה של מה שהלידים האלה הביאו (כולל מי שהצטרף אחרי שהקמפיין נגמר).']),
+      el('div', { class:'cg-metrics' }, [
+        tile('הוצאה', fmtShekel(st.cost)), tile('שיחות (Meta)', st.conversations ? String(st.conversations) : '—'), tile('עלות לשיחה', st.cpConv == null ? '—' : fmtShekel(st.cpConv), st.cpConv != null && M && st.cpConv > M ? 'bad' : ''),
+        tile('לידים באפליקציה', String(st.leads)), tile('שיחות שהפכו לליד', fmtPct(st.convToLead)), tile('עלות לליד', st.cpLead == null ? '—' : fmtShekel(st.cpLead)),
+        tile('נרשמו (מנויים)', String(st.registered)), tile('בשיעור ניסיון', String(st.trial)), tile('עלות לנרשם', st.cpReg == null ? '—' : fmtShekel(st.cpReg)),
+        tile('תמורה (הערכה)', fmtShekel(st.revenue), 'good'), tile('נטו', fmtShekel(st.net), st.net >= 0 ? 'good' : 'bad'), tile('החזר על ההשקעה', st.roi == null ? '—' : fmtPct(st.roi), st.roi != null && st.roi < 0 ? 'bad' : '')
+      ]),
+      leadsList.length ? el('details', { class:'cg-leads' }, [ el('summary', {}, ['הלידים של הקמפיין (' + leadsList.length + ')']), el('div', { class:'fhint' }, [leadsList.map(function(s){ var d = leadDateOf(s); return s.name + ' (' + (d ? shortDate(d) : '—') + ', ' + statusInfo(s.status).label + ')'; }).join(' · ')]) ]) : el('div', { class:'fhint' }, ['עוד אין לידים משויכים לקמפיין הזה.'])
+    ]));
+
+    // notes + troubleshooting
+    var notesI = el('textarea', { class:'cg-in cg-notes', rows:'3', placeholder:'הערות על הקמפיין: מה עבד, מה לשנות בפעם הבאה…' }); notesI.value = cur.notes || '';
+    notesI.addEventListener('change', function(e){ updateCampaign(cur.id, { notes:e.target.value }); });
+    box.appendChild(el('div', { class:'cg-card' }, [ el('h4', {}, ['📝 הערות ומסקנות']), notesI ]));
+    var tOpen = !!state.guideOpen.__trouble;
+    var trouble = el('div', { class:'cg-phase' }, [ el('button', { class:'cg-phase-head', onclick:function(){ state.guideOpen.__trouble = !tOpen; render(); } }, [ el('span', {}, [(tOpen ? '▾ ' : '◂ ') + '🛠 תקלות נפוצות']) ]) ]);
+    if (tOpen){ META_TROUBLE.forEach(function(t){ trouble.appendChild(el('div', { class:'cg-step' }, [ el('b', {}, [t[0]]), el('div', { class:'cg-help' }, [t[1]]) ])); }); }
+    box.appendChild(trouble);
+    return box;
+  }
+
   function renderCampaignAnalysis(){
     var box = el('div',{class:'campaign-analysis'});
 
@@ -3979,6 +4232,7 @@
         ]),
         el('div',{class:'campaign-row-stats'},[
           el('span',{},['עלות: ₪'+cost.toLocaleString()]),
+          el('span',{},['לידים: ' + campaignStats(c).leads + (campaignStats(c).cpLead != null ? ' · עלות לליד: ' + fmtShekel(campaignStats(c).cpLead) : '')]),
           el('span',{class:'good'},['תמורה: ₪'+revenue.toLocaleString()]),
           el('span',{class:net>=0?'good':'bad'},['נטו: ₪'+net.toLocaleString()])
         ]),
@@ -3991,6 +4245,16 @@
     return box;
   }
 
+  // Which campaign a lead is counted under: automatic (by date), a chosen campaign, or "not from a campaign".
+  function leadCampaignSelect(s){
+    var auto = autoCampaignFor(s);
+    var sel = el('select', { class:'status-select-inline lead-camp-select', title:'לאיזה קמפיין הליד נספר' }, [
+      el('option', Object.assign({ value:'' }, !s.leadSource ? { selected:'selected' } : {}), ['אוטומטי: ' + (auto ? auto.name : 'אין קמפיין בתאריך')])
+    ].concat(state.campaigns.slice().sort(function(a, b){ return a.startDate < b.startDate ? 1 : -1; }).map(function(c){ return el('option', Object.assign({ value:c.id }, s.leadSource === c.id ? { selected:'selected' } : {}), [c.name]); }),
+      [ el('option', Object.assign({ value:'none' }, s.leadSource === 'none' ? { selected:'selected' } : {}), ['לא מקמפיין (אורגני)']) ]));
+    sel.addEventListener('change', function(e){ updateStudent(s.id, { leadSource:e.target.value }); });
+    return sel;
+  }
   function renderLeadsView(){
     var wrap = el('div',{});
     wrap.appendChild(el('div',{class:'group-header'},[
@@ -4000,10 +4264,16 @@
           'כל מי שסומן אי-פעם בעמודת "ליד" בטבלת קבוצה, כל מי שבפח הלידים, וכל מי שעדיין ללא שיוך לקבוצה — עם התאריך שבו נכנס למערכת לראשונה, לשימוש בהערכת אפקטיביות קמפיינים.'
         ])
       ]),
-      el('button',{class:'btn-primary', onclick:function(){ state.showCampaignAnalysis = !state.showCampaignAnalysis; render(); }},
-        [state.showCampaignAnalysis ? 'סגירת ניתוח עלות-תועלת' : '📊 ניתוח עלות-תועלת קמפיינים'])
+      el('div',{style:'display:flex;gap:8px;flex-wrap:wrap;'},[
+        el('button',{class:'btn-primary cg-toggle', onclick:function(){ state.showCampaignGuide = !state.showCampaignGuide; render(); }},[state.showCampaignGuide ? 'סגירת המדריך' : '🧭 מדריך הרצת קמפיין']),
+        el('button',{class:'btn-primary', onclick:function(){ state.showCampaignAnalysis = !state.showCampaignAnalysis; render(); }},
+          [state.showCampaignAnalysis ? 'סגירת ניתוח עלות-תועלת' : '📊 ניתוח עלות-תועלת קמפיינים'])
+      ])
     ]));
 
+    if (state.showCampaignGuide){
+      wrap.appendChild(renderCampaignGuide());
+    }
     if (state.showCampaignAnalysis){
       wrap.appendChild(renderCampaignAnalysis());
     }
@@ -4040,7 +4310,7 @@
     }
 
     var thead = el('thead',{},[ el('tr',{},[
-      el('th',{},['שם']), el('th',{},['תאריך סימון ראשוני כליד']), el('th',{},['טלפון']), el('th',{},['הערה']), el('th',{},['קבוצה']), el('th',{class:'col-narrow'},['סטטוס']), el('th',{class:'col-narrow'},['ליד']), el('th',{class:'col-narrow'},[''])
+      el('th',{},['שם']), el('th',{},['תאריך סימון ראשוני כליד']), el('th',{},['טלפון']), el('th',{},['הערה']), el('th',{},['קבוצה']), el('th',{},['קמפיין']), el('th',{class:'col-narrow'},['סטטוס']), el('th',{class:'col-narrow'},['ליד']), el('th',{class:'col-narrow'},[''])
     ])]);
 
     var tbody = el('tbody',{});
@@ -4054,6 +4324,7 @@
         el('td',{class:'phone-cell'},[s.phone || '—']),
         el('td',{},[ editableInput(s, 'note', 'הערה…', 'inline-input-wide') ]),
         el('td',{},[g ? g.name : '—']),
+        el('td',{class:'lead-camp-cell'},[ leadCampaignSelect(s) ]),
         el('td',{},[ statusSelectFor(s) ]),
         el('td',{class:'att-cell'},[
           el('button',{class:'lead-box'+(s.isLead?' checked':''), title: s.isLead ? 'ביטול סימון כליד' : 'סימון כליד', onclick:function(){ toggleLead(s.id); }},[s.isLead ? '✓' : ''])
@@ -7051,7 +7322,7 @@
       var tr = el('tr', { class:(it.status !== 'new' ? 'ib-done' : '') }, [
         el('td', {}, [cb]),
         el('td', { style:'white-space:nowrap;' }, [when]),
-        el('td', {}, [ el('span', { class:'lesson-chip' + (it.form === 'trial' ? ' free' : '') }, [it.form === 'trial' ? 'ניסיון' : 'הרשמה']) ]),
+        el('td', {}, [ el('span', { class:'lesson-chip' + (it.form === 'trial' ? ' free' : '') }, [it.form === 'trial' ? 'ניסיון' : 'הרשמה']), fx.src ? el('div', { class:'fhint ib-src' }, ['מקור: ' + fx.src]) : null ]),
         el('td', { class:'name-cell' }, [it.child || '—']),
         el('td', {}, [ (it.parent || '—') + ' · ', wa ? el('a', { href:wa, target:'_blank', rel:'noopener', title:'פתח וואטסאפ' }, [it.phone]) : (it.phone || '') ]),
         el('td', {}, [it.grade || '—']),
@@ -7095,7 +7366,7 @@
       };
       return row;
     });
-    state.modal = { type:'formTransfer', rows:rows, busy:false, error:'' };
+    state.modal = { type:'formTransfer', rows:rows, busy:false, error:'', markLead:false };
     refreshTransferDuplicates(state.modal);
     render();
   }
@@ -7121,10 +7392,15 @@
       var r = m.rows[i], names = [];
       r.entries.filter(function(e){ return e.include; }).forEach(function(e){
         var g = state.groups.find(function(x){ return x.id === e.tatamiId; });
-        addStudent({
+        var st0 = addStudent({
           name:r.child.trim(), phone:r.phone, groupId:e.tatamiId, status:r.status, classGrade:normalizeClassGrade(r.classGrade.trim()),
           shirtSize:(r.useShirt ? r.shirtAnswer : ''), daycare:r.daycare, isFemale:r.female
         });
+        if (m.markLead && st0){            // a registrant from the forms is a lead; the link's ?src=CODE tells which campaign
+          var fx0 = (r.item.data && r.item.data.fixed) || {}, camp0 = campaignByCode(fx0.src);
+          st0.isLead = true; st0.leadMarkedDate = r.item.at ? new Date(r.item.at).toISOString().slice(0, 10) : todayISO();
+          if (camp0){ st0.leadSource = camp0.id; }
+        }
         added++; names.push(g ? g.name : '');
       });
       if (r.markHandled){
@@ -7162,6 +7438,7 @@
       b.appendChild(fCheck('סמן את ההרשמה כטופלה', r.markHandled, function(v){ r.markHandled = v; }));
       kids.push(b);
     });
+    kids.push(fCheck('סמן כלידים (יופיעו בניתוח הקמפיינים). רק אם הם הגיעו מקמפיין.', !!m.markLead, function(v){ m.markLead = v; }));
     if (m.error){ kids.push(el('div', { class:'error-text' }, [m.error])); }
     var total = m.rows.reduce(function(n, r){ return n + r.entries.filter(function(e){ return e.include; }).length; }, 0);
     kids.push(el('div', { class:'modal-actions' }, [
@@ -8652,7 +8929,7 @@
 
   // Test hook — only active when the page is opened with ?tatamiTest=1 (used by automated tests, not by normal use).
   if (/[?&]tatamiTest=1/.test(window.location.search)){
-    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, muni: { amounts:muniAmounts, months:muniMonths, split:splitName }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
+    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, camp: { stats:campaignStats, leads:leadsForCampaign, auto:autoCampaignFor, byCode:campaignByCode }, muni: { amounts:muniAmounts, months:muniMonths, split:splitName }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
   }
 
   window.addEventListener('focus', function(){ maybeCheckInbox(); });
