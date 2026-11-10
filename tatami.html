@@ -1110,7 +1110,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-09 14:00';
+  var APP_VERSION = '2026-11-10 10:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -2557,10 +2557,65 @@
     return { price:def, source:'default', perWeek:n, def:def };
   }
   function monthlyRateFor(s){ return groupPriceInfo(state.groups.find(function(x){ return x.id === s.groupId; })).price; }
+  // The income of a CHILD (not of one record): a child registered to two groups is two records with the same name and phone.
+  // Every month that was marked PAID counts (this year, and past years from the archive). The price of a month is the group's price when he is in one group,
+  // and the combined price (2 per week / 3 per week) when he is in several groups at once: never the groups' prices added separately.
+  var roiCache = null;
+  function academicStartYear(){ var d = new Date(); return d.getMonth() >= 8 ? d.getFullYear() : d.getFullYear() - 1; }
+  function tierPrice(w){ var c = roiCfg(); return w >= 3 ? c.w3 : (w === 2 ? c.w2 : c.w1); }
+  function sameChild(a, b){ var pa = digitsOf(a.phone), pb = digitsOf(b.phone); return normNameKey(a.name) === normNameKey(b.name) && (!pa || !pb || pa === pb); }
+  function registeredByDates(r, startYear, i){
+    var d = effectiveJoinedDate(r); if (!d) return true;
+    var y = i < 4 ? startYear : startYear + 1, m = i < 4 ? 9 + i : i - 3;
+    var first = new Date(y, m - 1, 1), last = new Date(y, m, 0, 23, 59, 59);
+    if (new Date(d) > last) return false;
+    return !(r.outDate && new Date(r.outDate) < first);
+  }
+  function roiIndex(){
+    if (roiCache) return roiCache;
+    var cfg = roiCfg(), masters = [], byId = {};
+    state.students.forEach(function(s){
+      if (s.trashed && !s.isLead) return;
+      var m = masters.filter(function(x){ return !(s.trashed || x.rep.trashed) && sameChild(x.rep, s); })[0];
+      if (!m){ m = { rep:s, cur:[], arch:[] }; masters.push(m); }
+      m.cur.push(s); if (!digitsOf(m.rep.phone) && digitsOf(s.phone)){ m.rep = s; }
+    });
+    (state.yearArchives || []).forEach(function(a, ai){
+      (a.students || []).forEach(function(s){ var m = masters.filter(function(x){ return sameChild(x.rep, s); })[0]; if (m){ (m.arch[ai] = m.arch[ai] || { a:a, recs:[] }).recs.push(s); } });
+    });
+    var gCur = {}; state.groups.forEach(function(g){ gCur[g.id] = g; });
+    masters.forEach(function(m){
+      var snaps = [{ recs:m.cur, groups:gCur, startYear:academicStartYear() }];
+      m.arch.forEach(function(x){ if (!x) return; var gg = {}; (x.a.groups || []).forEach(function(g){ gg[g.id] = gCur[g.id] || g; }); snaps.push({ recs:x.recs, groups:gg, startYear:new Date(x.a.savedAt).getFullYear() - 1 }); });
+      var months = 0, base = 0, combined = false, names = {};
+      snaps.forEach(function(sn){
+        for (var i = 0; i < 12; i++){
+          var paidRecs = sn.recs.filter(function(r){ return (r.monthlyPayments || [])[i] === 'paid'; });
+          if (!paidRecs.length) continue;
+          var reg = sn.recs.filter(function(r){ var st = (r.monthlyPayments || [])[i]; return st === 'paid' || st === 'scheduled' || st === 'problem' || (r.status === 'joined' && registeredByDates(r, sn.startYear, i)); });
+          if (!reg.length) reg = paidRecs;
+          var price;
+          if (reg.length === 1){ price = groupPriceInfo(sn.groups[reg[0].groupId]).price; }
+          else { var w = 0; reg.forEach(function(r){ w += groupWeeklyCount(sn.groups[r.groupId]); }); price = tierPrice(Math.min(3, w)); combined = true; }
+          months++; base += price;
+          reg.forEach(function(r){ var g = sn.groups[r.groupId]; if (g){ names[g.name] = true; } });
+        }
+      });
+      var extra = m.cur.reduce(function(sum, r){ return sum + (Number(r.extraPaid) || 0); }, 0), shirt = months > 0 ? cfg.shirt : 0;
+      var parts = { registered:months > 0, months:months, rate: months ? Math.round(base / months) : 0, shirt:shirt, extra:extra, base:base, total:base + shirt + extra, combined:combined, groupNames:Object.keys(names) };
+      var leadsHere = m.cur.filter(function(r){ return r.isLead; }).sort(function(a, b){ return (leadDateOf(a) || '9') < (leadDateOf(b) || '9') ? -1 : ((leadDateOf(a) || '9') > (leadDateOf(b) || '9') ? 1 : (a.id < b.id ? -1 : 1)); });
+      var primary = leadsHere[0] || null;
+      m.cur.forEach(function(r){ byId[r.id] = { parts:parts, primary: !!primary && primary.id === r.id, child:m }; });
+    });
+    roiCache = { byId:byId, masters:masters };
+    return roiCache;
+  }
+  function isPrimaryLead(s){ var x = roiIndex().byId[s.id]; return !x || x.primary; }
   function leadRevenueParts(s){
-    var reg = !!effectiveJoinedDate(s), cfg = roiCfg();
-    var months = reg ? monthsActiveFor(s) : 0, rate = monthlyRateFor(s), shirt = reg ? cfg.shirt : 0, extra = Number(s.extraPaid) || 0;
-    return { registered:reg, months:months, rate:rate, shirt:shirt, extra:extra, base:months * rate, total:months * rate + shirt + extra };
+    var x = roiIndex().byId[s.id];
+    if (!x) return { registered:false, months:0, rate:0, shirt:0, extra:Number(s.extraPaid) || 0, base:0, total:Number(s.extraPaid) || 0, combined:false, groupNames:[] };
+    if (!x.primary) return { registered:false, months:0, rate:0, shirt:0, extra:0, base:0, total:0, combined:false, groupNames:[], merged:true };
+    return x.parts;
   }
   function effectiveJoinedDate(s){
     if (s.joinedDate) return s.joinedDate;
@@ -2605,7 +2660,7 @@
     if (src && state.campaigns.some(function(x){ return x.id === src; })) return src === c.id;
     var a = autoCampaignFor(s); return !!a && a.id === c.id;
   }
-  function leadsForCampaign(c){ return state.students.filter(function(s){ return s.isLead && leadAttributedTo(s, c); }); }
+  function leadsForCampaign(c){ return state.students.filter(function(s){ return s.isLead && isPrimaryLead(s) && leadAttributedTo(s, c); }); }
   function campaignRevenue(campaign){
     return leadsForCampaign(campaign).reduce(function(sum, s){ return sum + accumulatedValueFor(s); }, 0);
   }
@@ -3301,6 +3356,7 @@
   }
 
   function render(){
+    roiCache = null;
     var pageScrollY = window.scrollY || document.documentElement.scrollTop || 0;
     var oldWraps = document.querySelectorAll('.table-wrap');
     var wrapScrolls = [];
@@ -3938,8 +3994,8 @@
     }
 
     var thead = el('thead',{},[ el('tr',{},[
-      el('th',{},['שם']), el('th',{},['סטטוס']), el('th',{},['קבוצה']), el('th',{class:'col-narrow'},['פעמים בשבוע']), el('th',{},['תאריך הצטרפות']), el('th',{class:'col-narrow'},['חודשי רישום']),
-      el('th',{class:'col-narrow'},['מחיר לחודש']), el('th',{class:'col-narrow'},['חולצה']), el('th',{},['תשלום נוסף (₪)']), el('th',{},['סה"כ תמורה'])
+      el('th',{},['שם']), el('th',{},['סטטוס']), el('th',{},['קבוצה']), el('th',{class:'col-narrow'},['פעמים בשבוע']), el('th',{},['תאריך הצטרפות']), el('th',{class:'col-narrow'},['חודשים משולמים']),
+      el('th',{class:'col-narrow'},['מחיר חודשי']), el('th',{class:'col-narrow'},['חולצה']), el('th',{},['תשלום נוסף (₪)']), el('th',{},['סה"כ תמורה'])
     ])]);
     var tbody = el('tbody',{}), grandTotal = 0;
     leadsWithValue.forEach(function(row){
@@ -3952,14 +4008,14 @@
       tbody.appendChild(el('tr',{},[
         el('td',{class:'name-cell'+(s.isFemale?' name-female':'')},[s.name]),
         el('td',{},[ el('span',{class:'status-dot', style:'display:inline-block;background:'+st.color+';margin-inline-end:6px;'}), st.label ]),
-        el('td',{},[row.group ? row.group.name : '—']),
-        el('td',{},[perWeekSel || '—']),
+        el('td',{},[pt.groupNames && pt.groupNames.length > 1 ? pt.groupNames.join(' + ') : (row.group ? row.group.name : '—')]),
+        el('td',{},[pt.combined ? 'תמחור משולב' : (perWeekSel || '—')]),
         el('td',{},[row.joinDate ? formatDateFull(row.joinDate) : '— (טרם הצטרף)']),
-        el('td',{},[pt.months ? String(pt.months) : '—']),
-        el('td',{},[pt.registered ? '₪' + pt.rate : '—']),
+        el('td',{},[pt.merged ? 'נכלל ברשומה אחרת של אותו ילד' : (pt.months ? String(pt.months) : '—')]),
+        el('td',{title:pt.combined ? 'ילד הרשום לכמה קבוצות: חודשים בקבוצה אחת בתעריף שלה, וחודשים בכמה קבוצות בתעריף המשולב (פעמיים או 3 פעמים בשבוע)' : ''},[pt.registered ? '₪' + pt.rate + (pt.combined ? ' (משולב)' : '') : '—']),
         el('td',{},[pt.registered ? '₪' + pt.shirt : '—']),
         el('td',{},[extraIn]),
-        el('td',{class: row.value ? 'good' : '', title: pt.months + ' חודשים × ₪' + pt.rate + ' + חולצה ₪' + pt.shirt + ' + נוספים ₪' + pt.extra},[row.value ? '₪'+row.value.toLocaleString() : '₪0'])
+        el('td',{class: row.value ? 'good' : '', title: pt.months + ' חודשים משולמים, סה״כ ₪' + pt.base + ' + חולצה ₪' + pt.shirt + ' + נוספים ₪' + pt.extra},[row.value ? '₪'+row.value.toLocaleString() : '₪0'])
       ]));
     });
     tbody.appendChild(el('tr',{style:'font-weight:700;border-top:2px solid var(--ink);'},[
@@ -3983,7 +4039,7 @@
     ]));
     var rc = roiCfg();
     box.appendChild(el('div',{style:'font-size:12.5px;color:var(--muted);margin:6px 0 10px;line-height:1.7;'},[
-      'מי שנכלל: כל תלמיד שסומן אי פעם כליד. התמורה שלו = חודשי רישום × מחיר החודש של הקבוצה (המחיר שהגדרת לקבוצה; בקבוצה בלי מחיר: ₪' + rc.w1 + ' לפעם בשבוע, ₪' + rc.w2 + ' לפעמיים, ₪' + rc.w3 + ' ל-3 פעמים) + חולצה חד-פעמית ₪' + rc.shirt + ' + תשלומים נוספים שרשמת. חודשי הרישום נספרים מיום ההצטרפות עד היום (או עד שעזב). מי שעוד לא הצטרף נחשב כליד בלי תמורה.'
+      'מי שנכלל: כל תלמיד שסומן אי פעם כליד. התמורה שלו = סכום החודשים שסומנו אצלו כ״שולם״ ב״ניהול תשלומים״ (השנה הנוכחית ושנים קודמות מהארכיון), לפי מחיר החודש של הקבוצה (בקבוצה בלי מחיר: ₪' + rc.w1 + ' לפעם בשבוע, ₪' + rc.w2 + ' לפעמיים, ₪' + rc.w3 + ' ל-3 פעמים) + חולצה חד-פעמית ₪' + rc.shirt + ' + תשלומים נוספים שרשמת. ילד שרשום לכמה קבוצות נחשב ילד אחד ומתומחר לפי סך הפעמים בשבוע (₪' + rc.w2 + ' לשתי קבוצות, ₪' + rc.w3 + ' לשלוש), ולא לפי מחירי הקבוצות בנפרד. חודש שלא סומן כשולם לא נכלל.'
     ]));
     var rcIn = function(key, label){ var i = el('input',{type:'text', inputmode:'decimal', class:'roi-cfg-in', value:String(rc[key]), 'data-k':key}); i.addEventListener('change', function(e){ var v = calcNum(e.target.value); var patch = {}; patch[key] = v; setRoiCfg(patch); }); return el('label',{class:'roi-cfg-f'},[label, i]); };
     box.appendChild(el('details',Object.assign({class:'roi-cfg'}, state.roiCfgOpen ? {open:'open'} : {}), [
@@ -4051,6 +4107,13 @@
           el('span',{class:net>=0?'good':'bad'},['נטו: ₪'+net.toLocaleString()])
         ]),
         el('div',{class:'campaign-row-actions'},[
+          el('button',{class:'btn-text assign-all-leads', title:'משייך את כל מי שסומן אי פעם כליד לקמפיין הזה', onclick:function(){
+            var leadsAll = state.students.filter(function(x){ return x.isLead; });
+            if (!leadsAll.length){ showToast('אין לידים לשייך.'); return; }
+            openConfirm('לשייך את כל ' + leadsAll.length + ' הלידים לקמפיין "' + c.name + '"? זה כולל גם לידים ששויכו קודם ידנית לקמפיין אחר או סומנו כלא מקמפיין. (ביטול אחרון: Ctrl+Z.)', function(){
+              leadsAll.forEach(function(x){ x.leadSource = c.id; }); scheduleSave(); showToast('שויכו ' + leadsAll.length + ' לידים לקמפיין.');
+            }, 'שייך את כולם');
+          }},['שייך אליו את כל הלידים']),
           el('button',{class:'btn-text danger', onclick:function(){ deleteCampaign(c.id); }},['מחיקה'])
         ])
       ]));
@@ -8745,8 +8808,8 @@
 
   // Test hook — only active when the page is opened with ?tatamiTest=1 (used by automated tests, not by normal use).
   if (/[?&]tatamiTest=1/.test(window.location.search)){
-    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, camp: { stats:campaignStats, leads:leadsForCampaign, auto:autoCampaignFor },
-    roi: { parts:function(s){ return leadRevenueParts(s); }, cfg:function(){ return roiCfg(); }, perWeek:function(g){ return groupWeeklyCount(g); }, price:function(g){ return groupPriceInfo(g); } }, muni: { amounts:muniAmounts, months:muniMonths, split:splitName }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
+    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, camp: { stats:function(c){ roiCache = null; return campaignStats(c); }, leads:function(c){ roiCache = null; return leadsForCampaign(c); }, auto:autoCampaignFor },
+    roi: { parts:function(s){ roiCache = null; return leadRevenueParts(s); }, cfg:function(){ return roiCfg(); }, perWeek:function(g){ return groupWeeklyCount(g); }, price:function(g){ return groupPriceInfo(g); } }, muni: { amounts:muniAmounts, months:muniMonths, split:splitName }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
   }
 
   window.addEventListener('focus', function(){ maybeCheckInbox(); });
