@@ -253,6 +253,10 @@
   .lead-camp-select{ max-width:200px; }
   .roi-cfg{ background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:8px 12px; margin:6px 0 12px; } .roi-cfg summary{ cursor:pointer; font-weight:700; font-size:14px; } .roi-cfg-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; margin:10px 0 6px; } .roi-cfg-f{ display:flex; flex-direction:column; gap:4px; font-size:12.5px; font-weight:700; } .roi-cfg-in{ padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14px; direction:ltr; text-align:right; }
   .roi-gprice{ width:90px; padding:6px 8px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13.5px; direction:ltr; text-align:right; } .roi-gprices-scroll{ max-height:360px; overflow:auto; } .roi-manual{ color:#2F7A3B !important; font-weight:700; }
+  .lead-nocamp{ background:#FFF6E0; border:1.5px solid #F0D58A; border-radius:12px; padding:10px 14px; margin:10px 0; font-size:14px; } .lead-nocamp-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:8px; } .lead-nocamp-sel{ padding:7px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; max-width:100%; }
+  .campaign-default-label{ display:inline-flex; gap:4px; align-items:center; font-size:12.5px; margin-inline-end:10px; cursor:pointer; }
+  .ft-merge{ background:#FFF6E0; border:1.5px solid #F0D58A; border-radius:10px; padding:9px 12px; margin:6px 0 4px; } .ft-merge-q{ font-weight:800; font-size:13.5px; margin-bottom:6px; } .ft-radio{ display:flex; gap:8px; align-items:flex-start; font-size:13.5px; margin:5px 0; cursor:pointer; } .ft-radio input{ margin-top:3px; }
+  .ft-merge-fields{ margin:8px 0 2px; padding:8px 10px; background:#fff; border-radius:8px; border:1px dashed #E3C97A; display:flex; flex-direction:column; gap:4px; font-size:13px; }
   .roi-extra{ width:84px; padding:5px 7px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13px; direction:ltr; text-align:right; } .roi-perweek{ min-width:54px; }
 
   .name-phone{ display:block; font-size:11.5px; color:var(--muted); font-weight:400; direction:ltr; text-align:right; text-decoration:none; line-height:1.3; } a.name-phone:hover{ text-decoration:underline; color:var(--accent); }
@@ -1110,7 +1114,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-10 10:00';
+  var APP_VERSION = '2026-11-12 10:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1281,6 +1285,7 @@
     followSort: 'wait',
     followByDay: true,          // separate the "who to contact" list by the day of the child's group
     followPrefsLoaded: false,
+    advSearch: '',               // search box inside the advanced-candidates page (it searches only the candidates)
     advJoinedOpen: false,       // the collapsible "joined" list on the candidates page
     advStatusFilter: null,   // candidacy-stage filter on the advanced-candidates page
     tombstones: [],             // ids of records that were explicitly deleted ({id, at}) — so a merely-missing record is never mistaken for a deletion
@@ -2643,17 +2648,23 @@
   // A lead belongs to ONE campaign: the one you picked for him, or - when left on "automatic" - the latest campaign that was running on the day he came in.
   // "none" = not from a campaign (organic). This stops overlapping campaigns from counting the same lead twice.
   function leadDateOf(s){ return s.leadMarkedDate || s.dateAdded || null; }      // the day he came in as a lead (the date shown in the leads table)
+  function defaultCampaign(){ return state.campaigns.filter(function(c){ return c.isDefault; })[0] || null; }
   function campaignForDate(d){
-    if (!d) return null;
+    if (!d) return defaultCampaign();
     var best = null;
     state.campaigns.forEach(function(c){
       if (!c.startDate || d < c.startDate) return;
       if (c.endDate && d > c.endDate) return;
       if (!best || c.startDate > best.startDate){ best = c; }
     });
-    return best;
+    return best || defaultCampaign();      // nothing was running that day: the default campaign (if there is one)
   }
   function autoCampaignFor(s){ return campaignForDate(leadDateOf(s)); }
+  function leadCampaignOf(s){
+    if (s.leadSource === 'none') return null;
+    if (s.leadSource){ var chosen = state.campaigns.filter(function(x){ return x.id === s.leadSource; })[0]; if (chosen) return chosen; }
+    return autoCampaignFor(s);
+  }
   function leadAttributedTo(s, c){
     var src = s.leadSource;
     if (src === 'none') return false;
@@ -3318,7 +3329,8 @@
     }
 
     var main = el('main',{});
-    var query = state.search.trim();
+    var inAdv = state.view === 'advanced';
+    var query = inAdv ? '' : state.search.trim();       // the candidates page has its own search
     if (query){
       main.appendChild(renderSearchResults(query));
     } else if (state.view === 'advanced'){
@@ -3348,7 +3360,7 @@
     app.appendChild(actionsRow);
     app.appendChild(renderUnassignedLeadsSection());
     app.appendChild(tabsBar);
-    app.appendChild(searchBar);
+    if (!inAdv){ app.appendChild(searchBar); }
     app.appendChild(main);
     app.appendChild(el('div',{class:'footer-note'},['הנתונים נשמרים אוטומטית במכשיר הזה.']));
 
@@ -3412,7 +3424,7 @@
               var isImportModal = newModal.classList.contains('import-modal');
               nFields.forEach(function(f, k){
                 if (isImportModal && f.tagName === 'SELECT'){ return; } // import modals re-detect their column choices on purpose
-                if (f.type==='checkbox' || f.type==='radio'){ f.checked = formCapture.values[k]; }
+                if (f.type==='checkbox' || f.type==='radio'){ if (!newModal.classList.contains('ft-modal')){ f.checked = formCapture.values[k]; } }     /* the transfer window draws its ticks from its own state */
                 else if (f.value !== formCapture.values[k]){ f.value = formCapture.values[k]; }
               });
             }
@@ -4107,6 +4119,10 @@
           el('span',{class:net>=0?'good':'bad'},['נטו: ₪'+net.toLocaleString()])
         ]),
         el('div',{class:'campaign-row-actions'},[
+          el('label',{class:'campaign-default-label', title:'כל ליד שאין לו קמפיין לפי תאריך, וכל ליד חדש, יספרו תחת הקמפיין הזה. יכול להיות רק אחד כזה.'},[
+            (function(){ var cb = el('input',{type:'checkbox', class:'campaign-default-cb'}); cb.checked = !!c.isDefault; cb.addEventListener('change', function(){ state.campaigns.forEach(function(x){ x.isDefault = false; }); if (cb.checked){ c.isDefault = true; } scheduleSave(); }); return cb; })(),
+            ' ברירת מחדל ללידים'
+          ]),
           el('button',{class:'btn-text assign-all-leads', title:'משייך את כל מי שסומן אי פעם כליד לקמפיין הזה', onclick:function(){
             var leadsAll = state.students.filter(function(x){ return x.isLead; });
             if (!leadsAll.length){ showToast('אין לידים לשייך.'); return; }
@@ -4164,6 +4180,29 @@
       },[st.label+' ('+count+')']));
     });
     wrap.appendChild(filterBar);
+
+    var noCamp = state.students.filter(function(x){ return x.isLead && isPrimaryLead(x) && x.leadSource !== 'none' && !leadCampaignOf(x); });
+    if (noCamp.length){
+      if (!state.campaigns.length){
+        wrap.appendChild(el('div',{class:'lead-nocamp'},['⚠ יש ' + noCamp.length + ' לידים שלא משויכים לשום קמפיין. צור קודם קמפיין בניתוח עלות-תועלת.']));
+      } else {
+        var pick = defaultCampaign() || state.campaigns.filter(function(c){ return c.name.indexOf('כל הקמפיינים') !== -1; })[0] || state.campaigns[0];
+        var sel = el('select',{class:'lead-nocamp-sel'}, state.campaigns.map(function(c){ return el('option', Object.assign({ value:c.id }, c.id === pick.id ? { selected:'selected' } : {}), [c.name]); }));
+        var mk = el('input',{type:'checkbox', class:'lead-nocamp-default'}); mk.checked = true;
+        wrap.appendChild(el('div',{class:'lead-nocamp'},[
+          el('div',{},['⚠ ' + noCamp.length + ' לידים לא משויכים לשום קמפיין, ולכן לא נספרים בניתוח (למשל לידים שנוספו אחרי שיוך קודם).']),
+          el('div',{class:'lead-nocamp-row'},[
+            sel,
+            el('label',{style:'display:flex;gap:6px;align-items:center;font-size:13px;'},[mk, 'והפוך אותו לברירת מחדל, כך שלידים חדשים ישויכו אליו לבד']),
+            el('button',{class:'btn-primary lead-nocamp-btn', onclick:function(){
+              var cid = sel.value; noCamp.forEach(function(x){ x.leadSource = cid; });
+              if (mk.checked){ state.campaigns.forEach(function(c){ c.isDefault = (c.id === cid); }); }
+              scheduleSave(); showToast('שויכו ' + noCamp.length + ' לידים לקמפיין.');
+            } },['שייך אותם'])
+          ])
+        ]));
+      }
+    }
 
     var leads = allLeads.filter(function(s){
       return state.leadsStatusFilter===null || s.status===state.leadsStatusFilter;
@@ -5073,6 +5112,26 @@
       return wrap;
     }
 
+    // search inside the candidates only: name, phone, current group, target group, or the candidacy note
+    var q = (state.advSearch || '').trim(), qd = q.replace(/\D/g, ''), ql = q.toLowerCase();
+    function advMatches(s){
+      if (!q) return true;
+      var g0 = state.groups.find(function(x){ return x.id === s.groupId; }), tg0 = state.groups.find(function(x){ return x.id === s.advGroupId; });
+      return (s.name || '').toLowerCase().indexOf(ql) !== -1 || (qd.length >= 3 && String(s.phone || '').replace(/\D/g, '').indexOf(qd) !== -1) ||
+        (g0 && g0.name.toLowerCase().indexOf(ql) !== -1) || (tg0 && tg0.name.toLowerCase().indexOf(ql) !== -1) || (s.advNote || '').toLowerCase().indexOf(ql) !== -1;
+    }
+    var shown = all.filter(advMatches);
+    var sbar = el('div',{class:'search-bar adv-search'});
+    var sIn = el('input',{type:'text', id:'advSearchBox', placeholder:'חיפוש בתוך המועמדים: שם, טלפון, קבוצה או הערה…', value: state.advSearch || ''});
+    sIn.addEventListener('input', function(e){
+      var pos = e.target.selectionStart; state.advSearch = e.target.value; render();
+      var live = document.getElementById('advSearchBox'); if (live){ live.focus(); try{ live.setSelectionRange(pos, pos); }catch(err){} }
+    });
+    sbar.appendChild(sIn);
+    if (state.advSearch){ sbar.appendChild(el('button',{class:'btn-ghost adv-search-clear', onclick:function(){ state.advSearch = ''; render(); }},['נקה'])); }
+    wrap.appendChild(sbar);
+    if (q){ wrap.appendChild(el('div',{class:'fhint adv-search-sum', style:'margin:2px 0 10px;'},[shown.length ? 'נמצאו ' + shown.length + ' מתוך ' + all.length + ' מועמדים. הרשימות הריקות מוסתרות בזמן החיפוש.' : 'לא נמצאו מועמדים שמתאימים ל"' + q + '".'])); }
+
     function candidateRow(s, st){
       var g = state.groups.find(function(x){return x.id===s.groupId;});
       var tgtSel = el('select',{class:'status-select-inline adv-target-select'}, [ el('option',{value:''},['— לא נקבעה —']) ].concat(
@@ -5133,7 +5192,8 @@
 
     // one list per stage, always shown (like the statuses in a group's attendance), so a candidate can be dropped into an empty stage too
     ADV_STATUSES.forEach(function(st){
-      var list = sortByClass(all.filter(function(s){ return advStatusInfo(s.advStatus).key === st.key && !(st.key === 'confirmed' && advIsJoined(s)); }));
+      var list = sortByClass(shown.filter(function(s){ return advStatusInfo(s.advStatus).key === st.key && !(st.key === 'confirmed' && advIsJoined(s)); }));
+      if (q && !list.length) return;            // while searching, lists with no match are hidden
       var dh = makeAdvDropHandlers(st.key);
       var block = el('div',{
         class:'status-block adv-section', 'data-stage':st.key,
@@ -5150,7 +5210,7 @@
     });
 
     // A separate list for everyone who joined: folded by default so it takes no room, opens on click.
-    var joinedList = sortByClass(all.filter(advIsJoined)), jopen = !!state.advJoinedOpen, jdh = makeAdvDropHandlers('joined');
+    var joinedList = sortByClass(shown.filter(advIsJoined)), jopen = q ? joinedList.length > 0 : !!state.advJoinedOpen, jdh = makeAdvDropHandlers('joined');
     var jblock = el('div',{
       class:'status-block adv-section adv-joined-section', 'data-stage':'joined',
       style:'border-inline-start:6px solid #4B7F52;padding-inline-start:14px;',
@@ -5166,7 +5226,7 @@
         jblock.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[ headFor({key:'confirmed'}), el('tbody',{}, joinedList.map(function(x){ return candidateRow(x, {key:'confirmed'}); })) ]) ]));
       }
     }
-    wrap.appendChild(jblock);
+    if (!(q && !joinedList.length)){ wrap.appendChild(jblock); }
     return wrap;
   }
 
@@ -7242,11 +7302,61 @@
     refreshTransferDuplicates(state.modal);
     render();
   }
+  // ---- is this registrant a child that is already in the group (possibly written a bit differently)? ----
+  function nameTokensOf(n){ return String(n || '').toLowerCase().replace(/[\u0591-\u05C7'"`´’‘“”״׳.,\-־_()]/g, ' ').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean); }
+  function levenshtein(a, b){
+    var m = a.length, n = b.length, d = []; for (var i = 0; i <= m; i++){ d[i] = [i]; } for (var j = 1; j <= n; j++){ d[0][j] = j; }
+    for (var i2 = 1; i2 <= m; i2++){ for (var j2 = 1; j2 <= n; j2++){ d[i2][j2] = Math.min(d[i2-1][j2] + 1, d[i2][j2-1] + 1, d[i2-1][j2-1] + (a.charAt(i2-1) === b.charAt(j2-1) ? 0 : 1)); } }
+    return d[m][n];
+  }
+  function tokenMatch(a, b){
+    if (a === b) return true;
+    var lo = Math.min(a.length, b.length), hi = Math.max(a.length, b.length);
+    if (lo < 3) return false;
+    if ((a.indexOf(b) === 0 || b.indexOf(a) === 0) && hi - lo <= 2) return true;          // יובל / יובלי
+    return levenshtein(a, b) <= (hi >= 6 ? 2 : 1);                                         // a typo
+  }
+  // score 1 = same name; 0.9 = the shorter name is contained in the longer (כרמל תמרי / כרמל דולב תמרי); lower = weaker; 0 = not similar
+  function nameSimilarity(a, b, phoneA, phoneB){
+    var A = nameTokensOf(a), B = nameTokensOf(b); if (!A.length || !B.length) return 0;
+    if (A.join(' ') === B.join(' ')) return 1;
+    var small = A.length <= B.length ? A : B, large = small === A ? B : A, used = {}, matches = 0, firstHit = false;
+    small.forEach(function(t, ti){ for (var k = 0; k < large.length; k++){ if (!used[k] && tokenMatch(t, large[k])){ used[k] = true; matches++; if (ti === 0 || k === 0){ firstHit = true; } break; } } });
+    if (matches === small.length && small.length >= 2) return 0.9;
+    if (matches === small.length && small.length === 1 && firstHit) return 0.7;            // a first name only
+    if (matches >= 2 && matches / large.length >= 0.5) return 0.7;
+    var pa = digitsOf(phoneA), pb = digitsOf(phoneB);
+    if (matches >= 1 && firstHit && pa && pb && pa === pb) return 0.65;                    // same phone and the same first name
+    return 0;
+  }
+  function similarStudents(name, phone, groupId){
+    return state.students.filter(function(x){ return !x.trashed && !x.archived && x.groupId === groupId; })
+      .map(function(x){ return { student:x, score:nameSimilarity(name, x.name, phone, x.phone) }; })
+      .filter(function(c){ return c.score >= 0.65; })
+      .sort(function(a, b){ return b.score - a.score; }).slice(0, 3);
+  }
+  var STATUS_RANK = { review:0, follow:1, trial:2, joined:3 };
+  // what to offer to update on an existing child: only values that are new and different; ticked by default only when they FILL something missing (or move him forward)
+  function mergeFieldDefs(r, st){
+    var defs = [];
+    var nm = r.child.trim(), cg = normalizeClassGrade((r.classGrade || '').trim());
+    if (nm && nameTokensOf(nm).join(' ') !== nameTokensOf(st.name).join(' ')){ defs.push({ key:'name', label:'שם', from:st.name, to:nm, on:false }); }
+    if (r.phone && digitsOf(r.phone) !== digitsOf(st.phone)){ defs.push({ key:'phone', label:'טלפון', from:st.phone || '—', to:r.phone, on:!st.phone }); }
+    if (cg && cg !== (st.classGrade || '')){ defs.push({ key:'classGrade', label:'כיתה', from:st.classGrade || '—', to:cg, on:!st.classGrade }); }
+    if (r.status && r.status !== st.status){ defs.push({ key:'status', label:'סטטוס', from:statusInfo(st.status).label, to:statusInfo(r.status).label, on:(STATUS_RANK[r.status] !== undefined && STATUS_RANK[st.status] !== undefined && STATUS_RANK[r.status] > STATUS_RANK[st.status]) }); }
+    if (r.daycare && !st.daycare){ defs.push({ key:'daycare', label:'צהרון', from:'לא', to:'כן', on:true }); }
+    if (r.female && !st.isFemale){ defs.push({ key:'female', label:'מין', from:'לא מסומן כנקבה', to:'נקבה', on:true }); }
+    if (r.shirtAnswer && r.useShirt && r.shirtAnswer !== st.shirtSize){ defs.push({ key:'shirt', label:'מידת חולצה', from:st.shirtSize || '—', to:r.shirtAnswer, on:!st.shirtSize }); }
+    return defs;
+  }
   function refreshTransferDuplicates(m){
     m.rows.forEach(function(r){ r.entries.forEach(function(e){
       var dup = e.tatamiId ? findExistingStudent(r.child, r.phone, e.tatamiId) : null;
       var wasDup = !!e.dup; e.dup = !!dup;
       if (e.dup && !wasDup){ e.include = false; }              // already there: don't add twice unless asked
+      var prev = e.choice;
+      e.cands = (e.tatamiId && r.child.trim()) ? similarStudents(r.child, r.phone, e.tatamiId) : [];
+      if (prev && prev !== 'new' && !e.cands.some(function(c){ return c.student.id === prev; })){ e.choice = undefined; }     // the choice no longer applies
     }); });
   }
   async function confirmFormTransfer(){
@@ -7256,14 +7366,30 @@
       var chosen = r.entries.filter(function(e){ return e.include; });
       if (chosen.length && !r.child.trim()) problems.push('חסר שם מתאמן/ת לרשומה של ' + (r.parent || r.phone));
       chosen.forEach(function(e){ if (!e.tatamiId) problems.push('בחר קבוצה בטטאמי עבור "' + e.label + '" (' + (r.child || '?') + ')'); });
+      chosen.forEach(function(e){ if (e.cands && e.cands.length && !e.choice) problems.push('בחר עבור "' + r.child + '": אותו ילד כמו ' + e.cands[0].student.name + ', או ילד אחר');});
     });
     if (problems.length){ m.error = problems[0] + (problems.length > 1 ? ' (ועוד ' + (problems.length - 1) + ')' : ''); render(); return; }
     m.busy = true; m.error = ''; render();
-    var added = 0, handledFailed = 0, today = shortDate(todayISO());
+    var added = 0, updated = 0, handledFailed = 0, today = shortDate(todayISO());
     for (var i = 0; i < m.rows.length; i++){
       var r = m.rows[i], names = [];
       r.entries.filter(function(e){ return e.include; }).forEach(function(e){
         var g = state.groups.find(function(x){ return x.id === e.tatamiId; });
+        if (e.choice && e.choice !== 'new'){            // the same child: update only what was ticked, never create a second one
+          var ex = state.students.filter(function(x){ return x.id === e.choice; })[0], up = e.upd || {}, patch = {};
+          if (ex){
+            if (up.name) patch.name = r.child.trim();
+            if (up.phone) patch.phone = r.phone;
+            if (up.classGrade) patch.classGrade = normalizeClassGrade(r.classGrade.trim());
+            if (up.daycare) patch.daycare = r.daycare;
+            if (up.female) patch.isFemale = r.female;
+            if (up.shirt && r.shirtAnswer) patch.shirtSize = r.shirtAnswer;
+            if (up.status) patch.status = r.status;
+            if (Object.keys(patch).length){ updateStudent(ex.id, patch); }
+            updated++; names.push((g ? g.name : '') + ' (עודכן ' + ex.name + ')');
+            return;
+          }
+        }
         addStudent({
           name:r.child.trim(), phone:r.phone, groupId:e.tatamiId, status:r.status, classGrade:normalizeClassGrade(r.classGrade.trim()),
           shirtSize:(r.useShirt ? r.shirtAnswer : ''), daycare:r.daycare, isFemale:r.female
@@ -7277,7 +7403,7 @@
     }
     state.modal = null;
     state.inbox.selected = {};
-    showToast(added ? 'נוספו ' + added + ' מתאמנים לקבוצות.' + (handledFailed ? ' (לא הצלחתי לסמן חלק מההרשמות כטופלו — אפשר לסמן ידנית.)' : '') : 'לא נוסף אף מתאמן.');
+    showToast((added || updated) ? (added ? 'נוספו ' + added + ' מתאמנים לקבוצות.' : '') + (updated ? (added ? ' ' : '') + 'עודכנו ' + updated + ' מתאמנים קיימים.' : '') + (handledFailed ? ' (לא הצלחתי לסמן חלק מההרשמות כטופלו — אפשר לסמן ידנית.)' : '') : 'לא נוסף אף מתאמן.');
     loadInbox(true);
   }
   function buildFormTransferModal(m){
@@ -7301,6 +7427,28 @@
           fSelect([{ key:'', label:'— בחר קבוצה בטטאמי —' }].concat(state.groups.map(function(g){ return { key:g.id, label:g.name }; })), e.tatamiId, function(v){ e.tatamiId = v; if (v){ e.include = true; e.dup = false; } refreshTransferDuplicates(m); render(); }, { class:'ft-select' }),
           e.dup ? el('span', { class:'ft-dup' }, ['כבר קיים/ת בקבוצה'+(e.include ? '' : ' — לא יתווסף')]) : null
         ]));
+      });
+      r.entries.forEach(function(e, ei){
+        if (!e.include || !e.cands || !e.cands.length) return;
+        var gname = 'mg_' + (r.item.id || '') + '_' + ei, panel = el('div', { class:'ft-merge' });
+        panel.appendChild(el('div', { class:'ft-merge-q' }, ['⚠ נמצא בקבוצה הזו ילד דומה. האם זה אותו ילד?']));
+        e.cands.forEach(function(c){
+          var rb = el('input', { type:'radio', name:gname, value:c.student.id }); rb.checked = e.choice === c.student.id;
+          rb.addEventListener('change', function(){ e.choice = c.student.id; e.upd = {}; mergeFieldDefs(r, c.student).forEach(function(f){ e.upd[f.key] = f.on; }); render(); });
+          panel.appendChild(el('label', { class:'ft-radio' }, [rb, el('span', {}, [ 'כן, זה ', el('b', {}, [c.student.name]), ' (' + statusInfo(c.student.status).label + (c.student.classGrade ? ', כיתה ' + c.student.classGrade : '') + (c.student.phone ? ', ' + c.student.phone : '') + ')' + (c.score >= 1 ? ' · שם זהה' : '') + ' — עדכן אותו, בלי ליצור תלמיד חדש' ])]));
+        });
+        var rn = el('input', { type:'radio', name:gname, value:'new' }); rn.checked = e.choice === 'new';
+        rn.addEventListener('change', function(){ e.choice = 'new'; render(); });
+        panel.appendChild(el('label', { class:'ft-radio' }, [rn, el('span', {}, ['לא, זה ילד אחר — צור תלמיד חדש'])]));
+        var picked = e.choice && e.choice !== 'new' ? state.students.filter(function(x){ return x.id === e.choice; })[0] : null;
+        if (picked){
+          var defs = mergeFieldDefs(r, picked);
+          e.upd = e.upd || {}; defs.forEach(function(f){ if (e.upd[f.key] === undefined){ e.upd[f.key] = f.on; } });
+          panel.appendChild(el('div', { class:'ft-merge-fields' }, defs.length ? [ el('div', { class:'fhint' }, ['מה להוסיף לכרטיס של ' + picked.name + ' (רק מה שתסמן ישתנה):']) ].concat(defs.map(function(f){
+            return fCheck(f.label + ': ' + f.from + '  ←  ' + f.to, !!e.upd[f.key], function(v){ e.upd[f.key] = v; });
+          })) : [ el('div', { class:'fhint' }, ['אין פרטים חדשים להוסיף: הכל כבר מופיע אצלו.']) ]));
+        }
+        b.appendChild(panel);
       });
       b.appendChild(fCheck('סמן את ההרשמה כטופלה', r.markHandled, function(v){ r.markHandled = v; }));
       kids.push(b);
@@ -8808,7 +8956,8 @@
 
   // Test hook — only active when the page is opened with ?tatamiTest=1 (used by automated tests, not by normal use).
   if (/[?&]tatamiTest=1/.test(window.location.search)){
-    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, camp: { stats:function(c){ roiCache = null; return campaignStats(c); }, leads:function(c){ roiCache = null; return leadsForCampaign(c); }, auto:autoCampaignFor },
+    window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, camp: { stats:function(c){ roiCache = null; return campaignStats(c); }, leads:function(c){ roiCache = null; return leadsForCampaign(c); }, auto:autoCampaignFor, of:function(x){ roiCache = null; return leadCampaignOf(x); } },
+    similar: { score:nameSimilarity, find:similarStudents },
     roi: { parts:function(s){ roiCache = null; return leadRevenueParts(s); }, cfg:function(){ return roiCfg(); }, perWeek:function(g){ return groupWeeklyCount(g); }, price:function(g){ return groupPriceInfo(g); } }, muni: { amounts:muniAmounts, months:muniMonths, split:splitName }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
   }
 
