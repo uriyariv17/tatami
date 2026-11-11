@@ -257,6 +257,9 @@
   .campaign-default-label{ display:inline-flex; gap:4px; align-items:center; font-size:12.5px; margin-inline-end:10px; cursor:pointer; }
   .ft-merge{ background:#FFF6E0; border:1.5px solid #F0D58A; border-radius:10px; padding:9px 12px; margin:6px 0 4px; } .ft-merge-q{ font-weight:800; font-size:13.5px; margin-bottom:6px; } .ft-radio{ display:flex; gap:8px; align-items:flex-start; font-size:13.5px; margin:5px 0; cursor:pointer; } .ft-radio input{ margin-top:3px; }
   .ft-merge-fields{ margin:8px 0 2px; padding:8px 10px; background:#fff; border-radius:8px; border:1px dashed #E3C97A; display:flex; flex-direction:column; gap:4px; font-size:13px; }
+  .camp-cost-label{ display:inline-flex; gap:6px; align-items:center; font-size:13px; } .camp-cost-in{ width:96px; padding:5px 8px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13.5px; direction:ltr; text-align:right; } .camp-nocost{ font-size:12.5px; font-weight:700; }
+  .camp-edit{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; background:#F7F5F0; border-radius:10px; padding:10px 12px; margin-top:8px; width:100%; box-sizing:border-box; } .camp-edit-f{ display:flex; flex-direction:column; gap:4px; font-size:12.5px; font-weight:700; } .camp-edit-in{ padding:7px 9px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14px; }
+  .lead-fee-in{ width:78px; padding:5px 7px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13.5px; direction:ltr; text-align:right; } .lead-fee-in:not(:placeholder-shown){ border-color:#2F7A3B; font-weight:700; }
   .roi-extra{ width:84px; padding:5px 7px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13px; direction:ltr; text-align:right; } .roi-perweek{ min-width:54px; }
 
   .name-phone{ display:block; font-size:11.5px; color:var(--muted); font-weight:400; direction:ltr; text-align:right; text-decoration:none; line-height:1.3; } a.name-phone:hover{ text-decoration:underline; color:var(--accent); }
@@ -1114,7 +1117,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-12 10:00';
+  var APP_VERSION = '2026-11-13 10:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1285,6 +1288,7 @@
     followSort: 'wait',
     followByDay: true,          // separate the "who to contact" list by the day of the child's group
     followPrefsLoaded: false,
+    campEditId: '',              // the campaign whose name/dates are being edited in the analysis list
     advSearch: '',               // search box inside the advanced-candidates page (it searches only the candidates)
     advJoinedOpen: false,       // the collapsible "joined" list on the candidates page
     advStatusFilter: null,   // candidacy-stage filter on the advanced-candidates page
@@ -2590,9 +2594,13 @@
     });
     var gCur = {}; state.groups.forEach(function(g){ gCur[g.id] = g; });
     masters.forEach(function(m){
+      var leadsHere = m.cur.filter(function(r){ return r.isLead; }).sort(function(a, b){ return (leadDateOf(a) || '9') < (leadDateOf(b) || '9') ? -1 : ((leadDateOf(a) || '9') > (leadDateOf(b) || '9') ? 1 : (a.id < b.id ? -1 : 1)); });
+      var primary = leadsHere[0] || null;
+      var feeRec = (primary && Number(primary.monthlyFee) > 0) ? primary : m.cur.filter(function(r){ return Number(r.monthlyFee) > 0; })[0];
+      var fee = feeRec ? Number(feeRec.monthlyFee) : 0;        // what this child pays each month, as typed in the leads table
       var snaps = [{ recs:m.cur, groups:gCur, startYear:academicStartYear() }];
       m.arch.forEach(function(x){ if (!x) return; var gg = {}; (x.a.groups || []).forEach(function(g){ gg[g.id] = gCur[g.id] || g; }); snaps.push({ recs:x.recs, groups:gg, startYear:new Date(x.a.savedAt).getFullYear() - 1 }); });
-      var months = 0, base = 0, combined = false, names = {};
+      var months = 0, base = 0, baseDefault = 0, combined = false, names = {};
       snaps.forEach(function(sn){
         for (var i = 0; i < 12; i++){
           var paidRecs = sn.recs.filter(function(r){ return (r.monthlyPayments || [])[i] === 'paid'; });
@@ -2602,18 +2610,22 @@
           var price;
           if (reg.length === 1){ price = groupPriceInfo(sn.groups[reg[0].groupId]).price; }
           else { var w = 0; reg.forEach(function(r){ w += groupWeeklyCount(sn.groups[r.groupId]); }); price = tierPrice(Math.min(3, w)); combined = true; }
-          months++; base += price;
+          months++; baseDefault += price; if (fee > 0){ price = fee; } base += price;
           reg.forEach(function(r){ var g = sn.groups[r.groupId]; if (g){ names[g.name] = true; } });
         }
       });
       var extra = m.cur.reduce(function(sum, r){ return sum + (Number(r.extraPaid) || 0); }, 0), shirt = months > 0 ? cfg.shirt : 0;
-      var parts = { registered:months > 0, months:months, rate: months ? Math.round(base / months) : 0, shirt:shirt, extra:extra, base:base, total:base + shirt + extra, combined:combined, groupNames:Object.keys(names) };
-      var leadsHere = m.cur.filter(function(r){ return r.isLead; }).sort(function(a, b){ return (leadDateOf(a) || '9') < (leadDateOf(b) || '9') ? -1 : ((leadDateOf(a) || '9') > (leadDateOf(b) || '9') ? 1 : (a.id < b.id ? -1 : 1)); });
-      var primary = leadsHere[0] || null;
-      m.cur.forEach(function(r){ byId[r.id] = { parts:parts, primary: !!primary && primary.id === r.id, child:m }; });
+      var parts = { registered:months > 0, months:months, rate: months ? Math.round(base / months) : 0, shirt:shirt, extra:extra, base:base, total:base + shirt + extra, combined:combined, groupNames:Object.keys(names), fee:fee, feeSet:fee > 0 };
+      var defaultRate = months ? Math.round(baseDefault / months) : 0;
+      m.cur.forEach(function(r){ byId[r.id] = { parts:parts, primary: !!primary && primary.id === r.id, child:m, fee:fee, feeFromOther: fee > 0 && !(Number(r.monthlyFee) > 0) }; });
+      m.defaultRate = defaultRate;
     });
     roiCache = { byId:byId, masters:masters };
     return roiCache;
+  }
+  function defaultMonthlyFor(s){
+    var g = state.groups.find(function(x){ return x.id === s.groupId; }), x = roiIndex().byId[s.id];
+    return (x && x.child && x.child.defaultRate) || groupPriceInfo(g).price;
   }
   function isPrimaryLead(s){ var x = roiIndex().byId[s.id]; return !x || x.primary; }
   function leadRevenueParts(s){
@@ -4024,7 +4036,7 @@
         el('td',{},[pt.combined ? 'תמחור משולב' : (perWeekSel || '—')]),
         el('td',{},[row.joinDate ? formatDateFull(row.joinDate) : '— (טרם הצטרף)']),
         el('td',{},[pt.merged ? 'נכלל ברשומה אחרת של אותו ילד' : (pt.months ? String(pt.months) : '—')]),
-        el('td',{title:pt.combined ? 'ילד הרשום לכמה קבוצות: חודשים בקבוצה אחת בתעריף שלה, וחודשים בכמה קבוצות בתעריף המשולב (פעמיים או 3 פעמים בשבוע)' : ''},[pt.registered ? '₪' + pt.rate + (pt.combined ? ' (משולב)' : '') : '—']),
+        el('td',{title:pt.feeSet ? 'התשלום החודשי הוזן ידנית בטבלת הלידים' : (pt.combined ? 'ילד הרשום לכמה קבוצות: חודשים בקבוצה אחת בתעריף שלה, וחודשים בכמה קבוצות בתעריף המשולב (פעמיים או 3 פעמים בשבוע)' : '')},[pt.registered ? '₪' + pt.rate + (pt.feeSet ? ' (ידני)' : (pt.combined ? ' (משולב)' : '')) : '—']),
         el('td',{},[pt.registered ? '₪' + pt.shirt : '—']),
         el('td',{},[extraIn]),
         el('td',{class: row.value ? 'good' : '', title: pt.months + ' חודשים משולמים, סה״כ ₪' + pt.base + ' + חולצה ₪' + pt.shirt + ' + נוספים ₪' + pt.extra},[row.value ? '₪'+row.value.toLocaleString() : '₪0'])
@@ -4047,11 +4059,15 @@
     box.appendChild(el('div',{class:'campaign-summary'},[
       el('div',{class:'campaign-summary-item'},[el('div',{class:'campaign-summary-label'},['סה"כ הוצאה על קמפיינים אי-פעם']), el('div',{class:'campaign-summary-value'},['₪'+totalSpent.toLocaleString()])]),
       el('div',{class:'campaign-summary-item'},[el('div',{class:'campaign-summary-label'},['סה"כ תמורה שהתקבלה אי-פעם']), el('div',{class:'campaign-summary-value good'},['₪'+totalRevenue.toLocaleString()])]),
-      el('div',{class:'campaign-summary-item'},[el('div',{class:'campaign-summary-label'},['רווח נטו כולל']), el('div',{class:'campaign-summary-value'+(totalNet>=0?' good':' bad')},['₪'+totalNet.toLocaleString()])])
+      el('div',{class:'campaign-summary-item'},[el('div',{class:'campaign-summary-label'},['נטו כולל (תמורה פחות הוצאה על פרסום)']), el('div',{class:'campaign-summary-value'+(totalNet>=0?' good':' bad')},['₪'+totalNet.toLocaleString()])])
     ]));
+    var noCost = state.campaigns.filter(function(c){ return !(Number(c.cost) > 0); });
+    if (noCost.length){
+      box.appendChild(el('div',{class:'lead-nocamp camp-nocost-warn'},['⚠ לא הוזנה הוצאה ל' + (noCost.length === 1 ? 'קמפיין: ' : '-' + noCost.length + ' קמפיינים: ') + noCost.map(function(c){ return '"' + c.name + '"'; }).join(', ') + '. עד שתזין (בשדה "הוצאה עד כה" בשורת הקמפיין למטה), הנטו שווה לכל התמורה ונראה כמו רווח גדול.']));
+    }
     var rc = roiCfg();
     box.appendChild(el('div',{style:'font-size:12.5px;color:var(--muted);margin:6px 0 10px;line-height:1.7;'},[
-      'מי שנכלל: כל תלמיד שסומן אי פעם כליד. התמורה שלו = סכום החודשים שסומנו אצלו כ״שולם״ ב״ניהול תשלומים״ (השנה הנוכחית ושנים קודמות מהארכיון), לפי מחיר החודש של הקבוצה (בקבוצה בלי מחיר: ₪' + rc.w1 + ' לפעם בשבוע, ₪' + rc.w2 + ' לפעמיים, ₪' + rc.w3 + ' ל-3 פעמים) + חולצה חד-פעמית ₪' + rc.shirt + ' + תשלומים נוספים שרשמת. ילד שרשום לכמה קבוצות נחשב ילד אחד ומתומחר לפי סך הפעמים בשבוע (₪' + rc.w2 + ' לשתי קבוצות, ₪' + rc.w3 + ' לשלוש), ולא לפי מחירי הקבוצות בנפרד. חודש שלא סומן כשולם לא נכלל.'
+      'מי שנכלל: כל תלמיד שסומן אי פעם כליד. התמורה שלו = סכום החודשים שסומנו אצלו כ״שולם״ ב״ניהול תשלומים״ (השנה הנוכחית ושנים קודמות מהארכיון), לפי מחיר החודש של הקבוצה (בקבוצה בלי מחיר: ₪' + rc.w1 + ' לפעם בשבוע, ₪' + rc.w2 + ' לפעמיים, ₪' + rc.w3 + ' ל-3 פעמים) + חולצה חד-פעמית ₪' + rc.shirt + ' + תשלומים נוספים שרשמת. ילד שרשום לכמה קבוצות נחשב ילד אחד ומתומחר לפי סך הפעמים בשבוע (₪' + rc.w2 + ' לשתי קבוצות, ₪' + rc.w3 + ' לשלוש), ולא לפי מחירי הקבוצות בנפרד. חודש שלא סומן כשולם לא נכלל. נטו = התמורה פחות ההוצאה על פרסום בלבד, ולא רווח אמיתי: הוא לא כולל שכר, שכירות ועלויות אחרות.'
     ]));
     var rcIn = function(key, label){ var i = el('input',{type:'text', inputmode:'decimal', class:'roi-cfg-in', value:String(rc[key]), 'data-k':key}); i.addEventListener('change', function(e){ var v = calcNum(e.target.value); var patch = {}; patch[key] = v; setRoiCfg(patch); }); return el('label',{class:'roi-cfg-f'},[label, i]); };
     box.appendChild(el('details',Object.assign({class:'roi-cfg'}, state.roiCfgOpen ? {open:'open'} : {}), [
@@ -4091,7 +4107,8 @@
       el('div',{class:'field'},[el('label',{},['תאריך סיום (אופציונלי — ריק = עדיין פעיל)']), endInput]),
       el('button',{class:'btn-primary', onclick:function(){
         if (!nameInput.value.trim() || !startInput.value){ showToast('נא למלא שם ותאריך התחלה לפחות.'); return; }
-        addCampaign({name:nameInput.value.trim(), cost:costInput.value, startDate:startInput.value, endDate:endInput.value||null});
+        if (endInput.value && endInput.value < startInput.value){ showToast('תאריך הסיום מוקדם מתאריך ההתחלה. בדוק שהתאריכים לא הוחלפו.'); return; }
+        addCampaign({name:nameInput.value.trim(), cost:calcNum(costInput.value), startDate:startInput.value, endDate:endInput.value||null});
       }},['+ הוספת קמפיין'])
     ]));
 
@@ -4110,14 +4127,19 @@
       list.appendChild(el('div',{class:'campaign-row'},[
         el('div',{class:'campaign-row-main'},[
           el('div',{class:'campaign-row-name'},[c.name]),
-          el('div',{class:'campaign-row-dates'},[dateRangeText])
-        ]),
+          el('div',{class:'campaign-row-dates'},[dateRangeText]),
+          (c.endDate && c.endDate < c.startDate) ? el('div',{class:'bad camp-baddates', style:'font-size:12.5px;font-weight:700;margin-top:4px;'},[
+            '⚠ תאריך הסיום מוקדם מתאריך ההתחלה, כנראה הם הוחלפו. ',
+            el('button',{class:'btn-text camp-swap', onclick:function(){ updateCampaign(c.id, { startDate:c.endDate, endDate:c.startDate }); }},['החלף ביניהם'])
+          ]) : null
+        ].filter(Boolean)),
         el('div',{class:'campaign-row-stats'},[
-          el('span',{},['עלות: ₪'+cost.toLocaleString()]),
+          (function(){ var ci = el('input',{type:'text', inputmode:'decimal', class:'camp-cost-in', value:cost ? String(cost) : '', placeholder:'0', title:'כמה שילמת על הקמפיין הזה עד היום (Amount spent ב-Ads Manager)'}); ci.addEventListener('change', function(e){ updateCampaign(c.id, { cost: calcNum(e.target.value) || 0 }); }); return el('label',{class:'camp-cost-label'},['הוצאה עד כה (₪) ', ci]); })(),
           el('span',{},['לידים: ' + campaignStats(c).leads + (campaignStats(c).cpLead != null ? ' · עלות לליד: ' + fmtShekel(campaignStats(c).cpLead) : '')]),
           el('span',{class:'good'},['תמורה: ₪'+revenue.toLocaleString()]),
-          el('span',{class:net>=0?'good':'bad'},['נטו: ₪'+net.toLocaleString()])
-        ]),
+          el('span',{class:net>=0?'good':'bad'},['נטו: ₪'+net.toLocaleString()]),
+          cost ? null : el('span',{class:'bad camp-nocost'},['⚠ לא הוזנה הוצאה: הנטו שווה לכל התמורה'])
+        ].filter(Boolean)),
         el('div',{class:'campaign-row-actions'},[
           el('label',{class:'campaign-default-label', title:'כל ליד שאין לו קמפיין לפי תאריך, וכל ליד חדש, יספרו תחת הקמפיין הזה. יכול להיות רק אחד כזה.'},[
             (function(){ var cb = el('input',{type:'checkbox', class:'campaign-default-cb'}); cb.checked = !!c.isDefault; cb.addEventListener('change', function(){ state.campaigns.forEach(function(x){ x.isDefault = false; }); if (cb.checked){ c.isDefault = true; } scheduleSave(); }); return cb; })(),
@@ -4130,9 +4152,14 @@
               leadsAll.forEach(function(x){ x.leadSource = c.id; }); scheduleSave(); showToast('שויכו ' + leadsAll.length + ' לידים לקמפיין.');
             }, 'שייך את כולם');
           }},['שייך אליו את כל הלידים']),
+          el('button',{class:'btn-text camp-edit-btn', onclick:function(){ state.campEditId = state.campEditId === c.id ? '' : c.id; render(); }},[state.campEditId === c.id ? 'סגירת עריכה' : '✏️ שם ותאריכים']),
           el('button',{class:'btn-text danger', onclick:function(){ deleteCampaign(c.id); }},['מחיקה'])
-        ])
-      ]));
+        ]),
+        state.campEditId === c.id ? (function(){
+          var f = function(label, key, type, nullable){ var i = el('input',{type:type, class:'camp-edit-in', 'data-k':key, value:c[key] == null ? '' : c[key]}); i.addEventListener('change', function(e){ var v = e.target.value; var patch = {}; patch[key] = (nullable && v === '') ? null : v; if (key === 'name' && !v.trim()){ showToast('שם הקמפיין לא יכול להיות ריק.'); render(); return; } if ((key === 'startDate' && v && c.endDate && c.endDate < v) || (key === 'endDate' && v && v < c.startDate)){ showToast('שים לב: תאריך הסיום מוקדם מתאריך ההתחלה.'); } updateCampaign(c.id, patch); }); return el('label',{class:'camp-edit-f'},[label, i]); };
+          return el('div',{class:'camp-edit'},[ f('שם הקמפיין', 'name', 'text'), f('תאריך התחלה', 'startDate', 'date'), f('תאריך סיום (ריק = עדיין רץ)', 'endDate', 'date', true) ]);
+        })() : null
+      ].filter(Boolean)));
     });
     box.appendChild(list);
     return box;
@@ -4147,6 +4174,14 @@
       [ el('option', Object.assign({ value:'none' }, s.leadSource === 'none' ? { selected:'selected' } : {}), ['לא מקמפיין (אורגני)']) ]));
     sel.addEventListener('change', function(e){ updateStudent(s.id, { leadSource:e.target.value }); });
     return sel;
+  }
+  // what this student pays each month. Empty = the group's price (shown in grey). A number here replaces it in the income calculation.
+  function leadFeeInput(s){
+    var x = roiIndex().byId[s.id], dflt = defaultMonthlyFor(s), other = x && x.feeFromOther;
+    var inp = el('input',{type:'text', inputmode:'decimal', class:'lead-fee-in', value:Number(s.monthlyFee) > 0 ? String(s.monthlyFee) : '', placeholder:String(other ? x.fee : dflt),
+      title: other ? 'נקבע ברשומה אחרת של אותו ילד' : (Number(s.monthlyFee) > 0 ? 'התשלום החודשי של התלמיד. ריק = מחיר הקבוצה (₪' + dflt + ')' : 'ריק = מחיר הקבוצה (₪' + dflt + '). הקלד סכום כדי לקבוע תשלום חודשי לתלמיד הזה.') });
+    inp.addEventListener('change', function(e){ var v = e.target.value.trim(); updateStudent(s.id, { monthlyFee: v === '' ? '' : (calcNum(v) || '') }); });
+    return inp;
   }
   function renderLeadsView(){
     var wrap = el('div',{});
@@ -4220,7 +4255,7 @@
     }
 
     var thead = el('thead',{},[ el('tr',{},[
-      el('th',{},['שם']), el('th',{},['תאריך סימון ראשוני כליד']), el('th',{},['טלפון']), el('th',{},['הערה']), el('th',{},['קבוצה']), el('th',{},['קמפיין']), el('th',{class:'col-narrow'},['סטטוס']), el('th',{class:'col-narrow'},['ליד']), el('th',{class:'col-narrow'},[''])
+      el('th',{},['שם']), el('th',{},['תאריך סימון ראשוני כליד']), el('th',{},['טלפון']), el('th',{},['הערה']), el('th',{},['קבוצה']), el('th',{},['קמפיין']), el('th',{class:'col-narrow'},['תשלום חודשי (₪)']), el('th',{class:'col-narrow'},['סטטוס']), el('th',{class:'col-narrow'},['ליד']), el('th',{class:'col-narrow'},[''])
     ])]);
 
     var tbody = el('tbody',{});
@@ -4235,6 +4270,7 @@
         el('td',{},[ editableInput(s, 'note', 'הערה…', 'inline-input-wide') ]),
         el('td',{},[g ? g.name : '—']),
         el('td',{class:'lead-camp-cell'},[ leadCampaignSelect(s) ]),
+        el('td',{class:'lead-fee-cell'},[ leadFeeInput(s) ]),
         el('td',{},[ statusSelectFor(s) ]),
         el('td',{class:'att-cell'},[
           el('button',{class:'lead-box'+(s.isLead?' checked':''), title: s.isLead ? 'ביטול סימון כליד' : 'סימון כליד', onclick:function(){ toggleLead(s.id); }},[s.isLead ? '✓' : ''])
@@ -4392,7 +4428,12 @@
 
   // ---------------- job profitability calculator: compare up to 3 jobs ----------------
   var CALC_WPM = 52 / 12;      // weeks in a month
-  function calcNum(v){ var x = parseFloat(String(v == null ? '' : v).replace(',', '.')); return isNaN(x) ? 0 : x; }
+  function calcNum(v){
+    var t = String(v == null ? '' : v).replace(/[₪\s]/g, '');
+    if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(t)){ t = t.replace(/,/g, ''); }      // 1,800 = eighteen hundred
+    else { t = t.replace(',', '.'); }                                           // 12,5 = twelve and a half
+    var x = parseFloat(t); return isNaN(x) ? 0 : x;
+  }
   function newCalcJob(){ return { name:'', students:'', price:'', pricePer:'month', minutes:'60', perWeek:'1', extraMin:'', rent:'', rentPer:'month', taxPct:'', taxOn:'profit' }; }
   function calcJob(j){
     var students = calcNum(j.students), price = calcNum(j.price), minutes = calcNum(j.minutes), perWeek = calcNum(j.perWeek);
@@ -8958,7 +8999,7 @@
   if (/[?&]tatamiTest=1/.test(window.location.search)){
     window.__tatami = { state: state, scheduleSave: function(){ scheduleSave(); }, inbox: { load:loadInbox, check:maybeCheckInbox, loadMerch:loadMerch }, calc: { job:calcJob }, camp: { stats:function(c){ roiCache = null; return campaignStats(c); }, leads:function(c){ roiCache = null; return leadsForCampaign(c); }, auto:autoCampaignFor, of:function(x){ roiCache = null; return leadCampaignOf(x); } },
     similar: { score:nameSimilarity, find:similarStudents },
-    roi: { parts:function(s){ roiCache = null; return leadRevenueParts(s); }, cfg:function(){ return roiCfg(); }, perWeek:function(g){ return groupWeeklyCount(g); }, price:function(g){ return groupPriceInfo(g); } }, muni: { amounts:muniAmounts, months:muniMonths, split:splitName }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
+    roi: { parts:function(s){ roiCache = null; return leadRevenueParts(s); }, defaultFee:function(s){ roiCache = null; return defaultMonthlyFor(s); }, cfg:function(){ return roiCfg(); }, perWeek:function(g){ return groupWeeklyCount(g); }, price:function(g){ return groupPriceInfo(g); } }, muni: { amounts:muniAmounts, months:muniMonths, split:splitName }, forms: { createMerch:createMerchForm, create:createFormsRecord, record:formsRecord, validate:validateFormsConfig, publish:doPublishForms, hash:cfgHash, dirty:formsDirty } };
   }
 
   window.addEventListener('focus', function(){ maybeCheckInbox(); });
