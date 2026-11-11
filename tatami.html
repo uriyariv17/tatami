@@ -260,6 +260,8 @@
   .camp-cost-label{ display:inline-flex; gap:6px; align-items:center; font-size:13px; } .camp-cost-in{ width:96px; padding:5px 8px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13.5px; direction:ltr; text-align:right; } .camp-nocost{ font-size:12.5px; font-weight:700; }
   .camp-edit{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:10px; background:#F7F5F0; border-radius:10px; padding:10px 12px; margin-top:8px; width:100%; box-sizing:border-box; } .camp-edit-f{ display:flex; flex-direction:column; gap:4px; font-size:12.5px; font-weight:700; } .camp-edit-in{ padding:7px 9px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; font-size:14px; }
   .lead-fee-in{ width:78px; padding:5px 7px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13.5px; direction:ltr; text-align:right; } .lead-fee-in:not(:placeholder-shown){ border-color:#2F7A3B; font-weight:700; }
+  .camp-leadlist{ width:100%; margin-top:8px; background:#F7F5F0; border-radius:10px; padding:10px 12px; box-sizing:border-box; } .camp-how{ font-size:12.5px; color:var(--muted); }
+  .roi-fee-note{ font-size:11px; color:var(--muted); margin-top:2px; text-align:right; }
   .roi-extra{ width:84px; padding:5px 7px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13px; direction:ltr; text-align:right; } .roi-perweek{ min-width:54px; }
 
   .name-phone{ display:block; font-size:11.5px; color:var(--muted); font-weight:400; direction:ltr; text-align:right; text-decoration:none; line-height:1.3; } a.name-phone:hover{ text-decoration:underline; color:var(--accent); }
@@ -1117,7 +1119,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-13 10:00';
+  var APP_VERSION = '2026-11-13 18:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1288,6 +1290,7 @@
     followSort: 'wait',
     followByDay: true,          // separate the "who to contact" list by the day of the child's group
     followPrefsLoaded: false,
+    campLeadsId: '',             // the campaign whose leads are listed (who counts, and why)
     campEditId: '',              // the campaign whose name/dates are being edited in the analysis list
     advSearch: '',               // search box inside the advanced-candidates page (it searches only the candidates)
     advJoinedOpen: false,       // the collapsible "joined" list on the candidates page
@@ -4017,6 +4020,7 @@
       return wrap;
     }
 
+    wrap.appendChild(el('div',{class:'fhint',style:'margin:8px 0;line-height:1.6;'},['אפשר לערוך כאן ישירות את ״מחיר חודשי״ של כל תלמיד ואת ״תשלום נוסף״. בשדה ״מחיר חודשי״ ריק, המחיר של הקבוצה (המספר באפור). כשמקלידים סכום, הוא מחליף את המחיר של הקבוצה בכל החודשים ששולמו.']));
     var thead = el('thead',{},[ el('tr',{},[
       el('th',{},['שם']), el('th',{},['סטטוס']), el('th',{},['קבוצה']), el('th',{class:'col-narrow'},['פעמים בשבוע']), el('th',{},['תאריך הצטרפות']), el('th',{class:'col-narrow'},['חודשים משולמים']),
       el('th',{class:'col-narrow'},['מחיר חודשי']), el('th',{class:'col-narrow'},['חולצה']), el('th',{},['תשלום נוסף (₪)']), el('th',{},['סה"כ תמורה'])
@@ -4036,7 +4040,7 @@
         el('td',{},[pt.combined ? 'תמחור משולב' : (perWeekSel || '—')]),
         el('td',{},[row.joinDate ? formatDateFull(row.joinDate) : '— (טרם הצטרף)']),
         el('td',{},[pt.merged ? 'נכלל ברשומה אחרת של אותו ילד' : (pt.months ? String(pt.months) : '—')]),
-        el('td',{title:pt.feeSet ? 'התשלום החודשי הוזן ידנית בטבלת הלידים' : (pt.combined ? 'ילד הרשום לכמה קבוצות: חודשים בקבוצה אחת בתעריף שלה, וחודשים בכמה קבוצות בתעריף המשולב (פעמיים או 3 פעמים בשבוע)' : '')},[pt.registered ? '₪' + pt.rate + (pt.feeSet ? ' (ידני)' : (pt.combined ? ' (משולב)' : '')) : '—']),
+        el('td',{class:'roi-fee-cell'},[ pt.merged ? '—' : leadFeeInput(s), (!pt.merged && pt.registered) ? el('div',{class:'roi-fee-note'},[ pt.feeSet ? 'ידני' : (pt.combined ? 'משולב (שתי קבוצות או יותר)' : 'מחיר הקבוצה') ]) : null ].filter(Boolean)),
         el('td',{},[pt.registered ? '₪' + pt.shirt : '—']),
         el('td',{},[extraIn]),
         el('td',{class: row.value ? 'good' : '', title: pt.months + ' חודשים משולמים, סה״כ ₪' + pt.base + ' + חולצה ₪' + pt.shirt + ' + נוספים ₪' + pt.extra},[row.value ? '₪'+row.value.toLocaleString() : '₪0'])
@@ -4050,6 +4054,23 @@
     return wrap;
   }
 
+  function renderCampaignLeadList(c){
+    var rows = leadsForCampaign(c).map(function(s){ return { s:s, pt:leadRevenueParts(s) }; }).sort(function(a, b){ return b.pt.total - a.pt.total || ((leadDateOf(a.s) || '') < (leadDateOf(b.s) || '') ? -1 : 1); });
+    var box = el('div',{class:'camp-leadlist'});
+    if (!rows.length){ box.appendChild(el('div',{class:'fhint'},['אין לידים שנספרים בקמפיין הזה.'])); return box; }
+    box.appendChild(el('div',{class:'fhint',style:'margin-bottom:6px;line-height:1.6;'},['מי נספר בקמפיין הזה, ולמה. ליד שנשאר על "אוטומטי" נספר כאן רק כי נכנס בתאריך שהקמפיין רץ, בלי קשר למקור האמיתי שלו. אם הוא לא הגיע מהקמפיין, בחר לו "לא מקמפיין".']));
+    var head = el('thead',{},[ el('tr',{},['שם','נכנס כליד','סטטוס','חודשים משולמים','תמורה','איך שויך','קמפיין'].map(function(t){ return el('th',{},[t]); })) ]);
+    var body = el('tbody',{}, rows.map(function(r){
+      var s = r.s, d = leadDateOf(s);
+      return el('tr',{},[
+        el('td',{class:'name-cell'},[s.name]), el('td',{},[d ? formatDateFull(d) : '—']), el('td',{},[statusInfo(s.status).label]),
+        el('td',{},[r.pt.months ? String(r.pt.months) : '0']), el('td',{class: r.pt.total ? 'good' : ''},['₪' + r.pt.total.toLocaleString()]),
+        el('td',{class:'camp-how'},[s.leadSource === c.id ? 'נבחר ידנית' : 'אוטומטי לפי תאריך']), el('td',{},[leadCampaignSelect(s)])
+      ]);
+    }));
+    box.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[head, body]) ]));
+    return box;
+  }
   function renderCampaignAnalysis(){
     var box = el('div',{class:'campaign-analysis'});
 
@@ -4136,6 +4157,7 @@
         el('div',{class:'campaign-row-stats'},[
           (function(){ var ci = el('input',{type:'text', inputmode:'decimal', class:'camp-cost-in', value:cost ? String(cost) : '', placeholder:'0', title:'כמה שילמת על הקמפיין הזה עד היום (Amount spent ב-Ads Manager)'}); ci.addEventListener('change', function(e){ updateCampaign(c.id, { cost: calcNum(e.target.value) || 0 }); }); return el('label',{class:'camp-cost-label'},['הוצאה עד כה (₪) ', ci]); })(),
           el('span',{},['לידים: ' + campaignStats(c).leads + (campaignStats(c).cpLead != null ? ' · עלות לליד: ' + fmtShekel(campaignStats(c).cpLead) : '')]),
+          el('span',{class:'camp-reg'},['נרשמו כמנויים: ' + campaignStats(c).registered + ' · חודשים משולמים: ' + leadsForCampaign(c).reduce(function(n, x){ return n + leadRevenueParts(x).months; }, 0)]),
           el('span',{class:'good'},['תמורה: ₪'+revenue.toLocaleString()]),
           el('span',{class:net>=0?'good':'bad'},['נטו: ₪'+net.toLocaleString()]),
           cost ? null : el('span',{class:'bad camp-nocost'},['⚠ לא הוזנה הוצאה: הנטו שווה לכל התמורה'])
@@ -4152,9 +4174,11 @@
               leadsAll.forEach(function(x){ x.leadSource = c.id; }); scheduleSave(); showToast('שויכו ' + leadsAll.length + ' לידים לקמפיין.');
             }, 'שייך את כולם');
           }},['שייך אליו את כל הלידים']),
+          el('button',{class:'btn-text camp-leads-btn', onclick:function(){ state.campLeadsId = state.campLeadsId === c.id ? '' : c.id; render(); }},[state.campLeadsId === c.id ? 'סגירת הרשימה' : '👥 מי נספר כאן']),
           el('button',{class:'btn-text camp-edit-btn', onclick:function(){ state.campEditId = state.campEditId === c.id ? '' : c.id; render(); }},[state.campEditId === c.id ? 'סגירת עריכה' : '✏️ שם ותאריכים']),
           el('button',{class:'btn-text danger', onclick:function(){ deleteCampaign(c.id); }},['מחיקה'])
         ]),
+        state.campLeadsId === c.id ? renderCampaignLeadList(c) : null,
         state.campEditId === c.id ? (function(){
           var f = function(label, key, type, nullable){ var i = el('input',{type:type, class:'camp-edit-in', 'data-k':key, value:c[key] == null ? '' : c[key]}); i.addEventListener('change', function(e){ var v = e.target.value; var patch = {}; patch[key] = (nullable && v === '') ? null : v; if (key === 'name' && !v.trim()){ showToast('שם הקמפיין לא יכול להיות ריק.'); render(); return; } if ((key === 'startDate' && v && c.endDate && c.endDate < v) || (key === 'endDate' && v && v < c.startDate)){ showToast('שים לב: תאריך הסיום מוקדם מתאריך ההתחלה.'); } updateCampaign(c.id, patch); }); return el('label',{class:'camp-edit-f'},[label, i]); };
           return el('div',{class:'camp-edit'},[ f('שם הקמפיין', 'name', 'text'), f('תאריך התחלה', 'startDate', 'date'), f('תאריך סיום (ריק = עדיין רץ)', 'endDate', 'date', true) ]);
@@ -9011,3 +9035,4 @@
 </script>
 </body>
 </html>
+  
