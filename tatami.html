@@ -262,6 +262,8 @@
   .lead-fee-in{ width:78px; padding:5px 7px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13.5px; direction:ltr; text-align:right; } .lead-fee-in:not(:placeholder-shown){ border-color:#2F7A3B; font-weight:700; }
   .camp-leadlist{ width:100%; margin-top:8px; background:#F7F5F0; border-radius:10px; padding:10px 12px; box-sizing:border-box; } .camp-how{ font-size:12.5px; color:var(--muted); }
   .roi-fee-note{ font-size:11px; color:var(--muted); margin-top:2px; text-align:right; }
+  .attpdf-dates{ display:grid; grid-template-columns:1fr 1fr; gap:10px; } .attpdf-presets{ display:flex; gap:8px; flex-wrap:wrap; margin:6px 0 10px; } .attpdf-groups{ display:flex; flex-direction:column; gap:3px; max-height:220px; overflow:auto; border:1.5px solid var(--line); border-radius:10px; padding:8px 10px; } .attpdf-statuses{ display:flex; gap:12px; flex-wrap:wrap; } .attpdf-quick{ display:flex; gap:8px; margin-bottom:4px; }
+  .attpdf-summary{ background:#F2F9F3; border:1.5px solid #BFE0C4; border-radius:10px; padding:8px 12px; margin:10px 0; font-size:13.5px; font-weight:700; }
   .roi-extra{ width:84px; padding:5px 7px; border:1.5px solid var(--line); border-radius:7px; font-family:inherit; font-size:13px; direction:ltr; text-align:right; } .roi-perweek{ min-width:54px; }
 
   .name-phone{ display:block; font-size:11.5px; color:var(--muted); font-weight:400; direction:ltr; text-align:right; text-decoration:none; line-height:1.3; } a.name-phone:hover{ text-decoration:underline; color:var(--accent); }
@@ -1119,7 +1121,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-13 18:00';
+  var APP_VERSION = '2026-11-14 10:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -3310,6 +3312,7 @@
         el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openModal({type:'import', text:''}); }},['ייבוא רשימה']),
         el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openModal({type:'importExcel'}); }},['📋 הוספה מהדבקת אקסל']),
         el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openModal({type:'exportExcel'}); }},['📊 ייצוא לאקסל']),
+        el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openModal({type:'attPdf'}); }},['📄 רשימת נוכחות (PDF)']),
         el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openModal({type:'backup'}); }},['📤 גיבוי / העברה בין מכשירים']),
         el('button',{class:'more-menu-item', onclick:function(){ state.showMoreActions=false; openRestoreDialog(); }},['🕘 שחזור מגרסה קודמת']),
         el('div',{class:'more-menu-divider'}),
@@ -3439,6 +3442,7 @@
               var isImportModal = newModal.classList.contains('import-modal');
               nFields.forEach(function(f, k){
                 if (isImportModal && f.tagName === 'SELECT'){ return; } // import modals re-detect their column choices on purpose
+                if (newModal.classList.contains('attpdf-modal')){ return; }   // the PDF window draws everything (dates, ticks, choices) from its own state
                 if (f.type==='checkbox' || f.type==='radio'){ if (!newModal.classList.contains('ft-modal')){ f.checked = formCapture.values[k]; } }     /* the transfer window draws its ticks from its own state */
                 else if (f.value !== formCapture.values[k]){ f.value = formCapture.values[k]; }
               });
@@ -3651,6 +3655,155 @@
     catch(e){ window.prompt('העתק את ההודעה:', text); }
   }
 
+  // ---------------- attendance list as a PDF ----------------
+  // Pages are drawn in the browser (so Hebrew, RTL and fonts are exactly right) and packed into a real PDF file, one image per page.
+  var HEB_WD = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
+  function attPdfCollect(o){
+    var out = [], skipped = [];
+    state.groups.forEach(function(g){
+      if (!o.groups[g.id]) return;
+      var dates = (g.sessions || []).filter(function(d){ return d >= o.from && d <= o.to; }).sort();
+      var studs = state.students.filter(function(x){ return x.groupId === g.id && !x.trashed && !x.archived && o.statuses[x.status]; }).sort(function(a, b){ return a.name.localeCompare(b.name, 'he'); });
+      if (!dates.length){ skipped.push(g.name + ' (אין אימונים בטווח)'); return; }
+      if (!studs.length){ skipped.push(g.name + ' (אין תלמידים בסטטוסים שנבחרו)'); return; }
+      out.push({ g:g, dates:dates, studs:studs });
+    });
+    return { items:out, skipped:skipped };
+  }
+  function attPdfPlan(items, o){
+    var pages = [];
+    items.forEach(function(it){
+      var land = o.orient === 'landscape' || (o.orient === 'auto' && it.dates.length > 12);
+      var W = land ? 1123 : 794, H = land ? 794 : 1123, M = 30, nameW = 200, totW = o.totals ? 56 : 0, dw = 34;
+      var maxCols = Math.max(1, Math.floor((W - 2 * M - nameW - totW) / dw));
+      var rowH = 26, rowsPer = Math.max(3, Math.floor((H - 2 * M - 96 - 46 - 34) / rowH) - 1);
+      var colChunks = [], rowChunks = [], i;
+      for (i = 0; i < it.dates.length; i += maxCols){ colChunks.push(it.dates.slice(i, i + maxCols)); }
+      for (i = 0; i < it.studs.length; i += rowsPer){ rowChunks.push(it.studs.slice(i, i + rowsPer)); }
+      colChunks.forEach(function(cc, ci){ rowChunks.forEach(function(rc, ri){
+        pages.push({ it:it, dates:cc, studs:rc, W:W, H:H, M:M, nameW:nameW, totW:totW, dw:dw, rowH:rowH, colPart:ci + 1, colParts:colChunks.length, lastRows:ri === rowChunks.length - 1 });
+      }); });
+    });
+    return pages;
+  }
+  function attFmt(d){ return d.slice(8, 10) + '.' + d.slice(5, 7); }
+  function fitText(ctx, text, maxW, size, weight, fam){
+    var sz = size; ctx.font = weight + ' ' + sz + 'px ' + fam;
+    while (ctx.measureText(text).width > maxW && sz > 8){ sz -= 1; ctx.font = weight + ' ' + sz + 'px ' + fam; }
+  }
+  function drawAttendancePage(pg, no, total, o, fam){
+    var S = 2, c = document.createElement('canvas'); c.width = pg.W * S; c.height = pg.H * S;
+    var ctx = c.getContext('2d'); ctx.scale(S, S); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, pg.W, pg.H);
+    ctx.direction = 'rtl'; ctx.textBaseline = 'middle';
+    var right = pg.W - pg.M, left = pg.M, y = pg.M;
+    // title block
+    ctx.fillStyle = '#111'; ctx.textAlign = 'right'; fitText(ctx, 'רשימת נוכחות: ' + pg.it.g.name, pg.W - 2 * pg.M, 22, '700', fam); ctx.fillText('רשימת נוכחות: ' + pg.it.g.name, right, y + 16);
+    ctx.fillStyle = '#555'; ctx.font = '400 13px ' + fam;
+    ctx.fillText('תאריכים: ' + formatDateFull(o.from) + ' עד ' + formatDateFull(o.to) + '  ·  ' + pg.it.dates.length + ' אימונים  ·  ' + pg.it.studs.length + ' משתתפים' + (pg.colParts > 1 ? '  ·  חלק ' + pg.colPart + ' מתוך ' + pg.colParts + ' (תאריכים)' : ''), right, y + 44);
+    var sch = groupDays(pg.it.g).join(', '); if (sch){ ctx.fillText('ימי אימון: ' + sch, right, y + 64); }
+    y += 96;
+    // table geometry (right to left: names, dates, total)
+    var tableRight = right, nameX0 = tableRight - pg.nameW, dateX0 = nameX0, rowH = pg.rowH, thH = 46;
+    var nDates = pg.dates.length, tableLeft = dateX0 - nDates * pg.dw - pg.totW;
+    ctx.fillStyle = '#EDEBE6'; ctx.fillRect(tableLeft, y, tableRight - tableLeft, thH);
+    ctx.strokeStyle = '#999'; ctx.lineWidth = 1;
+    ctx.fillStyle = '#111'; ctx.textAlign = 'right'; ctx.font = '700 13px ' + fam; ctx.fillText('שם', tableRight - 10, y + thH / 2);
+    pg.dates.forEach(function(d, i){
+      var cx = dateX0 - i * pg.dw - pg.dw / 2; ctx.textAlign = 'center';
+      ctx.font = '400 11px ' + fam; ctx.fillStyle = '#555'; ctx.fillText(HEB_WD[new Date(d + 'T12:00:00').getDay()], cx, y + 14);
+      ctx.font = '700 12px ' + fam; ctx.fillStyle = '#111'; ctx.fillText(attFmt(d), cx, y + 32);
+    });
+    if (pg.totW){ ctx.textAlign = 'center'; ctx.font = '700 12px ' + fam; ctx.fillStyle = '#111'; ctx.fillText('סה״כ', tableLeft + pg.totW / 2, y + thH / 2); }
+    var by = y + thH, nRows = pg.studs.length + (pg.lastRows && o.colTotals ? 1 : 0);
+    pg.studs.forEach(function(st, ri){
+      var ry = by + ri * rowH; if (ri % 2 === 1){ ctx.fillStyle = '#F7F5F0'; ctx.fillRect(tableLeft, ry, tableRight - tableLeft, rowH); }
+      ctx.fillStyle = '#111'; ctx.textAlign = 'right'; fitText(ctx, st.name, pg.nameW - 16, 13, '400', fam); ctx.fillText(st.name, tableRight - 10, ry + rowH / 2);
+      var att = st.attendance || [];
+      pg.dates.forEach(function(d, i){                      // only the dates that are on THIS page
+        if (att.indexOf(d) === -1) return;
+        var cx = dateX0 - i * pg.dw - pg.dw / 2, cy = ry + rowH / 2;
+        ctx.strokeStyle = '#111'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(cx - 6, cy); ctx.lineTo(cx - 2, cy + 5); ctx.lineTo(cx + 7, cy - 6); ctx.stroke();
+      });
+      if (pg.totW){
+        var all = (st.attendance || []).filter(function(d){ return d >= o.from && d <= o.to && (pg.it.g.sessions || []).indexOf(d) !== -1; }).length;
+        ctx.fillStyle = '#111'; ctx.textAlign = 'center'; ctx.font = '700 13px ' + fam; ctx.fillText(all + '/' + pg.it.dates.length, tableLeft + pg.totW / 2, ry + rowH / 2);
+      }
+    });
+    if (pg.lastRows && o.colTotals){
+      var ty = by + pg.studs.length * rowH; ctx.fillStyle = '#EDEBE6'; ctx.fillRect(tableLeft, ty, tableRight - tableLeft, rowH);
+      ctx.fillStyle = '#111'; ctx.textAlign = 'right'; ctx.font = '700 12px ' + fam; ctx.fillText('סה״כ נוכחים', tableRight - 10, ty + rowH / 2);
+      pg.dates.forEach(function(d, i){
+        var n = pg.it.studs.filter(function(st){ return (st.attendance || []).indexOf(d) !== -1; }).length;
+        ctx.textAlign = 'center'; ctx.fillText(String(n), dateX0 - i * pg.dw - pg.dw / 2, ty + rowH / 2);
+      });
+    }
+    // grid
+    var gridBottom = by + nRows * rowH; ctx.strokeStyle = '#B5B2AB'; ctx.lineWidth = 0.8;
+    ctx.strokeRect(tableLeft, y, tableRight - tableLeft, gridBottom - y);
+    ctx.beginPath(); ctx.moveTo(tableLeft, by); ctx.lineTo(tableRight, by);
+    for (var r = 1; r <= nRows; r++){ ctx.moveTo(tableLeft, by + r * rowH); ctx.lineTo(tableRight, by + r * rowH); }
+    ctx.moveTo(nameX0, y); ctx.lineTo(nameX0, gridBottom);
+    for (var k = 1; k <= nDates; k++){ var vx = dateX0 - k * pg.dw; ctx.moveTo(vx, y); ctx.lineTo(vx, gridBottom); }
+    ctx.stroke();
+    // footer
+    ctx.fillStyle = '#777'; ctx.font = '400 11px ' + fam; ctx.textAlign = 'right'; ctx.fillText('הופק בטטאמי ב-' + formatDateFull(todayISO()), right, pg.H - pg.M + 4);
+    ctx.textAlign = 'left'; ctx.fillText('עמוד ' + no + ' מתוך ' + total, left, pg.H - pg.M + 4);
+    return c;
+  }
+  async function pdfDeflate(u8){
+    var cs = new CompressionStream('deflate'), w = cs.writable.getWriter(); w.write(u8); w.close();
+    return new Uint8Array(await new Response(cs.readable).arrayBuffer());
+  }
+  async function attPdfBytes(canvases, sizes, title){
+    var enc = new TextEncoder(), chunks = [], offsets = [], len = 0;
+    function put(x){ var b = typeof x === 'string' ? enc.encode(x) : x; chunks.push(b); len += b.length; }
+    function obj(n, body){ offsets[n] = len; put(n + ' 0 obj\n'); put(body); put('\nendobj\n'); }
+    function utf16hex(str){ var h = 'FEFF'; for (var i = 0; i < str.length; i++){ h += ('0000' + str.charCodeAt(i).toString(16)).slice(-4).toUpperCase(); } return '<' + h + '>'; }
+    put('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+    var N = canvases.length, kids = [], imgs = [];
+    for (var i = 0; i < N; i++){
+      var cv = canvases[i], w = cv.width, h = cv.height, data, filter;
+      if (typeof CompressionStream !== 'undefined'){
+        var rgba = cv.getContext('2d').getImageData(0, 0, w, h).data, rgb = new Uint8Array(w * h * 3), j = 0, q = 0;
+        for (; j < rgba.length; j += 4){ rgb[q++] = rgba[j]; rgb[q++] = rgba[j + 1]; rgb[q++] = rgba[j + 2]; }
+        data = await pdfDeflate(rgb); filter = '/FlateDecode';
+      } else {
+        var b64 = cv.toDataURL('image/jpeg', 0.95).split(',')[1], bin = atob(b64); data = new Uint8Array(bin.length); for (var z = 0; z < bin.length; z++){ data[z] = bin.charCodeAt(z); } filter = '/DCTDecode';
+      }
+      imgs.push({ w:w, h:h, data:data, filter:filter });
+    }
+    // objects: 1 catalog, 2 pages, 3 info, then per page: page, content, image
+    obj(1, '<< /Type /Catalog /Pages 2 0 R >>');
+    for (var p2 = 0; p2 < N; p2++){ kids.push((4 + p2 * 3) + ' 0 R'); }
+    obj(2, '<< /Type /Pages /Kids [' + kids.join(' ') + '] /Count ' + N + ' >>');
+    obj(3, '<< /Title ' + utf16hex(title) + ' /Producer (Tatami) >>');
+    for (var k = 0; k < N; k++){
+      var pw = (sizes[k].w / 96 * 72).toFixed(2), ph = (sizes[k].h / 96 * 72).toFixed(2), base = 4 + k * 3, im = imgs[k];
+      obj(base, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ' + pw + ' ' + ph + '] /Resources << /XObject << /Im0 ' + (base + 2) + ' 0 R >> >> /Contents ' + (base + 1) + ' 0 R >>');
+      var cs2 = 'q ' + pw + ' 0 0 ' + ph + ' 0 0 cm /Im0 Do Q';
+      obj(base + 1, '<< /Length ' + cs2.length + ' >>\nstream\n' + cs2 + '\nendstream');
+      offsets[base + 2] = len; put((base + 2) + ' 0 obj\n<< /Type /XObject /Subtype /Image /Width ' + im.w + ' /Height ' + im.h + ' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter ' + im.filter + ' /Length ' + im.data.length + ' >>\nstream\n'); put(im.data); put('\nendstream\nendobj\n');
+    }
+    var xref = len, total = 4 + N * 3; put('xref\n0 ' + total + '\n0000000000 65535 f \n');
+    for (var n = 1; n < total; n++){ put(('0000000000' + offsets[n]).slice(-10) + ' 00000 n \n'); }
+    put('trailer\n<< /Size ' + total + ' /Root 1 0 R /Info 3 0 R >>\nstartxref\n' + xref + '\n%%EOF');
+    var all = new Uint8Array(len), pos = 0; chunks.forEach(function(ch){ all.set(ch, pos); pos += ch.length; }); return all;
+  }
+  async function makeAttendancePdf(o){
+    var col = attPdfCollect(o); if (!col.items.length){ return { error:'אין מה להדפיס: ' + (col.skipped.length ? col.skipped.join(', ') : 'לא נבחרו קבוצות') }; }
+    var plan = attPdfPlan(col.items, o), fam = getComputedStyle(document.body).fontFamily || 'Arial, sans-serif';
+    try{ await document.fonts.load('700 16px ' + fam); await document.fonts.load('400 13px ' + fam); }catch(e){}
+    var canvases = plan.map(function(pg, i){ return drawAttendancePage(pg, i + 1, plan.length, o, fam); });
+    var bytes = await attPdfBytes(canvases, plan.map(function(pg){ return { w:pg.W, h:pg.H }; }), 'רשימת נוכחות ' + o.from + ' עד ' + o.to);
+    return { bytes:bytes, pages:plan.length, skipped:col.skipped, filename:'attendance_' + o.from + '_to_' + o.to + '.pdf' };
+  }
+  function downloadBytes(bytes, filename, mime){
+    var blob = new Blob([bytes], { type:mime }), url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }
+
   function renderGroup(group){
     var wrap = el('div',{});
 
@@ -3662,6 +3815,7 @@
           if (!(group.sessions || []).length){ showToast('אין עדיין מפגשים בקבוצה. הוסף מפגש וסמן נוכחות כדי ליצור הודעה.'); return; }
           openModal({type:'missingMsg', groupId:group.id});
         }},['📣 הודעה על חסרים']),
+        el('button',{class:'btn-ghost attpdf-open', title:'קובץ PDF של רשימת הנוכחות בתאריכים שתבחר', onclick:function(){ openModal({type:'attPdf', groupId:group.id}); }},['📄 PDF נוכחות']),
         el('button',{class:'btn-ghost', onclick:function(){ openModal({type:'addSession', groupId:group.id}); }},['הוספת מפגש']),
         el('button',{class:'btn-primary', onclick:function(){ openModal({type:'addStudent', groupId:group.id, status:'follow'}); }},['הוספת מתאמן'])
       ])
@@ -8678,6 +8832,64 @@
       rvKids.push(el('div',{class:'modal-actions'},[ el('button',{class:'btn-ghost', onclick:closeModal},['סגירה']) ]));
       content = el('div',{class:'modal'}, rvKids);
     }
+    else if (m.type === 'attPdf'){
+      if (!m.init){
+        var tdy = todayISO(), first = tdy.slice(0, 8) + '01';
+        m.init = true; m.from = first; m.to = tdy; m.totals = true; m.colTotals = true; m.orient = 'auto'; m.busy = false; m.error = '';
+        m.groups = {}; state.groups.forEach(function(g){ m.groups[g.id] = m.groupId ? g.id === m.groupId : (g.sessions || []).length > 0; });
+        m.statuses = {}; STATUSES.forEach(function(st){ m.statuses[st.key] = (st.key === 'joined' || st.key === 'trial'); });
+      }
+      var col = attPdfCollect(m), plan = attPdfPlan(col.items, m);
+      var setRange = function(a, b){ m.from = a; m.to = b; render(); };
+      var iso = function(d){ return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); };
+      var now = new Date(), firstThis = new Date(now.getFullYear(), now.getMonth(), 1), firstPrev = new Date(now.getFullYear(), now.getMonth() - 1, 1), lastPrev = new Date(now.getFullYear(), now.getMonth(), 0), ago30 = new Date(now.getTime() - 29 * 864e5);
+      var allDates = []; state.groups.forEach(function(g){ if (m.groups[g.id]){ allDates = allDates.concat(g.sessions || []); } }); allDates.sort();
+      var fromIn = el('input',{type:'date', class:'attpdf-from', value:m.from}), toIn = el('input',{type:'date', class:'attpdf-to', value:m.to});
+      fromIn.addEventListener('change', function(e){ m.from = e.target.value; render(); }); toIn.addEventListener('change', function(e){ m.to = e.target.value; render(); });
+      var gChecks = state.groups.slice().sort(function(a, b){ return a.name.localeCompare(b.name, 'he'); }).map(function(g){
+        var cb = el('input',{type:'checkbox', 'data-gid':g.id}); cb.checked = !!m.groups[g.id]; cb.addEventListener('change', function(e){ m.groups[g.id] = e.target.checked; render(); });
+        return el('label',{class:'day-check-label'},[cb, g.name + ' (' + (g.sessions || []).filter(function(d){ return d >= m.from && d <= m.to; }).length + ' אימונים)']);
+      });
+      var stChecks = STATUSES.map(function(st){ var cb = el('input',{type:'checkbox'}); cb.checked = !!m.statuses[st.key]; cb.addEventListener('change', function(e){ m.statuses[st.key] = e.target.checked; render(); }); return el('label',{class:'day-check-label'},[cb, st.label]); });
+      var orientSel = fSelect([{key:'auto', label:'אוטומטי (לרוחב כשיש הרבה תאריכים)'}, {key:'portrait', label:'לאורך'}, {key:'landscape', label:'לרוחב'}], m.orient, function(v){ m.orient = v; render(); });
+      var summary = !col.items.length ? 'אין מה להדפיס עם הבחירה הנוכחית.' : 'ייווצרו ' + plan.length + ' עמודים: ' + col.items.length + ' קבוצות, ' + col.items.reduce(function(n, it){ return n + it.dates.length; }, 0) + ' תאריכי אימון בסך הכל.';
+      content = el('div',{class:'modal attpdf-modal', style:'max-width:640px;'},[
+        el('h2',{},['📄 רשימת נוכחות (PDF)']),
+        el('p',{class:'fhint',style:'margin:0 0 10px;line-height:1.6;'},['קובץ PDF עם שמות התלמידים בשורות והתאריכים בעמודות, ו-✓ במי שהגיע. בוחרים את טווח התאריכים ואת הקבוצות.']),
+        el('div',{class:'attpdf-dates'},[ fField('מתאריך', fromIn), fField('עד תאריך', toIn) ]),
+        el('div',{class:'attpdf-presets'},[
+          el('button',{class:'btn-ghost', onclick:function(){ setRange(iso(firstThis), iso(now)); }},['החודש']),
+          el('button',{class:'btn-ghost', onclick:function(){ setRange(iso(firstPrev), iso(lastPrev)); }},['חודש שעבר']),
+          el('button',{class:'btn-ghost', onclick:function(){ setRange(iso(ago30), iso(now)); }},['30 הימים האחרונים']),
+          el('button',{class:'btn-ghost', onclick:function(){ if (allDates.length){ setRange(allDates[0], allDates[allDates.length - 1]); } else { showToast('אין עדיין מפגשים בקבוצות שנבחרו.'); } }},['כל המפגשים'])
+        ]),
+        el('div',{class:'field'},[ el('label',{},['קבוצות']), el('div',{class:'attpdf-quick'},[
+          el('button',{class:'btn-text', onclick:function(){ state.groups.forEach(function(g){ m.groups[g.id] = true; }); render(); }},['בחר הכל']),
+          el('button',{class:'btn-text', onclick:function(){ state.groups.forEach(function(g){ m.groups[g.id] = false; }); render(); }},['נקה הכל'])
+        ]), el('div',{class:'attpdf-groups'}, gChecks) ]),
+        el('div',{class:'field'},[ el('label',{},['מי לכלול (לפי סטטוס)']), el('div',{class:'attpdf-statuses'}, stChecks) ]),
+        fCheck('עמודת סה״כ נוכחות לכל תלמיד', m.totals, function(v){ m.totals = v; render(); }),
+        fCheck('שורת סה״כ נוכחים בכל אימון', m.colTotals, function(v){ m.colTotals = v; render(); }),
+        fField('כיוון הדף', orientSel),
+        el('div',{class:'attpdf-summary'},[summary]),
+        col.skipped.length ? el('div',{class:'fhint attpdf-skipped'},['לא ייכללו: ' + col.skipped.join(' · ')]) : null,
+        m.error ? el('div',{class:'error-text'},[m.error]) : null,
+        el('div',{class:'modal-actions'},[
+          el('button',{class:'btn-ghost', onclick:closeModal},['סגירה']),
+          el('button',{class:'btn-primary attpdf-go', onclick:async function(){
+            if (!m.from || !m.to){ m.error = 'נא לבחור תאריך התחלה וסיום.'; render(); return; }
+            if (m.from > m.to){ m.error = 'תאריך ההתחלה אחרי תאריך הסיום.'; render(); return; }
+            if (!col.items.length){ m.error = 'אין מה להדפיס: ' + (col.skipped.length ? col.skipped.join(', ') : 'לא נבחרו קבוצות') + '.'; render(); return; }
+            m.error = ''; m.busy = true; render();
+            try{
+              var res = await makeAttendancePdf(m);
+              if (res.error){ m.error = res.error; m.busy = false; render(); return; }
+              downloadBytes(res.bytes, res.filename, 'application/pdf'); closeModal(); showToast('נוצר קובץ PDF עם ' + res.pages + ' עמודים.');
+            }catch(err){ m.error = 'יצירת הקובץ נכשלה: ' + (err && err.message ? err.message : err); m.busy = false; render(); }
+          }},[m.busy ? 'יוצר קובץ…' : '⬇ הורד PDF'])
+        ].filter(Boolean))
+      ].filter(Boolean));
+    }
     else if (m.type === 'exportExcel'){
       var EXPORT_FIELDS = [
         {key:'name', label:'שם', always:true},
@@ -9035,4 +9247,3 @@
 </script>
 </body>
 </html>
-  
