@@ -992,6 +992,11 @@
     border:1.5px solid var(--line); background:var(--paper); padding:0;
   }
   .shirt-dot.received{ background:#4B7F52; border-color:#4B7F52; }
+  .shirt-cell.needs-shirt .shirt-dot:not(.received){ background:#D32F2F; border-color:#D32F2F; }
+  .merch-assign .ma-cand{ display:flex; align-items:center; gap:8px; padding:7px 10px; border:1.5px solid var(--line); border-radius:9px; margin:5px 0; cursor:pointer; background:#fff; }
+  .merch-assign .ma-cand.on{ border-color:var(--brand,#2d5a3d); background:#F2F9F3; }
+  .merch-assign .ma-cand small{ color:var(--muted); }
+  .merch-assign .ma-items{ background:#FFF8E1; border:1.5px solid #F0DCA0; border-radius:10px; padding:8px 12px; margin:8px 0; font-size:13.5px; }
   .shirt-dot:hover{ border-color:var(--muted); }
 
   .status-select{
@@ -1123,7 +1128,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-14 20:00';
+  var APP_VERSION = '2026-11-14 21:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -4779,9 +4784,34 @@
   // ---------------- shirts to bring this week, by day ----------------
   var SHIRT_ORDER = ['4','6','8','10','12','14','16','XS','S','M','L','XL','XXL'];
   function shirtKey(s){ return String(s.shirtSize || '').trim().toUpperCase(); }
+  // "6" = one shirt size 6; "6X2" = two of size 6; "6, 8X2" = one 6 and two 8
+  function shirtParts(text){
+    var out = [];
+    String(text || '').toUpperCase().split(/[,،;+]+/).forEach(function(tok){
+      tok = tok.trim(); if (!tok) return;
+      var m = tok.match(/^(.+?)\s*[X×*]\s*(\d+)$/);
+      if (m && m[1].trim()){ out.push({ size:m[1].trim(), n:Math.max(1, parseInt(m[2], 10) || 1) }); }
+      else { out.push({ size:tok, n:1 }); }
+    });
+    return out;
+  }
+  function shirtCountOf(s){ return shirtParts(s.shirtSize).reduce(function(n, p){ return n + p.n; }, 0) || 1; }
+  function shirtCount(list){ return list.reduce(function(n, s){ return n + shirtCountOf(s); }, 0); }
+  function shirtTextFromParts(parts){
+    var sum = {}, order = [];
+    parts.forEach(function(p){ if (!(p.size in sum)){ sum[p.size] = 0; order.push(p.size); } sum[p.size] += p.n; });
+    order.sort(function(a, b){ return shirtRank(a) - shirtRank(b) || a.localeCompare(b); });
+    return order.map(function(k){ return k + (sum[k] > 1 ? 'X' + sum[k] : ''); }).join(', ');
+  }
+  function mergeShirtTexts(a, b){ return shirtTextFromParts(shirtParts(a).concat(shirtParts(b))); }
+  function merchShirtText(items){
+    var parts = [];
+    (items || []).forEach(function(x){ var sz = String(x.size || '').trim(); if (sz){ parts.push({ size:sz.toUpperCase(), n:Math.max(1, parseInt(x.qty, 10) || 1) }); } });
+    return shirtTextFromParts(parts);
+  }
   function shirtRank(k){ var i = SHIRT_ORDER.indexOf(k); return i === -1 ? 999 : i; }
   function sizeSummary(list){
-    var c = {}; list.forEach(function(s){ var k = shirtKey(s); c[k] = (c[k] || 0) + 1; });
+    var c = {}; list.forEach(function(s){ shirtParts(s.shirtSize).forEach(function(p){ c[p.size] = (c[p.size] || 0) + p.n; }); });
     return Object.keys(c).sort(function(a, b){ return shirtRank(a) - shirtRank(b) || a.localeCompare(b); }).map(function(k){ return c[k] + '×' + k; }).join('  ·  ');
   }
   function shirtsNeeded(){
@@ -4797,7 +4827,7 @@
       wrap.appendChild(el('p', { class:'lesson-empty', style:'text-align:center;padding:30px;' }, ['🎉 אין כרגע חולצות להביא.']));
       return wrap;
     }
-    wrap.appendChild(el('div', { class:'shirt-total' }, [ el('b', {}, [list.length + (list.length === 1 ? ' חולצה' : ' חולצות')]), el('span', {}, ['  —  ' + sizeSummary(list)]) ]));
+    wrap.appendChild(el('div', { class:'shirt-total' }, [ el('b', {}, [shirtCount(list) + (shirtCount(list) === 1 ? ' חולצה' : ' חולצות')]), el('span', {}, ['  —  ' + sizeSummary(list)]) ]));
     var NODAY = '__noday', NOGROUP = '__nogroup', byDay = {};
     list.forEach(function(s){
       var g = state.groups.find(function(x){ return x.id === s.groupId; });
@@ -4809,12 +4839,12 @@
     order.forEach(function(key){
       var kids = byDay[key], title = key === NODAY ? 'ללא יום מוגדר' : (key === NOGROUP ? 'ללא קבוצה' : 'יום ' + key);
       var box = el('div', { class:'shirt-day' + (key === today ? ' today' : '') }, [
-        el('div', { class:'shirt-day-head' }, [ el('h3', {}, [title, key === today ? el('span', { class:'shirt-today' }, ['היום']) : null]), el('span', { class:'shirt-day-n' }, [kids.length + ' חולצות']), el('span', { class:'shirt-day-sum' }, [sizeSummary(kids)]) ])
+        el('div', { class:'shirt-day-head' }, [ el('h3', {}, [title, key === today ? el('span', { class:'shirt-today' }, ['היום']) : null]), el('span', { class:'shirt-day-n' }, [shirtCount(kids) + ' חולצות']), el('span', { class:'shirt-day-sum' }, [sizeSummary(kids)]) ])
       ]);
       var groups = [], byGroup = {};
       kids.forEach(function(s){ var g = state.groups.find(function(x){ return x.id === s.groupId; }), gk = g ? g.id : '__none'; if (!byGroup[gk]){ byGroup[gk] = { name:g ? g.name : '(ללא קבוצה)', kids:[] }; groups.push(byGroup[gk]); } byGroup[gk].kids.push(s); });
       groups.forEach(function(gr){
-        gr.kids.sort(function(a, b){ return shirtRank(shirtKey(a)) - shirtRank(shirtKey(b)) || a.name.localeCompare(b.name, 'he'); });
+        gr.kids.sort(function(a, b){ return shirtRank((shirtParts(a.shirtSize)[0]||{size:''}).size) - shirtRank((shirtParts(b.shirtSize)[0]||{size:''}).size) || a.name.localeCompare(b.name, 'he'); });
         box.appendChild(el('div', { class:'shirt-group' }, [
           el('div', { class:'shirt-group-name' }, [gr.name + ' ', el('small', {}, ['(' + gr.kids.length + ')'])]),
           el('div', { class:'table-wrap' }, [ el('table', {}, [ el('tbody', {}, gr.kids.map(function(s){
@@ -7429,7 +7459,7 @@
         el('td', { class:'oq-items' }, items.length ? items.map(function(x){ return el('div', {}, [x.name + (x.size ? ' — ' + x.size : '')]); }) : [it.route || '—']),
         el('td', {}, [ el('span', { class:'lesson-chip' + (it.status === 'new' ? '' : ' free') }, [it.status === 'new' ? 'ממתינה' : (it.status === 'skipped' ? 'בוטלה' : 'טופלה')]) ]),
         el('td', { style:'white-space:nowrap;' }, it.status === 'new'
-          ? [ el('button', { class:'btn-text', onclick:function(){ after('handled', 'טופל'); } }, ['✓ טופל']), el('button', { class:'btn-text', style:'color:#B00020;', onclick:function(){ openConfirm('לבטל את ההזמנה של ' + (it.child || 'הילד/ה') + '? היא תישאר בגיליון.', function(){ after('skipped', 'בוטל'); }, 'ביטול ההזמנה'); } }, ['✕ בטל']) ]
+          ? [ el('button', { class:'btn-text', onclick:function(){ openModal({type:'merchAssign', item:it}); } }, ['✓ טופל']), el('button', { class:'btn-text', style:'color:#B00020;', onclick:function(){ openConfirm('לבטל את ההזמנה של ' + (it.child || 'הילד/ה') + '? היא תישאר בגיליון.', function(){ after('skipped', 'בוטל'); }, 'ביטול ההזמנה'); } }, ['✕ בטל']) ]
           : [ el('button', { class:'btn-text', onclick:function(){ after('new', ''); } }, ['↩ החזר']) ])
       ]));
     });
@@ -8923,6 +8953,67 @@
               downloadBytes(res.bytes, res.filename, 'application/pdf'); closeModal(); showToast('נוצר קובץ PDF עם ' + res.pages + ' עמודים.');
             }catch(err){ m.error = 'יצירת הקובץ נכשלה: ' + (err && err.message ? err.message : err); m.busy = false; render(); }
           }},[m.busy ? 'יוצר קובץ…' : '⬇ הורד PDF'])
+        ].filter(Boolean))
+      ].filter(Boolean));
+    }
+    else if (m.type === 'merchAssign'){
+      var mit = m.item, mfx = (mit.data && mit.data.fixed) || {}, mitems = mfx.items || [];
+      if (!m.init){
+        m.init = true; m.error = ''; m.busy = false; m.q = '';
+        m.child = mfx.childName || mit.child || ''; m.phone = mfx.phone || mit.phone || '';
+        m.text = merchShirtText(mitems);
+        var scored = state.students.filter(function(x){ return !x.trashed && !x.archived; }).map(function(x){ return { s:x, score:nameSimilarity(m.child, x.name, m.phone, x.phone) }; }).sort(function(a, b){ return b.score - a.score; });
+        m.cands = scored.filter(function(c){ return c.score >= 0.5; }).slice(0, 5).map(function(c){ return c.s.id; });
+        m.choice = (scored.length && scored[0].score >= 0.65) ? scored[0].s.id : null;
+        m.mode = 'append';
+      }
+      var mstud = m.choice && m.choice !== 'none' ? state.students.find(function(x){ return x.id === m.choice; }) : null;
+      var gname = function(x){ var g = state.groups.find(function(y){ return y.id === x.groupId; }); return g ? g.name : 'ללא קבוצה'; };
+      var candBox = el('div', {});
+      m.cands.forEach(function(id){
+        var x = state.students.find(function(y){ return y.id === id; }); if (!x) return;
+        var rb = el('input', { type:'radio', name:'ma-choice' }); rb.checked = m.choice === id;
+        var lab = el('label', { class:'ma-cand' + (m.choice === id ? ' on' : '') }, [rb, el('span', {}, [x.name + ' ', el('small', {}, ['· ' + gname(x) + (x.shirtSize ? ' · מידה קיימת: ' + x.shirtSize : '')])])]);
+        rb.addEventListener('change', function(){ m.choice = id; render(); });
+        candBox.appendChild(lab);
+      });
+      if (!m.cands.length){ candBox.appendChild(el('div', { class:'fhint' }, ['לא נמצא ילד עם שם דומה. אפשר לבחור ידנית מהרשימה.'])); }
+      var others = state.students.filter(function(x){ return !x.trashed && !x.archived; }).sort(function(a, b){ return a.name.localeCompare(b.name, 'he'); });
+      var pick = el('select', {}, [el('option', { value:'' }, ['— בחירה ידנית של ילד אחר —'])].concat(others.map(function(x){ var o = el('option', { value:x.id }, [x.name + ' (' + gname(x) + ')']); if (m.choice === x.id && m.cands.indexOf(x.id) === -1){ o.setAttribute('selected', 'selected'); } return o; })));
+      pick.addEventListener('change', function(e){ if (e.target.value){ m.choice = e.target.value; render(); } });
+      var noneRb = el('input', { type:'radio', name:'ma-choice' }); noneRb.checked = m.choice === 'none'; noneRb.addEventListener('change', function(){ m.choice = 'none'; render(); });
+      var textIn = el('input', { type:'text', value:m.text, placeholder:'למשל 6 או 6X2' });
+      textIn.addEventListener('input', function(e){ m.text = e.target.value; });
+      var conflict = mstud && mstud.shirtSize && !mstud.shirtReceived && m.text.trim();
+      var modeSel = conflict ? fSelect([{ key:'append', label:'להוסיף למה שכבר רשום (' + mstud.shirtSize + ')' }, { key:'replace', label:'להחליף את מה שרשום (' + mstud.shirtSize + ')' }], m.mode, function(v){ m.mode = v; render(); }) : null;
+      content = el('div', { class:'modal merch-assign ft-modal', style:'max-width:560px;' }, [
+        el('h2', {}, ['סימון ההזמנה כטופלה']),
+        el('div', { class:'ma-items' }, [ el('b', {}, [m.child || 'ללא שם']), ': ' + (mitems.length ? mitems.map(function(x){ return x.name + (x.size ? ' ' + x.size : '') + ((parseInt(x.qty, 10) || 1) > 1 ? ' ×' + x.qty : ''); }).join(' · ') : 'אין פריטים') ]),
+        el('div', { class:'field' }, [ el('label', {}, ['איזה ילד זה בטטאמי?']), candBox, el('label', { class:'ma-cand' + (m.choice === 'none' ? ' on' : '') }, [noneRb, el('span', {}, ['לא לרשום מידה אצל אף ילד (רק לסמן כטופל)'])]), pick ]),
+        el('div', { class:'field' }, [ el('label', {}, ['מה לרשום בעמודת החולצה (אפשר לערוך)']), textIn, el('div', { class:'fhint' }, ['חולצה אחת: 6 · שתי חולצות באותה מידה: 6X2 · מידות שונות: 6, 8']) ]),
+        modeSel ? el('div', { class:'field' }, [ el('label', {}, ['לילד כבר יש מידה שעוד לא נמסרה']), modeSel ]) : null,
+        m.error ? el('div', { class:'error-text' }, [m.error]) : null,
+        el('div', { class:'modal-actions' }, [
+          el('button', { class:'btn-ghost', onclick:closeModal }, ['ביטול']),
+          el('button', { class:'btn-primary', onclick:function(){
+            if (!m.choice){ m.error = 'בחר את הילד, או "לא לרשום מידה אצל אף ילד".'; render(); return; }
+            var note = 'טופל';
+            if (mstud){
+              var txt = (m.text || '').trim();
+              if (!txt){ m.error = 'כתוב מידה לרישום, או בחר "לא לרשום מידה".'; render(); return; }
+              var cur = (!mstud.shirtReceived && mstud.shirtSize) ? mstud.shirtSize : '';
+              mstud.shirtSize = (cur && m.mode === 'append') ? mergeShirtTexts(cur, txt) : shirtTextFromParts(shirtParts(txt));
+              mstud.shirtReceived = false;
+              note = 'טופל · נרשם אצל ' + mstud.name + ': ' + mstud.shirtSize;
+            }
+            var itemRef = m.item;
+            closeModal(); if (mstud){ scheduleSave(); }
+            (async function(){
+              var ok = await markHandled(itemRef, 'handled', note);
+              showToast(ok ? (mstud ? 'ההזמנה טופלה, ונרשמה מידה ' + mstud.shirtSize + ' אצל ' + mstud.name + '.' : 'ההזמנה סומנה כטופלה.') : 'לא הצלחתי לעדכן את ההזמנה בגיליון — נסה שוב.');
+              loadMerch(true); loadInbox(true);
+            })();
+          } }, ['✓ אישור וסימון כטופל'])
         ].filter(Boolean))
       ].filter(Boolean));
     }
