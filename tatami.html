@@ -815,6 +815,8 @@
   td.drag-cell:active{ cursor:grabbing; }
   tbody tr.dragging{ opacity:0.35; }
   td.name-cell{ font-weight:600; min-width:110px; max-width:150px; white-space:normal; padding-inline-start:10px; padding-inline-end:12px; }
+  .pending-out-note{ font-weight:700; font-size:11px; color:#C62828; margin-top:2px; white-space:nowrap; }
+  .pending-out-note button{ background:none; border:none; color:#C62828; text-decoration:underline; font-size:10.5px; cursor:pointer; padding:0 4px; font-family:inherit; }
   .name-date-note{ font-weight:400; font-size:10.5px; color:var(--muted); margin-top:2px; white-space:nowrap; }
   td.name-cell.name-female{ color:#B03A9B; }
   .note-field-wrap{ display:flex; flex-direction:column; gap:2px; }
@@ -1121,7 +1123,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-14 10:00';
+  var APP_VERSION = '2026-11-14 20:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1334,6 +1336,31 @@
   }
   function uid(p){ return p+'_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8); }
   function todayISO(){ return new Date().toISOString().slice(0,10); }
+  var PENDING_OUT_DAYS = 14;
+  function addDaysISO(iso, n){ var d = new Date(iso+'T00:00:00Z'); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10); }
+  function daysUntilISO(iso){ return Math.round((new Date(iso+'T00:00:00Z') - new Date(todayISO()+'T00:00:00Z')) / 86400000); }
+  function cancelPendingOut(id){
+    var s = state.students.find(function(x){return x.id===id;}); if (!s) return;
+    s.pendingOutDate = null; s.pendingOutRequested = null; scheduleSave();
+  }
+  function sweepPendingOut(){
+    var changed = false;
+    (state.students||[]).forEach(function(s){
+      if (s.pendingOutDate && s.status === 'joined' && daysUntilISO(s.pendingOutDate) <= 0){
+        s.status = 'out'; s.outDate = s.pendingOutDate; s.pendingOutDate = null; s.pendingOutRequested = null; changed = true;
+      }
+    });
+    if (changed){ scheduleSave(); }
+  }
+  function pendingOutNote(s){
+    if (!s.pendingOutDate || s.status !== 'joined') return null;
+    var d = daysUntilISO(s.pendingOutDate);
+    var txt = d <= 0 ? 'יוצא מהרשימה היום' : (d === 1 ? 'יוצא מהרשימה מחר (עוד יום)' : 'יוצא מהרשימה בעוד '+d+' ימים');
+    return el('div',{class:'pending-out-note'},[ '⏳ ביטל הרשמה · '+txt,
+      el('button',{title:'להשאיר אותו כמנוי', onclick:function(){ cancelPendingOut(s.id); }},['ביטול']),
+      el('button',{title:'להעביר עכשיו ללא רלוונטי', onclick:function(){ updateStudent(s.id, {status:'out', __now:true}); }},['העבר עכשיו'])
+    ]);
+  }
   // "17.9 14:32" — date and time a note was last changed. Older notes that
   // were saved before times were recorded show the date only.
   function stampOf(ms){
@@ -2758,6 +2785,13 @@
     if (!s) return;
     var becomingJoined = patch.status === 'joined' && s.status !== 'joined';
     var becomingOut = patch.status === 'out' && s.status !== 'out';
+    // A paying member who is marked "not relevant / cancelled" stays a member for two more weeks (grace period), then moves automatically.
+    if (becomingOut && s.status === 'joined' && !patch.__now){
+      if (!s.pendingOutDate){ s.pendingOutDate = addDaysISO(todayISO(), PENDING_OUT_DAYS); s.pendingOutRequested = todayISO(); }
+      delete patch.status; becomingOut = false;
+    }
+    delete patch.__now;
+    if (patch.status && patch.status !== 'joined'){ s.pendingOutDate = null; s.pendingOutRequested = null; }
     var noteChanged = patch.note !== undefined && patch.note !== s.note;
     var advNoteChanged = patch.advNote !== undefined && patch.advNote !== (s.advNote || '');
     Object.assign(s, patch);
@@ -2766,7 +2800,7 @@
       if (!s.joinedDate){ s.joinedDate = todayISO(); } // preserve original join date across rejoins
       s.outDate = null;
     }
-    if (becomingOut){ s.outDate = todayISO(); }
+    if (becomingOut){ s.outDate = s.pendingOutDate || todayISO(); s.pendingOutDate = null; s.pendingOutRequested = null; }
     if (advNoteChanged){ s.advNoteUpdatedAt = s.advNote ? Date.now() : null; }
     if (noteChanged){
       s.noteUpdatedDate = s.note ? todayISO() : null; // clear the date if the note was emptied out
@@ -4016,7 +4050,9 @@
       if (s.phone){ var waL = waLinkFor(s.phone); nameCellContent.push(waL ? el('a',{class:'name-phone', href:waL, target:'_blank', rel:'noopener', title:'פתח וואטסאפ'},[s.phone]) : el('span',{class:'name-phone'},[s.phone])); }
       if (s.status === 'joined' && s.joinedDate){
         nameCellContent.push(el('div',{class:'name-date-note'},['הצטרף: '+shortDate(s.joinedDate)]));
-      } else if (s.status === 'out' && s.outDate){
+      }
+      var pon = pendingOutNote(s); if (pon){ nameCellContent.push(pon); }
+      if (s.status === 'joined'){ /* nothing more */ } else if (s.status === 'out' && s.outDate){
         nameCellContent.push(el('div',{class:'name-date-note'},['הפך ללא רלוונטי: '+shortDate(s.outDate)]));
       }
       var cells = [
@@ -9239,10 +9275,10 @@
   }
 
   window.addEventListener('focus', function(){ maybeCheckInbox(); });
-  document.addEventListener('visibilitychange', function(){ if (!document.hidden) maybeCheckInbox(); });
-  setInterval(function(){ if (!document.hidden) maybeCheckInbox(); }, 150000);   // every ~2.5 minutes while the app is open
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden){ maybeCheckInbox(); sweepPendingOut(); } });
+  setInterval(function(){ if (!document.hidden){ maybeCheckInbox(); sweepPendingOut(); } }, 150000);   // every ~2.5 minutes while the app is open
 
-  loadData();
+  loadData().then(sweepPendingOut).catch(function(){});
 })();
 </script>
 </body>
