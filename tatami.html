@@ -1175,14 +1175,15 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-15 13:00';
+  var APP_VERSION = '2026-11-15 14:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
   var SHEETS_API_KEY = '1791992';
+  var PUBLIC_KEY = 'pk_66847173e49accc97b2f';   // the same read-only key the public forms use: it can only read the published form settings, never students
 
   var lastGetVersion = null; // write-counter reported by the v4 Apps Script (null with the older script)
-  function sheetsCall(extraQuery){
+  function sheetsCall(extraQuery, keyOverride){
     // JSONP: loading a <script> tag is never subject to CORS, unlike fetch().
     return new Promise(function(resolve, reject){
       var callbackName = '__sheetsCb' + Date.now() + Math.floor(Math.random()*100000);
@@ -1220,7 +1221,7 @@
         cleanup();
         reject(new Error('נכשלה טעינת הנתונים מהגיליון (בדוק שה-URL תקין ופרוס כ-Web app)'));
       };
-      script.src = SHEETS_API_URL + '?key=' + encodeURIComponent(SHEETS_API_KEY) + '&callback=' + callbackName + (extraQuery || '');
+      script.src = SHEETS_API_URL + '?key=' + encodeURIComponent(keyOverride || SHEETS_API_KEY) + '&callback=' + callbackName + (extraQuery || '');
       document.head.appendChild(script);
     });
   }
@@ -6525,15 +6526,18 @@
     });
   }
 
+  function cfgWithoutWheel(c){ if (!c) return c; var o = Object.assign({}, c); delete o.wheel; return o; }
   async function doPublishForms(){
     var rec = formsRecord(); if (!rec) return;
     state.formsPublishing = true; render();
     try{
-      var text = JSON.stringify(rec.config);
       var cur = await sheetsCall('&action=formConfig');
       if (cur.error || cur.version === undefined){ throw new Error('הסקריפט בגיליון לא עודכן לגרסה שתומכת בטפסים (v5).'); }
+      var outCfg = JSON.parse(JSON.stringify(rec.config));
+      if (cur.config && cur.config.wheel){ outCfg.wheel = cur.config.wheel; }       // the published technique wheel lives in the same sheet cell: publishing the forms must not erase it
+      var text = JSON.stringify(outCfg);
       var ver = cur.version;
-      if (rec.publishedVersion && ver !== rec.publishedVersion && cur.config && JSON.stringify(cur.config) !== JSON.stringify(rec.config)){
+      if (rec.publishedVersion && ver !== rec.publishedVersion && cur.config && JSON.stringify(cfgWithoutWheel(cur.config)) !== JSON.stringify(rec.config)){
         var okOver = await new Promise(function(res){ openConfirm('בגיליון פורסמה גרסה אחרת של הטפסים מאז הפרסום האחרון שלך (ייתכן שממכשיר אחר). לדרוס אותה בגרסה שלך?', function(){ res(true); }, 'לדרוס ולפרסם'); var iv = setInterval(function(){ if (!state.modal){ clearInterval(iv); res(false); } }, 300); });
         if (!okOver){ state.formsPublishing = false; render(); return; }
       }
@@ -8002,11 +8006,41 @@
   var WHEEL_COLORS = ['#B91717', '#1E1E1E', '#8A1010', '#3C3C3C'];
   function wheelB64(str){ return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
   function wheelUnB64(s){ s = String(s).replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4){ s += '='; } return decodeURIComponent(escape(atob(s))); }
-  function wheelLinkFor(){
-    var names = wheelAvailableAll().map(function(t){ return t.name; });
-    if (!names.length) return '';
-    var base = window.location.href.split('#')[0].split('?')[0];
-    return base + '?wheel=' + wheelB64(JSON.stringify(names));
+  function wheelPublicLink(){ return window.location.href.split('#')[0].split('?')[0] + '?wheel=1'; }
+  try{ wheelUI.pubCount = parseInt(localStorage.getItem('tatami-wheel-pub') || '0', 10) || 0; }catch(e){}
+  async function wheelPublish(){
+    if (wheelUI.publishing) return;
+    var names = wheelAvailableAll().map(function(x){ return x.name; });
+    if (!names.length){ showToast('בחר קודם טכניקות לגלגל.'); return; }
+    wheelUI.publishing = true; wheelUI.error = ''; wheelBuild(true);
+    try{
+      var cur = await sheetsCall('&action=formConfig');
+      if (cur.error || cur.version === undefined){ throw new Error('הסקריפט בגיליון לא עודכן לגרסה שתומכת בפרסום (v5).'); }
+      var cfg = cur.config || {};
+      var rec = formsRecord(), wasInSync = !!(rec && rec.publishedVersion === cur.version);
+      cfg.wheel = { names:names, at:Date.now() };
+      await sheetsPostAction({ action:'saveFormConfig', config:JSON.stringify(cfg), expected:String(cur.version) });
+      var after = await sheetsCall('&action=formConfig');
+      if (!after.config || !after.config.wheel || JSON.stringify(after.config.wheel.names) !== JSON.stringify(names)){ throw new Error('הפרסום לא אומת בגיליון. נסה שוב.'); }
+      if (rec && wasInSync){ rec.publishedVersion = after.version; scheduleSave(); }     // nothing else changed in the published forms, so don't treat this as someone else's publish
+      wheelUI.pubCount = names.length;
+      try{ localStorage.setItem('tatami-wheel-pub', String(names.length)); }catch(e){}
+      showToast('✓ הגלגל פורסם, והקישור מעודכן.');
+    }catch(e){ wheelUI.error = 'הפרסום נכשל: ' + ((e && e.message) || 'שגיאה'); }
+    wheelUI.publishing = false; wheelBuild(true);
+  }
+  function startWheelOnly(names){
+    state.techniques = names.map(function(n, i){ return { id:'w' + i, name:String(n), categoryId:'', videoUrl:'' }; });
+    state.techCategories = []; state.techSubCategories = [];
+    wheelUI.sel = {}; state.techniques.forEach(function(x){ wheelUI.sel[x.id] = true; });
+    wheelUI.only = true; wheelUI.kids = true; wheelUI.noRepeat = true;
+    wheelUI.root = el('div', { class:'wheel-page' }); wheelBuild();
+    var appEl = document.getElementById('app'); appEl.innerHTML = ''; appEl.appendChild(wheelUI.root);
+    document.title = 'גלגל טכניקות';
+  }
+  function wheelOnlyMessage(title, text){
+    var ae = document.getElementById('app'); ae.innerHTML = '';
+    ae.appendChild(el('div', { style:'max-width:460px;margin:60px auto;padding:20px;text-align:center;direction:rtl;font-family:inherit;' }, [ el('h2', {}, [title]), el('p', {}, [text]) ]));
   }
   function wheelAvailableAll(){
     var ids = {}; state.techniques.forEach(function(t){ ids[t.id] = t; });
@@ -8132,22 +8166,24 @@
     if (wheelUI.hist.length){ side.appendChild(el('div', { class:'wheel-hist' }, wheelUI.hist.map(function(h){ return el('span', {}, [h]); }))); }
     side.appendChild(el('div', { style:'margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;' }, [
       el('button', { class:'btn-primary', onclick:function(){ wheelSetKids(true); } }, ['🖥 מצב ילדים (מסך מלא)']),
-      el('button', { class:'btn-ghost', onclick:function(){ var l = wheelLinkFor(); if (!l){ showToast('בחר קודם טכניקות לגלגל.'); return; } wheelUI.link = l; wheelBuild(true); } }, ['🔗 יצירת קישור לגלגל'])
+      el('button', { class:'btn-ghost', onclick:wheelPublish }, [wheelUI.publishing ? 'מפרסם…' : '🔗 פרסום הגלגל וקבלת קישור'])
     ]));
-    if (wheelUI.link){
-      var lin = el('input', { type:'text', readonly:'readonly', value:wheelUI.link });
+    if (wheelUI.error){ side.appendChild(el('div', { class:'wheel-warn' }, [wheelUI.error])); }
+    if (wheelUI.pubCount){
+      var pubLink = wheelPublicLink();
+      var lin = el('input', { type:'text', readonly:'readonly', value:pubLink });
       lin.addEventListener('focus', function(){ lin.select(); });
       side.appendChild(el('div', { class:'wheel-link' }, [
-        el('b', {}, ['קישור לגלגל (' + selCount + ' טכניקות)']),
+        el('b', {}, ['הגלגל מפורסם (' + wheelUI.pubCount + ' טכניקות)']),
         lin,
         el('div', { style:'display:flex;gap:8px;flex-wrap:wrap;' }, [
           el('button', { class:'btn-primary', onclick:function(){
             var done = function(){ showToast('הקישור הועתק.'); };
-            try{ navigator.clipboard.writeText(wheelUI.link).then(done, function(){ lin.select(); document.execCommand('copy'); done(); }); }catch(e){ lin.select(); try{ document.execCommand('copy'); done(); }catch(e2){} }
+            try{ navigator.clipboard.writeText(pubLink).then(done, function(){ lin.select(); document.execCommand('copy'); done(); }); }catch(e){ lin.select(); try{ document.execCommand('copy'); done(); }catch(e2){} }
           } }, ['העתק קישור']),
-          el('a', { class:'btn-ghost', href:wheelUI.link, target:'_blank', rel:'noopener', style:'text-decoration:none;display:inline-block;' }, ['פתיחה לבדיקה'])
+          el('a', { class:'btn-ghost', href:pubLink, target:'_blank', rel:'noopener', style:'text-decoration:none;display:inline-block;' }, ['פתיחה לבדיקה'])
         ]),
-        el('div', { class:'fhint', style:'margin-top:6px;' }, ['הקישור מציג רק את הגלגל, בלי תלמידים ובלי שום נתון אחר. אם תשנה את הבחירה, צור קישור חדש.'])
+        el('div', { class:'fhint', style:'margin-top:6px;' }, ['זה קישור קבוע וקצר, ותמיד מציג את הגלגל שפרסמת לאחרונה (רק את הגלגל, בלי תלמידים). אם שינית את הבחירה, לחץ שוב על "פרסום" והקישור הקיים יתעדכן.'])
       ]));
     }
 
@@ -8160,7 +8196,7 @@
     if (!state.techniques.length){ tree.appendChild(el('p', { class:'lesson-empty', style:'padding:14px;' }, ['עוד אין טכניקות. הוסף אותן ב"ניהול טכניקות".'])); return; }
     var subjects = [], bySubj = {};
     state.techCategories.forEach(function(c){ var s = c.subject || 'כללי'; if (!bySubj[s]){ bySubj[s] = []; subjects.push(s); } bySubj[s].push(c); });
-    var refresh = function(){ wheelSave(); wheelUI.link = ''; wheelUI.used = {}; wheelBuildKeepScroll(tree); };
+    var refresh = function(){ wheelSave(); wheelUI.used = {}; wheelBuildKeepScroll(tree); };
     subjects.forEach(function(subj){
       var cats = bySubj[subj].map(function(c){
         var techs = state.techniques.filter(function(t){ return t.categoryId === c.id && (!q || t.name.toLowerCase().indexOf(q) !== -1 || (c.name || '').toLowerCase().indexOf(q) !== -1); });
@@ -9608,23 +9644,20 @@
     }
   }catch(eUrl){ /* URLSearchParams unavailable — ignore, defaults to normal mode */ }
 
-  // A link made from the wheel screen: only the wheel, built from the names inside the link itself. Nothing is read from the sheet, so no student data is ever loaded.
+  // A wheel link: only the wheel. "?wheel=1" reads the published list (technique names only) with the public key; nothing about students is ever loaded.
   try{
     var wheelParam = new URLSearchParams(window.location.search).get('wheel');
-    if (wheelParam){
-      var wnames = JSON.parse(wheelUnB64(wheelParam));
-      if (Array.isArray(wnames) && wnames.length){
-        state.techniques = wnames.map(function(n, i){ return { id:'w' + i, name:String(n), categoryId:'', videoUrl:'' }; });
-        state.techCategories = []; state.techSubCategories = [];
-        wheelUI.sel = {}; state.techniques.forEach(function(x){ wheelUI.sel[x.id] = true; });
-        wheelUI.only = true; wheelUI.kids = true; wheelUI.noRepeat = true;
-        wheelUI.root = el('div', { class:'wheel-page' }); wheelBuild();
-        var appEl = document.getElementById('app'); appEl.innerHTML = ''; appEl.appendChild(wheelUI.root);
-        document.title = 'גלגל טכניקות';
-        return;
+    if (wheelParam !== null){
+      wheelOnlyMessage('טוען את הגלגל…', '');
+      var wheelDone = function(names){ if (names && names.length){ startWheelOnly(names); } else { wheelOnlyMessage('הגלגל עוד לא פורסם', 'בקש מהמאמן לפרסם את הגלגל ולשלוח קישור חדש.'); } };
+      if (wheelParam === '1'){
+        sheetsCall('&action=formConfig', PUBLIC_KEY).then(function(d){ wheelDone(d && d.config && d.config.wheel && d.config.wheel.names); }, function(){ wheelOnlyMessage('הגלגל לא נטען', 'בדוק חיבור לאינטרנט ונסה שוב.'); });
+      } else {
+        try{ wheelDone(JSON.parse(wheelUnB64(wheelParam))); }catch(eOld){ wheelOnlyMessage('הגלגל לא נטען', 'הקישור לא נקרא נכון. בקש קישור חדש.'); }   // old long links that carry the names themselves
       }
+      return;
     }
-  }catch(eWheel){ /* a broken link: fall through to the normal app */ }
+  }catch(eWheel){ try{ wheelOnlyMessage('הגלגל לא נטען', 'בקש קישור חדש.'); }catch(e3){} return; }
 
   document.addEventListener('keydown', function(e){
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z')){
