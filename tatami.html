@@ -817,6 +817,53 @@
   td.name-cell{ font-weight:600; min-width:110px; max-width:150px; white-space:normal; padding-inline-start:10px; padding-inline-end:12px; }
   .pending-out-note{ font-weight:700; font-size:11px; color:#C62828; margin-top:2px; white-space:nowrap; }
   .pending-out-note button{ background:none; border:none; color:#C62828; text-decoration:underline; font-size:10.5px; cursor:pointer; padding:0 4px; font-family:inherit; }
+
+  /* ---- technique wheel ---- */
+  .wheel-page{ max-width:1180px; margin:0 auto; padding:18px 18px 40px; }
+  .wheel-layout{ display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr); gap:22px; align-items:start; }
+  .wheel-stage{ background:linear-gradient(160deg,#1B1B1B,#0F0F0F); border-radius:18px; padding:22px 18px 24px; display:flex; flex-direction:column; align-items:center; box-shadow:0 10px 30px rgba(0,0,0,.18); border-top:4px solid var(--accent); }
+  .wheel-circle{ position:relative; width:min(100%,560px); aspect-ratio:1; }
+  .wheel-circle canvas{ display:block; width:100%; height:100%; border-radius:50%; box-shadow:0 0 0 6px #2A2A2A,0 0 0 8px #B91717,0 12px 34px rgba(0,0,0,.55); }
+  .wheel-pointer{ position:absolute; z-index:3; top:-16px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:19px solid transparent; border-right:19px solid transparent; border-top:40px solid #fff; filter:drop-shadow(0 3px 4px rgba(0,0,0,.6)); }
+  .wheel-pointer::after{ content:''; position:absolute; left:-12px; top:-37px; border-left:12px solid transparent; border-right:12px solid transparent; border-top:28px solid var(--accent); }
+  .wheel-hub{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:17%; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 30%,#3a3a3a,#0F0F0F); border:4px solid #fff; box-shadow:0 3px 14px rgba(0,0,0,.6); pointer-events:none; display:grid; place-items:center; }
+  .wheel-hub::after{ content:''; width:34%; aspect-ratio:1; border-radius:50%; background:var(--accent); }
+  .wheel-spin{ margin-top:22px; border:none; border-radius:12px; background:linear-gradient(var(--accent),var(--accent-dark)); color:#fff; font-family:inherit; font-size:22px; font-weight:800; padding:13px 46px; letter-spacing:.3px; cursor:pointer; box-shadow:0 5px 0 #5E0A0A,0 10px 22px rgba(185,23,23,.35); }
+  .wheel-spin:active{ transform:translateY(3px); box-shadow:0 2px 0 #5E0A0A; }
+  .wheel-spin:disabled{ opacity:.55; cursor:wait; }
+  .wheel-result{ margin-top:18px; width:100%; max-width:560px; background:#fff; border-radius:14px; padding:14px 18px; text-align:center; border-inline-start:6px solid var(--accent); }
+  .wheel-result small{ display:block; color:var(--muted); font-size:13px; font-weight:700; letter-spacing:.4px; }
+  .wheel-result h2{ font-family:inherit; font-weight:800; margin:4px 0 2px; font-size:clamp(22px,4vw,32px); color:var(--ink); }
+  .wheel-result a{ color:var(--accent); font-weight:700; font-size:14px; }
+  .wheel-panel{ background:var(--paper); border:1px solid var(--line); border-radius:14px; padding:14px 16px; }
+  .wheel-panel h3{ margin:0 0 4px; font-size:17px; }
+  .wheel-panel .wp-sub{ color:var(--muted); font-size:13px; margin-bottom:10px; }
+  .wheel-count{ display:inline-block; background:var(--accent); color:#fff; border-radius:999px; padding:1px 10px; font-size:13px; font-weight:800; }
+  .wheel-tools{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:8px 0; }
+  .wheel-tools input[type=text]{ flex:1; min-width:140px; padding:8px 10px; border:1.5px solid var(--line); border-radius:8px; font-family:inherit; }
+  .wheel-tree{ max-height:460px; overflow:auto; border:1px solid var(--line); border-radius:10px; padding:4px 8px; background:#FBFAF8; }
+  .wheel-tree details{ margin:3px 0; }
+  .wheel-tree summary{ cursor:pointer; font-weight:800; padding:6px 2px; }
+  .wheel-tree .wt-cat{ margin-inline-start:12px; border-inline-start:3px solid var(--line); padding-inline-start:8px; }
+  .wheel-tree label{ display:flex; align-items:center; gap:8px; padding:4px 2px; cursor:pointer; font-size:14.5px; }
+  .wheel-tree .wt-catlabel{ font-weight:700; background:#F0EEE9; border-radius:6px; padding:5px 6px; margin:3px 0; }
+  .wheel-hist{ display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+  .wheel-hist span{ background:#F0EEE9; border-radius:999px; padding:3px 10px; font-size:12.5px; }
+  .wheel-warn{ background:#FFF4E5; border:1px solid #F2D4A5; border-radius:8px; padding:6px 10px; font-size:13px; margin-top:6px; }
+  .wheel-page.wheel-kids{ position:fixed; inset:0; z-index:9999; max-width:none; background:radial-gradient(ellipse at 50% 15%,#2a2a2a,#0a0a0a 75%); overflow:auto; padding:10px 14px 24px; display:flex; flex-direction:column; align-items:center; }
+  .wheel-kids .wheel-layout{ display:block; width:100%; }
+  .wheel-kids .wheel-stage{ background:none; box-shadow:none; border-top:none; }
+  .wheel-kids .wheel-circle{ width:min(90vw,58vh,680px); }
+  .wheel-kids .wheel-stage{ padding-top:26px; }
+  .wheel-kids .wheel-panel, .wheel-kids .wheel-title{ display:none; }
+  .wheel-kids .wheel-result h2{ font-size:clamp(28px,6vw,52px); }
+  .wheel-kids .wheel-exit{ position:fixed; top:10px; left:12px; z-index:10000; }
+  .wheel-exit{ display:none; }
+  .wheel-only .wheel-exit{ display:none !important; }
+  .wheel-link{ margin-top:10px; background:#F2F9F3; border:1.5px solid #BFE0C4; border-radius:10px; padding:10px; }
+  .wheel-link input{ width:100%; padding:7px 9px; border:1.5px solid var(--line); border-radius:8px; font-size:12.5px; direction:ltr; margin:6px 0; }
+  .wheel-kids .wheel-exit{ display:block; }
+  @media(max-width:800px){ .wheel-layout{ grid-template-columns:1fr; } }
   .name-date-note{ font-weight:400; font-size:10.5px; color:var(--muted); margin-top:2px; white-space:nowrap; }
   td.name-cell.name-female{ color:#B03A9B; }
   .note-field-wrap{ display:flex; flex-direction:column; gap:2px; }
@@ -1128,7 +1175,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-14 21:00';
+  var APP_VERSION = '2026-11-15 13:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1290,7 +1337,7 @@
     formsPublishing: false,
     inbox: { items: [], loading: false, error: '', showAll: false, supported: null, selected: {}, newCount: 0, loadedAt: 0, merchItems: [], merchNew: 0, merchLoading: false, merchError: '', merchQuery: '', merchOnlyNew: false },
     lessons: [],                // lesson log: [{id, groupId, date, techniqueIds[], extras[], note, done}]
-    techMode: 'library',        // 'library' | 'lessons' inside the techniques section
+    techMode: 'library',        // 'library' | 'lessons' | 'wheel' inside the techniques section
     lessonGroupId: null,
     lessonPickerQuery: '',
     lessonPickerCat: 'all',
@@ -7751,7 +7798,8 @@
   function renderTechModeBar(){
     return el('div',{class:'tech-mode-bar'},[
       el('button',{class:'tech-mode-btn'+(state.techMode==='library'?' active':''), onclick:function(){ state.techMode = 'library'; render(); }},['📚 ספריית טכניקות']),
-      el('button',{class:'tech-mode-btn'+(state.techMode==='lessons'?' active':''), onclick:function(){ state.techMode = 'lessons'; render(); }},['📓 יומן שיעורים'])
+      el('button',{class:'tech-mode-btn'+(state.techMode==='lessons'?' active':''), onclick:function(){ state.techMode = 'lessons'; render(); }},['📓 יומן שיעורים']),
+      el('button',{class:'tech-mode-btn'+(state.techMode==='wheel'?' active':''), onclick:function(){ state.techMode = 'wheel'; render(); }},['🎡 גלגל טכניקות'])
     ]);
   }
 
@@ -7945,6 +7993,213 @@
     return wrap;
   }
 
+
+  // ---------------- technique wheel (kids spin it in class; the teacher picks which techniques are on it) ----------------
+  var WHEEL_KEY = 'tatami-wheel-sel';
+  var wheelUI = { root:null, sel:{}, q:'', noRepeat:true, used:{}, hist:[], spinning:false, rotation:0, kids:false, last:null, canvas:null, items:[], open:{} };
+  try{ var wsv = JSON.parse(localStorage.getItem(WHEEL_KEY) || '[]'); (wsv || []).forEach(function(id){ wheelUI.sel[id] = true; }); }catch(e){}
+  function wheelSave(){ try{ localStorage.setItem(WHEEL_KEY, JSON.stringify(Object.keys(wheelUI.sel).filter(function(k){ return wheelUI.sel[k]; }))); }catch(e){} }
+  var WHEEL_COLORS = ['#B91717', '#1E1E1E', '#8A1010', '#3C3C3C'];
+  function wheelB64(str){ return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function wheelUnB64(s){ s = String(s).replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4){ s += '='; } return decodeURIComponent(escape(atob(s))); }
+  function wheelLinkFor(){
+    var names = wheelAvailableAll().map(function(t){ return t.name; });
+    if (!names.length) return '';
+    var base = window.location.href.split('#')[0].split('?')[0];
+    return base + '?wheel=' + wheelB64(JSON.stringify(names));
+  }
+  function wheelAvailableAll(){
+    var ids = {}; state.techniques.forEach(function(t){ ids[t.id] = t; });
+    return Object.keys(wheelUI.sel).filter(function(id){ return wheelUI.sel[id] && ids[id]; }).map(function(id){ return ids[id]; });
+  }
+  function wheelAvailable(){
+    var ids = {}; state.techniques.forEach(function(t){ ids[t.id] = t; });
+    var list = Object.keys(wheelUI.sel).filter(function(id){ return wheelUI.sel[id] && ids[id]; }).map(function(id){ return ids[id]; });
+    if (wheelUI.noRepeat){ var left = list.filter(function(t){ return !wheelUI.used[t.id]; }); return left; }
+    return list;
+  }
+  function wheelCatName(t){ var c = state.techCategories.find(function(x){ return x.id === t.categoryId; }); var sc = t.subCategoryId && state.techSubCategories.find(function(x){ return x.id === t.subCategoryId; }); return (c ? c.name : '') + (sc ? ' › ' + sc.name : ''); }
+  function wheelColorAt(k, n){ var c = WHEEL_COLORS[k % WHEEL_COLORS.length]; if (n > 1 && k === n - 1 && c === WHEEL_COLORS[0] && n % WHEEL_COLORS.length === 1){ c = '#5A5A5A'; } return c; }
+  function wheelPaint(){
+    var cv = wheelUI.canvas; if (!cv) return;
+    var ctx = cv.getContext('2d'), items = wheelUI.items, n = items.length, c = 450, R = 442;
+    ctx.clearRect(0, 0, 900, 900);
+    if (!n){
+      ctx.beginPath(); ctx.arc(c, c, R, 0, Math.PI * 2); ctx.fillStyle = '#242424'; ctx.fill();
+      ctx.fillStyle = '#bbb'; ctx.font = 'bold 38px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('בחר טכניקות לגלגל', c, c - 20); ctx.font = '28px Arial'; ctx.fillText('מהרשימה שלצד הגלגל', c, c + 26);
+      return;
+    }
+    var step = Math.PI * 2 / n;
+    var fs = Math.max(22, Math.min(46, Math.round(560 / Math.max(n, 6) * 1.0)));
+    for (var k = 0; k < n; k++){
+      var a = -Math.PI / 2 - step / 2 + k * step, mid = a + step / 2;
+      ctx.beginPath(); ctx.moveTo(c, c); ctx.arc(c, c, R, a, a + step); ctx.closePath();
+      ctx.fillStyle = wheelColorAt(k, n); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = n > 1 ? 4 : 0; ctx.stroke();
+      ctx.save(); ctx.translate(c, c); ctx.rotate(mid);
+      ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.textAlign = 'right'; ctx.direction = 'rtl';
+      var maxW = R - 150, txt = items[k].name, size = fs;
+      ctx.font = '700 ' + size + 'px Arial';
+      while (ctx.measureText(txt).width > maxW && size > 20){ size -= 2; ctx.font = '700 ' + size + 'px Arial'; }
+      if (ctx.measureText(txt).width > maxW){ while (txt.length > 3 && ctx.measureText(txt + '…').width > maxW){ txt = txt.slice(0, -1); } txt += '…'; }
+      ctx.fillText(txt, R - 34, 0);
+      ctx.restore();
+    }
+    ctx.beginPath(); ctx.arc(c, c, R, 0, Math.PI * 2); ctx.lineWidth = 10; ctx.strokeStyle = '#fff'; ctx.stroke();
+  }
+  function wheelSpin(){
+    if (wheelUI.spinning) return;
+    var fresh = wheelAvailable();
+    if (!fresh.length && wheelUI.only && Object.keys(wheelUI.used).length){ wheelUI.used = {}; fresh = wheelAvailable(); }                                   // techniques that already came up (when "don't repeat" is on) leave the wheel only now, at the next spin
+    if (fresh.map(function(t){ return t.id; }).join('|') !== wheelUI.items.map(function(t){ return t.id; }).join('|')){ wheelUI.items = fresh; wheelPaint(); }
+    var items = wheelUI.items, n = items.length;
+    if (!n){ showToast('בחר קודם טכניקות לגלגל.'); return; }
+    wheelUI.spinning = true;
+    var btn = wheelUI.root.querySelector('.wheel-spin'); if (btn){ btn.disabled = true; }
+    var chosen = Math.floor(Math.random() * n), stepDeg = 360 / n;
+    var current = ((wheelUI.rotation % 360) + 360) % 360;
+    var desired = (360 - chosen * stepDeg) % 360;
+    var jitter = (Math.random() - .5) * stepDeg * .6;                   // lands somewhere inside the segment, not always dead centre
+    var extra = (desired + jitter - current + 360) % 360;
+    var start = wheelUI.rotation, end = start + 360 * 6 + extra, begin = performance.now(), duration = 4600;
+    function frame(now){
+      var p = Math.min(1, (now - begin) / duration), ease = 1 - Math.pow(1 - p, 4);
+      wheelUI.rotation = start + (end - start) * ease;
+      if (wheelUI.canvas){ wheelUI.canvas.style.transform = 'rotate(' + wheelUI.rotation + 'deg)'; }
+      if (p < 1){ requestAnimationFrame(frame); }
+      else {
+        wheelUI.rotation = end; wheelUI.spinning = false;
+        var t = items[chosen]; wheelUI.last = t; wheelUI.used[t.id] = true;
+        wheelUI.hist.unshift(t.name); wheelUI.hist = wheelUI.hist.slice(0, 8);
+        wheelBuild(true);
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  function wheelSetKids(on){
+    wheelUI.kids = on;
+    try{
+      if (on && document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(function(){}); }
+      if (!on && document.fullscreenElement && document.exitFullscreen){ document.exitFullscreen().catch(function(){}); }
+    }catch(e){}
+    wheelBuild(true);
+  }
+  function wheelBuild(keepWheel){
+    var root = wheelUI.root; if (!root) return;
+    root.className = 'wheel-page' + (wheelUI.kids ? ' wheel-kids' : '') + (wheelUI.only ? ' wheel-only' : '');
+    var avail = wheelAvailable();
+    // keepWheel (after a spin, or a re-render of the whole app): the canvas and its list stay exactly as they are, so a spin is never interrupted and the pointer still points at the result
+    var sameWheel = !!(wheelUI.canvas && (keepWheel || wheelUI.spinning));
+    root.innerHTML = '';
+    var cv = sameWheel ? wheelUI.canvas : el('canvas', { width:'900', height:'900' });
+    wheelUI.canvas = cv; cv.style.transform = 'rotate(' + wheelUI.rotation + 'deg)';
+    if (!sameWheel){ wheelUI.items = avail; wheelPaint(); }
+
+    var circle = el('div', { class:'wheel-circle' }, [ el('div', { class:'wheel-pointer' }), cv, el('div', { class:'wheel-hub' }) ]);
+    var spinBtn = el('button', { class:'wheel-spin', onclick:wheelSpin }, ['סובב את הגלגל']);
+    if (wheelUI.spinning){ spinBtn.disabled = true; }
+    var last = wheelUI.last, resultBox = el('div', { class:'wheel-result' }, last ? [
+      el('small', {}, [wheelCatName(last) || 'הטכניקה שיצאה']), el('h2', {}, [last.name]),
+      last.videoUrl ? el('a', { href:last.videoUrl, target:'_blank', rel:'noopener' }, ['▶ צפייה בסרטון']) : null
+    ] : [ el('small', {}, ['מוכנים?']), el('h2', {}, [wheelUI.items.length ? 'לחצו על "סובב את הגלגל"' : 'עוד לא נבחרו טכניקות']) ]);
+    var stage = el('div', { class:'wheel-stage' }, [circle, spinBtn, resultBox]);
+    if (wheelUI.noRepeat && state.techniques.length && Object.keys(wheelUI.used).length && !avail.length && Object.keys(wheelUI.sel).some(function(k){ return wheelUI.sel[k]; })){
+      stage.appendChild(el('div', { class:'wheel-warn' }, ['כל הטכניקות כבר יצאו. אפשר לאפס בצד, ואז הגלגל יתמלא מחדש.']));
+    }
+
+    var side = el('div', { class:'wheel-panel' });
+    var selCount = Object.keys(wheelUI.sel).filter(function(k){ return wheelUI.sel[k] && state.techniques.some(function(t){ return t.id === k; }); }).length;
+    side.appendChild(el('h3', {}, ['מה בגלגל? ', el('span', { class:'wheel-count' }, [String(selCount)])]));
+    side.appendChild(el('div', { class:'wp-sub' }, ['סמן את הטכניקות שיופיעו בגלגל. הבחירה נשמרת במכשיר הזה.']));
+    var q = el('input', { type:'text', placeholder:'חיפוש טכניקה…', value:wheelUI.q });
+    q.addEventListener('input', function(e){ wheelUI.q = e.target.value; wheelTreeFill(tree); });
+    var noRep = el('input', { type:'checkbox' }); noRep.checked = wheelUI.noRepeat;
+    noRep.addEventListener('change', function(e){ wheelUI.noRepeat = e.target.checked; wheelBuild(); });
+    var tools = el('div', { class:'wheel-tools' }, [
+      q,
+      el('button', { class:'btn-ghost', onclick:function(){ wheelUI.sel = {}; wheelSave(); wheelUI.used = {}; wheelBuild(); } }, ['נקה בחירה'])
+    ]);
+    var tree = el('div', { class:'wheel-tree' });
+    side.appendChild(tools);
+    side.appendChild(el('label', { class:'day-check-label', style:'display:flex;gap:8px;align-items:center;margin:2px 0 8px;' }, [noRep, 'לא לחזור על טכניקה שכבר יצאה']));
+    if (Object.keys(wheelUI.used).length){
+      side.appendChild(el('button', { class:'btn-ghost', style:'margin-bottom:8px;', onclick:function(){ wheelUI.used = {}; wheelUI.hist = []; wheelUI.last = null; wheelBuild(); } }, ['↺ איפוס מה שכבר יצא (' + Object.keys(wheelUI.used).length + ')']));
+    }
+    if (selCount > 14){ side.appendChild(el('div', { class:'wheel-warn' }, ['בגלגל יש ' + selCount + ' טכניקות. מעל 12–14 הכתוב נהיה קטן; כדאי לבחור פחות לכל סיבוב.'])); }
+    side.appendChild(tree);
+    wheelTreeFill(tree);
+    if (wheelUI.hist.length){ side.appendChild(el('div', { class:'wheel-hist' }, wheelUI.hist.map(function(h){ return el('span', {}, [h]); }))); }
+    side.appendChild(el('div', { style:'margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;' }, [
+      el('button', { class:'btn-primary', onclick:function(){ wheelSetKids(true); } }, ['🖥 מצב ילדים (מסך מלא)']),
+      el('button', { class:'btn-ghost', onclick:function(){ var l = wheelLinkFor(); if (!l){ showToast('בחר קודם טכניקות לגלגל.'); return; } wheelUI.link = l; wheelBuild(true); } }, ['🔗 יצירת קישור לגלגל'])
+    ]));
+    if (wheelUI.link){
+      var lin = el('input', { type:'text', readonly:'readonly', value:wheelUI.link });
+      lin.addEventListener('focus', function(){ lin.select(); });
+      side.appendChild(el('div', { class:'wheel-link' }, [
+        el('b', {}, ['קישור לגלגל (' + selCount + ' טכניקות)']),
+        lin,
+        el('div', { style:'display:flex;gap:8px;flex-wrap:wrap;' }, [
+          el('button', { class:'btn-primary', onclick:function(){
+            var done = function(){ showToast('הקישור הועתק.'); };
+            try{ navigator.clipboard.writeText(wheelUI.link).then(done, function(){ lin.select(); document.execCommand('copy'); done(); }); }catch(e){ lin.select(); try{ document.execCommand('copy'); done(); }catch(e2){} }
+          } }, ['העתק קישור']),
+          el('a', { class:'btn-ghost', href:wheelUI.link, target:'_blank', rel:'noopener', style:'text-decoration:none;display:inline-block;' }, ['פתיחה לבדיקה'])
+        ]),
+        el('div', { class:'fhint', style:'margin-top:6px;' }, ['הקישור מציג רק את הגלגל, בלי תלמידים ובלי שום נתון אחר. אם תשנה את הבחירה, צור קישור חדש.'])
+      ]));
+    }
+
+    root.appendChild(el('button', { class:'btn-primary wheel-exit', onclick:function(){ wheelSetKids(false); } }, ['✕ יציאה ממצב ילדים']));
+    root.appendChild(el('div', { class:'wheel-layout' }, [ stage, side ]));
+  }
+  function wheelTreeFill(tree){
+    tree.innerHTML = '';
+    var q = (wheelUI.q || '').trim().toLowerCase();
+    if (!state.techniques.length){ tree.appendChild(el('p', { class:'lesson-empty', style:'padding:14px;' }, ['עוד אין טכניקות. הוסף אותן ב"ניהול טכניקות".'])); return; }
+    var subjects = [], bySubj = {};
+    state.techCategories.forEach(function(c){ var s = c.subject || 'כללי'; if (!bySubj[s]){ bySubj[s] = []; subjects.push(s); } bySubj[s].push(c); });
+    var refresh = function(){ wheelSave(); wheelUI.link = ''; wheelUI.used = {}; wheelBuildKeepScroll(tree); };
+    subjects.forEach(function(subj){
+      var cats = bySubj[subj].map(function(c){
+        var techs = state.techniques.filter(function(t){ return t.categoryId === c.id && (!q || t.name.toLowerCase().indexOf(q) !== -1 || (c.name || '').toLowerCase().indexOf(q) !== -1); });
+        return { c:c, techs:techs };
+      }).filter(function(x){ return x.techs.length; });
+      if (!cats.length) return;
+      var key = 's:' + subj;
+      var det = el('details', {}, [ el('summary', {}, [subj]) ]);
+      if (q || wheelUI.open[key] !== false && (wheelUI.open[key] || cats.some(function(x){ return x.techs.some(function(t){ return wheelUI.sel[t.id]; }); }))){ det.setAttribute('open', 'open'); }
+      det.addEventListener('toggle', function(){ wheelUI.open[key] = det.open; });
+      cats.forEach(function(x){
+        var wrap = el('div', { class:'wt-cat' });
+        var all = el('input', { type:'checkbox' });
+        var nSel = x.techs.filter(function(t){ return wheelUI.sel[t.id]; }).length;
+        all.checked = nSel === x.techs.length; all.indeterminate = nSel > 0 && nSel < x.techs.length;
+        all.addEventListener('change', function(e){ x.techs.forEach(function(t){ if (e.target.checked){ wheelUI.sel[t.id] = true; } else { delete wheelUI.sel[t.id]; } }); refresh(); });
+        wrap.appendChild(el('label', { class:'wt-catlabel' }, [all, x.c.name + ' (' + x.techs.length + ')']));
+        x.techs.forEach(function(t){
+          var cb = el('input', { type:'checkbox' }); cb.checked = !!wheelUI.sel[t.id];
+          cb.addEventListener('change', function(e){ if (e.target.checked){ wheelUI.sel[t.id] = true; } else { delete wheelUI.sel[t.id]; } refresh(); });
+          wrap.appendChild(el('label', {}, [cb, t.name]));
+        });
+        det.appendChild(wrap);
+      });
+      tree.appendChild(det);
+    });
+    if (!tree.children.length){ tree.appendChild(el('p', { class:'lesson-empty', style:'padding:14px;' }, ['לא נמצאו טכניקות.'])); }
+  }
+  function wheelBuildKeepScroll(tree){
+    var st = tree.scrollTop, qv = wheelUI.q;
+    wheelBuild();
+    var t2 = wheelUI.root.querySelector('.wheel-tree'); if (t2){ t2.scrollTop = st; }
+  }
+  function renderWheelSection(app){
+    if (!wheelUI.root){ wheelUI.root = el('div', { class:'wheel-page' }); wheelBuild(); }
+    else if (!wheelUI.spinning){ wheelBuild(true); }
+    app.appendChild(wheelUI.root);
+  }
+
   function renderTechniquesSection(app){
     var header = el('header',{},[
       el('div',{class:'brand'},[
@@ -7962,6 +8217,11 @@
       app.appendChild(header);
       app.appendChild(renderTechModeBar());
       app.appendChild(renderLessonsView());
+      return;
+    }
+    if (!state.readOnly && state.techMode === 'wheel'){
+      if (!wheelUI.kids){ app.appendChild(header); app.appendChild(renderTechModeBar()); }
+      renderWheelSection(app, true);
       return;
     }
 
@@ -9347,6 +9607,24 @@
       state.section = 'techniques';
     }
   }catch(eUrl){ /* URLSearchParams unavailable — ignore, defaults to normal mode */ }
+
+  // A link made from the wheel screen: only the wheel, built from the names inside the link itself. Nothing is read from the sheet, so no student data is ever loaded.
+  try{
+    var wheelParam = new URLSearchParams(window.location.search).get('wheel');
+    if (wheelParam){
+      var wnames = JSON.parse(wheelUnB64(wheelParam));
+      if (Array.isArray(wnames) && wnames.length){
+        state.techniques = wnames.map(function(n, i){ return { id:'w' + i, name:String(n), categoryId:'', videoUrl:'' }; });
+        state.techCategories = []; state.techSubCategories = [];
+        wheelUI.sel = {}; state.techniques.forEach(function(x){ wheelUI.sel[x.id] = true; });
+        wheelUI.only = true; wheelUI.kids = true; wheelUI.noRepeat = true;
+        wheelUI.root = el('div', { class:'wheel-page' }); wheelBuild();
+        var appEl = document.getElementById('app'); appEl.innerHTML = ''; appEl.appendChild(wheelUI.root);
+        document.title = 'גלגל טכניקות';
+        return;
+      }
+    }
+  }catch(eWheel){ /* a broken link: fall through to the normal app */ }
 
   document.addEventListener('keydown', function(e){
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && (e.key === 'z' || e.key === 'Z')){
