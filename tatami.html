@@ -1175,7 +1175,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-17 21:30';
+  var APP_VERSION = '2026-11-17 22:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1227,7 +1227,18 @@
   }
   function sheetsGet(){ return sheetsCall('').then(function(d){ return d.value; }); }
 
-  function sheetsSet(value, expectedVersion){
+  // A single request value is cut off by Google at 524,288 characters, so anything big goes up in pieces (script v5.2: actions "stage" + "commit").
+  async function sheetsSet(value, expectedVersion){
+    var BIG = 200000;
+    value = String(value);
+    if (value.length <= BIG){ return sheetsSetSingle(value, expectedVersion); }
+    var uid = 'u' + Date.now() + Math.floor(Math.random() * 1000), n = Math.ceil(value.length / BIG);
+    for (var i = 0; i < n; i++){
+      await sheetsPostAction({ action:'stage', uid:uid, idx:String(i), chunk:value.substring(i * BIG, (i + 1) * BIG) }, 60000);
+    }
+    await sheetsPostAction({ action:'commit', uid:uid, len:String(value.length), expected:(expectedVersion === null || expectedVersion === undefined) ? '' : String(expectedVersion) }, 60000);
+  }
+  function sheetsSetSingle(value, expectedVersion){
     // Classic hidden form + iframe POST: like JSONP, form submissions are not
     // subject to CORS. We can't read the response this way, so we just wait
     // briefly for the iframe to finish loading and treat that as success.
@@ -2189,7 +2200,7 @@
     try{
       var d = await sheetsCall('');
       var raw = d.value, CH = 40000;
-      out.push('typeof value: ' + (typeof raw) + ' · length: ' + (raw == null ? 'null' : String(raw).length) + ' · version: ' + d.version);
+      out.push('typeof value: ' + (typeof raw) + ' · length: ' + (raw == null ? 'null' : String(raw).length) + ' · version: ' + d.version + ' · אורך בשרת: ' + d.len);
       raw = raw == null ? '' : String(raw);
       out.push('chunks (40000): ' + Math.ceil(raw.length / CH));
       var markers = ['#ERROR!', '#NAME?', '#VALUE!', '#REF!', '#N/A', '#DIV/0!', 'Err:'];
@@ -2401,7 +2412,7 @@
     if (verifyRaw !== payloadStr && !refused(vd)){ await sleep(1500); vd = await sheetsCall(''); verifyRaw = vd.value; }  // give a slow write a moment to land
     if (verifyRaw !== payloadStr && !refused(vd)){ await sleep(3000); vd = await sheetsCall(''); verifyRaw = vd.value; }
     if (verifyRaw !== payloadStr){
-      throw new Error('האימות נכשל — מה שנשמר בגיליון לא תואם למה שניסינו לשמור (ייתכן שמישהו אחר שמר באותו רגע). מנסה שוב.');
+      throw new Error('האימות נכשל — מה שנשמר בגיליון לא תואם למה שניסינו לשמור (ייתכן שמישהו אחר שמר באותו רגע' + (payloadStr.length > 200000 ? ', או שסקריפט הגיליון עוד לא עודכן לגרסה v5.2' : '') + '). מנסה שוב.');
     }
     lastKnownServerContent = payloadStr;
     knownServerVersion = (vd.version !== undefined) ? vd.version : null;
