@@ -1175,7 +1175,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-15 14:00';
+  var APP_VERSION = '2026-11-17 21:30';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -2180,6 +2180,30 @@
       all.forEach(function(x){ if (!keep[x.id]){ st.delete(x.id); } });
       await idbDone(tx);
     }catch(e){}
+  }
+
+  // Shows exactly why the sheet's content can't be read (read-only: nothing is written anywhere).
+  async function runCorruptDiagnosis(){
+    openModal({ type:'diag', text:'בודק את הגיליון…' });
+    var out = [];
+    try{
+      var d = await sheetsCall('');
+      var raw = d.value, CH = 40000;
+      out.push('typeof value: ' + (typeof raw) + ' · length: ' + (raw == null ? 'null' : String(raw).length) + ' · version: ' + d.version);
+      raw = raw == null ? '' : String(raw);
+      out.push('chunks (40000): ' + Math.ceil(raw.length / CH));
+      var markers = ['#ERROR!', '#NAME?', '#VALUE!', '#REF!', '#N/A', '#DIV/0!', 'Err:'];
+      markers.forEach(function(mk){ var i = raw.indexOf(mk); if (i !== -1){ out.push('נמצא "' + mk + '" במקום ' + i + ' (חתיכה ' + (Math.floor(i / CH) + 1) + ', מקום ' + (i % CH) + ' בתוכה): ' + JSON.stringify(raw.slice(Math.max(0, i - 40), i + 60))); } });
+      try{ JSON.parse(raw); out.push('JSON.parse: תקין'); }
+      catch(pe){
+        out.push('JSON.parse נכשל: ' + (pe && pe.message));
+        var pm = String(pe && pe.message).match(/position (\d+)/), pos = pm ? parseInt(pm[1], 10) : -1;
+        if (pos >= 0){ out.push('מיקום השבר: ' + pos + ' (חתיכה ' + (Math.floor(pos / CH) + 1) + ', מקום ' + (pos % CH) + ' בתוכה)'); out.push('סביב השבר: ' + JSON.stringify(raw.slice(Math.max(0, pos - 60), pos + 60))); }
+      }
+      for (var k = CH; k < raw.length; k += CH){ out.push('גבול חתיכה ' + (k / CH + 1) + ' (' + k + '): ' + JSON.stringify(raw.slice(k - 25, k)) + ' | ' + JSON.stringify(raw.slice(k, k + 40))); if (out.length > 40) break; }
+      out.push('סוף הנתונים: ' + JSON.stringify(raw.slice(-80)));
+    }catch(e){ out.push('שגיאה בקריאה: ' + ((e && e.message) || e)); }
+    if (state.modal && state.modal.type === 'diag'){ state.modal.text = out.join('\n'); render(); }
   }
   async function openRestoreDialog(){
     openModal({ type:'restoreVersions', items:null });
@@ -3302,7 +3326,8 @@
       app.appendChild(el('div',{class:'storage-warning'},[
         el('b',{},['⛔ השמירה מושבתת — נתוני הגיליון אינם קריאים']),
         el('span',{},[' ייתכן שהם נפגעו. עצרתי את השמירה כדי לא לדרוס אותם. אפשר לשחזר גרסה קודמת מהעותקים האוטומטיים. ']),
-        el('button',{class:'btn-primary', style:'padding:4px 14px;margin-inline-start:6px;', onclick:function(){ openRestoreDialog(); }},['שחזור מגרסה קודמת'])
+        el('button',{class:'btn-primary', style:'padding:4px 14px;margin-inline-start:6px;', onclick:function(){ openRestoreDialog(); }},['שחזור מגרסה קודמת']),
+        el('button',{class:'btn-ghost', style:'padding:4px 14px;margin-inline-start:6px;', onclick:function(){ runCorruptDiagnosis(); }},['🔍 אבחון (לשלוח למפתח)'])
       ]));
     }
 
@@ -3529,7 +3554,7 @@
               var isImportModal = newModal.classList.contains('import-modal');
               nFields.forEach(function(f, k){
                 if (isImportModal && f.tagName === 'SELECT'){ return; } // import modals re-detect their column choices on purpose
-                if (newModal.classList.contains('attpdf-modal')){ return; }   // the PDF window draws everything (dates, ticks, choices) from its own state
+                if (newModal.classList.contains('attpdf-modal') || newModal.classList.contains('diag-modal')){ return; }   // the PDF window draws everything (dates, ticks, choices) from its own state
                 if (f.type==='checkbox' || f.type==='radio'){ if (!newModal.classList.contains('ft-modal')){ f.checked = formCapture.values[k]; } }     /* the transfer window draws its ticks from its own state */
                 else if (f.value !== formCapture.values[k]){ f.value = formCapture.values[k]; }
               });
@@ -8606,6 +8631,20 @@
         el('div',{class:'modal-actions'},[
           el('button',{class:'btn-ghost', onclick:dismissLocalBackupPrompt},['לא, השאר ריק']),
           el('button',{class:'btn-primary', onclick:function(){ restoreFromLocalBackup(b); }},['שחזור מהגיבוי'])
+        ])
+      ]);
+    }
+
+    else if (m.type === 'diag'){
+      var dta = el('textarea', { rows:'16', readonly:'readonly', style:'width:100%;direction:ltr;font-size:12px;font-family:monospace;' });
+      dta.value = m.text || '';
+      content = el('div',{class:'modal ft-modal diag-modal', style:'max-width:640px;'},[
+        el('h2',{},['אבחון נתוני הגיליון']),
+        el('p',{style:'font-size:13px;color:var(--muted);'},['הבדיקה קוראת בלבד ולא משנה כלום. צלם מסך או העתק את הטקסט ושלח אותו.']),
+        dta,
+        el('div',{class:'modal-actions'},[
+          el('button',{class:'btn-ghost', onclick:function(){ dta.select(); try{ document.execCommand('copy'); showToast('הועתק.'); }catch(e){} }},['העתק']),
+          el('button',{class:'btn-primary', onclick:closeModal},['סגירה'])
         ])
       ]);
     }
