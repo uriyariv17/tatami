@@ -1175,7 +1175,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-19 15:30';
+  var APP_VERSION = '2026-11-19 16:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -5172,7 +5172,9 @@
   }
 
   // ---- how long a student stays: first subscription date -> leaving date (or today), with manual overrides ----
+  var tenArchSet = new WeakSet();
   function tenureRows(){
+    tenArchSet = new WeakSet();
     var masters = [];
     state.students.forEach(function(s){
       if (s.trashed) return;
@@ -5180,13 +5182,24 @@
       if (!m){ m = { rep:s, recs:[] }; masters.push(m); }
       m.recs.push(s);
     });
+    // children who only appear in a previous year's archive (they left before the year turned) count too
+    (state.yearArchives || []).forEach(function(a){
+      (a.students || []).forEach(function(s){
+        if (s.trashed) return;
+        var m = masters.filter(function(x){ return sameChild(x.rep, s); })[0];
+        if (!m){ m = { rep:s, recs:[] }; masters.push(m); }
+        m.recs.push(s); tenArchSet.add(s);
+      });
+    });
     var today = todayISO(), rows = [];
+    var paidAny = function(r){ return (r.monthlyPayments || []).some(function(x){ return x === 'paid' || x === 'problem'; }); };
     masters.forEach(function(m){
       var recs = m.recs;
       if (recs.some(function(r){ return r.tenureSkip; })) return;
-      var active = recs.some(function(r){ return r.status === 'joined'; });
-      var ever = recs.some(function(r){ return r.joinedDate || r.tenureStart || (r.status === 'joined') || (r.status === 'out' && !r.isLead); });
-      if (!ever) return;
+      var active = recs.some(function(r){ return r.status === 'joined' && !tenArchSet.has(r); });
+      var evidence = active || recs.some(function(r){ return r.joinedDate || r.tenureStart || r.tenureSub || paidAny(r); });
+      var plausible = recs.some(function(r){ return (r.status === 'joined' || r.status === 'out') && (r.groupId || tenArchSet.has(r)); });
+      if (!evidence && !plausible) return;
       var pick = function(k){ var r = recs.filter(function(x){ return x[k]; })[0]; return r ? r[k] : ''; };
       var manualStart = pick('tenureStart'), manualEnd = pick('tenureEnd');
       var joins = recs.map(function(r){ return r.joinedDate; }).filter(Boolean).sort();
@@ -5201,7 +5214,7 @@
       else if (manualEnd){ end = manualEnd; endKind = 'manual'; }
       else if (outs.length){ end = outs[outs.length - 1]; endKind = 'auto'; }
       var days = (start && end) ? Math.max(0, Math.round((new Date(end + 'T00:00:00Z') - new Date(start + 'T00:00:00Z')) / 86400000)) : null;
-      rows.push({ key:m.rep.id, gids:recs.map(function(r){ return r.groupId; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; }), recs:recs, name:m.rep.name, phone:m.rep.phone, active:active, start:start, startKind:startKind, end:end, endKind:endKind, manualStart:manualStart, manualEnd:manualEnd, days:days, months: days === null ? null : days / 30.44 });
+      rows.push({ evidence:evidence, key:m.rep.id, gids:recs.map(function(r){ return r.groupId; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; }), recs:recs, name:m.rep.name, phone:m.rep.phone, active:active, start:start, startKind:startKind, end:end, endKind:endKind, manualStart:manualStart, manualEnd:manualEnd, days:days, months: days === null ? null : days / 30.44 });
     });
     return rows;
   }
@@ -5218,6 +5231,9 @@
     var T = state.tenureUI = state.tenureUI || { q:'', sort:'long' };
     T.sel = T.sel || {}; T.group = T.group || '';
     var rows = T.group ? allRows.filter(function(r){ return r.gids.indexOf(T.group) >= 0; }) : allRows;
+    var unclear = rows.filter(function(r){ return !r.evidence; });
+    rows = rows.filter(function(r){ return r.evidence; });
+    var allCounted = allRows.filter(function(r){ return r.evidence; });
     var done = rows.filter(function(r){ return !r.active && r.months !== null; });
     var act = rows.filter(function(r){ return r.active && r.months !== null; });
     var missing = rows.filter(function(r){ return r.months === null; });
@@ -5241,7 +5257,7 @@
       var gt = el('table', { class:'student-table' }, [ el('thead', {}, [ el('tr', {}, [ el('th', {}, ['קבוצה']), el('th', {}, ['תלמידים']), el('th', {}, ['ממוצע (שעזבו)']), el('th', {}, ['ממוצע כולל פעילים']), el('th', {}, ['פעילים כרגע']) ]) ]) ]);
       var gb = el('tbody', {});
       state.groups.forEach(function(g){
-        var rs = allRows.filter(function(r){ return r.gids.indexOf(g.id) >= 0 && r.months !== null; });
+        var rs = allCounted.filter(function(r){ return r.gids.indexOf(g.id) >= 0 && r.months !== null; });
         if (!rs.length) return;
         var d = rs.filter(function(r){ return !r.active; }), a = rs.filter(function(r){ return r.active; });
         var tr = el('tr', { style:'cursor:pointer;', onclick:function(){ T.group = g.id; render(); } }, [ el('td', {}, [el('b', {}, [g.name])]), el('td', {}, [String(rs.length)]), el('td', {}, [d.length ? tenureText(avgOf(d)) + ' (' + d.length + ')' : '—']), el('td', {}, [tenureText(avgOf(rs))]), el('td', {}, [String(a.length)]) ]);
@@ -5281,6 +5297,8 @@
       el('button', { class:'btn-primary', onclick:function(){ if (!bd.value){ showToast('בחר תאריך קודם'); return; } selRows.forEach(function(r){ r.recs.forEach(function(x){ x.tenureStart = bd.value; }); }); scheduleSave(); T.sel = {}; showToast('עודכן תאריך הצטרפות ל-' + selRows.length + ' תלמידים'); render(); } }, ['עדכן הצטרפות']),
       el('span', { style:'margin-inline-start:10px;' }, ['תאריך עזיבה משותף:']), ed,
       el('button', { class:'btn-primary', onclick:function(){ if (!ed.value){ showToast('בחר תאריך עזיבה קודם'); return; } var ok = selRows.filter(function(r){ return !r.active; }), skipped = selRows.length - ok.length; ok.forEach(function(r){ r.recs.forEach(function(x){ x.tenureEnd = ed.value; }); }); scheduleSave(); T.sel = {}; showToast('עודכן תאריך עזיבה ל-' + ok.length + ' תלמידים' + (skipped ? ' · ' + skipped + ' פעילים דולגו (עדיין לומדים)' : '')); render(); } }, ['עדכן עזיבה']),
+      el('button', { class:'btn-ghost', onclick:function(){ selRows.forEach(function(r){ r.recs.forEach(function(x){ x.tenureSub = true; }); }); scheduleSave(); T.sel = {}; showToast('סומנו כמנויים: ' + selRows.length); render(); } }, ['✓ היו מנויים']),
+      el('button', { class:'btn-ghost', onclick:function(){ openConfirm('להוציא ' + selRows.length + ' תלמידים מהחישוב (לא היו מנויים, רק ניסיון)?', function(){ selRows.forEach(function(r){ r.recs.forEach(function(x){ x.tenureSkip = true; }); }); scheduleSave(); T.sel = {}; render(); }, 'הוצאה'); } }, ['✕ לא היו מנויים']),
       el('button', { class:'btn-ghost', onclick:function(){ T.sel = {}; render(); } }, ['נקה סימון'])
     ]);
     wrap.appendChild(bulk);
@@ -5297,6 +5315,25 @@
     var list = done.concat(act).filter(function(r){ return !T.q || normNameKey(r.name).indexOf(normNameKey(T.q)) >= 0; });
     list.sort(function(a, b){ return T.sort === 'name' ? String(a.name).localeCompare(String(b.name), 'he') : (T.sort === 'short' ? a.months - b.months : b.months - a.months); });
     wrap.appendChild(tbl(list));
+    if (unclear.length){
+      var det = el('details', { style:'margin:16px 0;padding:10px;border:1px dashed #d4a017;border-radius:10px;background:#fffbea;' });
+      if (T.unclearOpen) det.setAttribute('open', '');
+      det.addEventListener('toggle', function(){ T.unclearOpen = det.open; });
+      det.appendChild(el('summary', { style:'cursor:pointer;font-weight:bold;' }, ['❓ ' + unclear.length + ' תלמידים שלא ברור אם היו מנויים (אין תאריך הצטרפות ולא שולם עבורם) – לא נכללים בחישוב']));
+      det.appendChild(el('div', { style:'font-size:12.5px;color:var(--muted);margin:6px 0;' }, ['סמן "היו מנויים" למי שהיה רשום (ואז תוכל להזין תאריכים), או "לא היו מנויים" למי שהיה רק בניסיון. אפשר לסמן כמה ביחד בתיבות ובפס הכחול.']));
+      var ut = el('table', { class:'student-table' }, [ el('thead', {}, [ el('tr', {}, [ el('th', {}, [(function(){ var c = el('input', { type:'checkbox' }); c.checked = unclear.every(function(r){ return T.sel[r.key]; }); c.addEventListener('change', function(e){ unclear.forEach(function(r){ if (e.target.checked) T.sel[r.key] = true; else delete T.sel[r.key]; }); render(); }); return c; })()]), el('th', {}, ['תלמיד']), el('th', {}, ['קבוצה']), el('th', {}, ['סטטוס']), el('th', {}, ['']) ]) ]) ]);
+      var ub = el('tbody', {});
+      unclear.forEach(function(r){
+        var gn = r.gids.map(function(id){ var g = state.groups.filter(function(x){ return x.id === id; })[0]; return g ? g.name : ''; }).filter(Boolean).join(', ');
+        ub.appendChild(el('tr', {}, [
+          el('td', {}, [ (function(){ var c = el('input', { type:'checkbox' }); c.checked = !!T.sel[r.key]; c.addEventListener('change', function(e){ if (e.target.checked) T.sel[r.key] = true; else delete T.sel[r.key]; render(); }); return c; })() ]),
+          el('td', {}, [el('b', {}, [r.name])]), el('td', {}, [gn || '—']), el('td', {}, [r.recs.some(function(x){ return tenArchSet.has(x); }) ? 'מארכיון שנה קודמת' : 'לא רלוונטי']),
+          el('td', {}, [ el('button', { class:'btn-ghost', onclick:function(){ tenureSet(r, { tenureSub:true }); } }, ['✓ היה מנוי']), el('button', { class:'btn-ghost', onclick:function(){ tenureSet(r, { tenureSkip:true }); } }, ['✕ רק ניסיון']) ])
+        ]));
+      });
+      ut.appendChild(ub); var uw = el('div', { style:'overflow-x:auto;' }, [ut]); try{ cardify(ut, uw); }catch(e){}
+      det.appendChild(uw); wrap.appendChild(det);
+    }
     return wrap;
   }
   function renderMuniView(){
