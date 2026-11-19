@@ -1175,7 +1175,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-17 22:00';
+  var APP_VERSION = '2026-11-19 14:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -3426,6 +3426,7 @@
         el('button',{class:'more-menu-item'+(state.view==='leads'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='leads'; render(); }},['📈 לידים לניתוח ROI ('+leadsCount+')']),
         el('button',{class:'more-menu-item'+(state.view==='archive'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='archive'; render(); }},['🗄 ארכיון ('+archivedCount+')']),
         el('button',{class:'more-menu-item'+(state.view==='byStatus'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='byStatus'; render(); }},['📋 כל התלמידים לפי סטטוס']),
+        el('button',{class:'more-menu-item'+(state.view==='tenure'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='tenure'; render(); }},['⏱ משך לימוד ממוצע']),
         el('button',{class:'more-menu-item'+(state.view==='muni'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='muni'; render(); }},['🏛️ דוח לעירייה']),
         el('button',{class:'more-menu-item'+(state.view==='shirts'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='shirts'; render(); }},['👕 חולצות להביא השבוע ('+shirtsNeeded().length+')']),
         el('button',{class:'more-menu-item'+(state.view==='calc'?' active':''), onclick:function(){ state.showMoreActions=false; state.view='calc'; render(); }},['🧮 מחשבון כדאיות עבודה']),
@@ -3480,6 +3481,7 @@
       main.appendChild(renderLeadsView());
     } else if (state.view === 'archive'){
       main.appendChild(renderArchiveView());
+    } else if (state.view === 'tenure'){ main.appendChild(renderTenureView());
     } else if (state.view === 'muni'){ main.appendChild(renderMuniView()); } else if (state.view === 'shirts'){ main.appendChild(renderShirtsView()); } else if (state.view === 'calc'){ main.appendChild(renderCalcView()); } else if (state.view === 'followup'){ main.appendChild(renderFollowupView()); } else if (state.view === 'byStatus'){
       main.appendChild(renderByStatusView());
     } else if (state.view === 'pastYears'){
@@ -4350,6 +4352,55 @@
     box.appendChild(el('div',{class:'table-wrap'},[ el('table',{},[head, body]) ]));
     return box;
   }
+  // ---- distribution of leads by day: bar per day + average line ----
+  function renderLeadsPerDay(){
+    var rng = state.leadDayRange || 30;
+    var leads = state.students.filter(function(s){ return s.isLead && isPrimaryLead(s) && leadDateOf(s); });
+    var box = el('div',{class:'lead-day-box', style:'margin:14px 0;padding:12px;border:1px solid var(--border,#ddd);border-radius:12px;background:var(--card,#fff);'});
+    var sel = el('select',{style:'margin-inline-start:8px;'},[ el('option',{value:'30'},['30 ימים אחרונים']), el('option',{value:'60'},['60 ימים אחרונים']), el('option',{value:'90'},['90 ימים אחרונים']), el('option',{value:'365'},['שנה אחרונה']), el('option',{value:'0'},['מכל התקופה']) ]);
+    sel.value = String(rng);
+    sel.addEventListener('change', function(e){ state.leadDayRange = Number(e.target.value); render(); });
+    var counts = {}, minD = '9999';
+    leads.forEach(function(s){ var d = leadDateOf(s).slice(0,10); counts[d] = (counts[d]||0) + 1; if (d < minD) minD = d; });
+    var today = todayISO(), start = rng ? addDaysISO(today, -(rng-1)) : (minD === '9999' ? today : minD);
+    if (rng && minD !== '9999' && minD > start && state.leadDayRange === 0) start = minD;
+    var days = [], d = start, guard = 0;
+    while (d <= today && guard++ < 1500){ days.push(d); d = addDaysISO(d, 1); }
+    var vals = days.map(function(x){ return counts[x] || 0; });
+    var total = vals.reduce(function(a,b){ return a+b; }, 0), avg = days.length ? total / days.length : 0;
+    var mx = Math.max.apply(null, vals.concat([1])), peak = mx;
+    box.appendChild(el('div',{style:'display:flex;flex-wrap:wrap;align-items:center;gap:6px;justify-content:space-between;margin-bottom:6px;'},[
+      el('b',{},['📅 התפלגות לידים לפי ימים']), el('span',{},['תקופה:', sel])
+    ]));
+    box.appendChild(el('div',{style:'font-size:13px;color:var(--muted);margin-bottom:8px;'},[
+      'סה"כ ' + total + ' לידים ב-' + days.length + ' ימים · ממוצע ליום: ', el('b',{style:'color:#c0392b;'},[avg.toFixed(2)]), ' · שיא: ' + peak + ' ביום אחד'
+    ]));
+    var W = Math.max(320, days.length * 14), H = 190, padL = 28, padB = 30, padT = 10, plotH = H - padB - padT, plotW = W - padL - 6;
+    var bw = plotW / Math.max(days.length,1);
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns,'svg'); svg.setAttribute('viewBox','0 0 '+W+' '+H); svg.setAttribute('width', W); svg.setAttribute('height', H); svg.setAttribute('direction','ltr'); svg.style.maxWidth = 'none';
+    function mk(tag, attrs, text){ var n = document.createElementNS(ns, tag); Object.keys(attrs).forEach(function(k){ n.setAttribute(k, attrs[k]); }); if (text !== undefined) n.textContent = text; svg.appendChild(n); return n; }
+    var yMax = Math.max(mx, Math.ceil(avg), 1);
+    for (var g = 0; g <= 4; g++){
+      var v = Math.round(yMax * g / 4), y = padT + plotH - (v / yMax) * plotH;
+      mk('line',{x1:padL,x2:W-4,y1:y,y2:y,stroke:'#8884',  'stroke-width':1});
+      mk('text',{x:padL-4,y:y+4,'text-anchor':'end','font-size':10,fill:'#888'}, v);
+    }
+    vals.forEach(function(v,i){
+      var bh = (v / yMax) * plotH, x = padL + i * bw;
+      var r = mk('rect',{x:x+1,y:padT+plotH-bh,width:Math.max(bw-2,2),height:Math.max(bh,v?1:0),rx:2,fill:'#2e86de'});
+      var t = document.createElementNS(ns,'title'); t.textContent = days[i].split('-').reverse().join('/') + ': ' + v + ' לידים'; r.appendChild(t);
+      if (v && bw >= 12){ mk('text',{x:x+bw/2,y:padT+plotH-bh-2,'text-anchor':'middle','font-size':9,fill:'#555'}, v); }
+      var step = Math.ceil(days.length / Math.floor(plotW / 44));
+      if (i % step === 0){ var p = days[i].split('-'); mk('text',{x:x+bw/2,y:H-12,'text-anchor':'middle','font-size':9,fill:'#888'}, p[2]+'/'+p[1]); }
+    });
+    var ya = padT + plotH - (avg / yMax) * plotH;
+    mk('line',{x1:padL,x2:W-4,y1:ya,y2:ya,stroke:'#c0392b','stroke-width':2,'stroke-dasharray':'6 4'});
+    mk('text',{x:padL+4,y:ya-4,'text-anchor':'start','font-size':11,fill:'#c0392b','font-weight':'bold','paint-order':'stroke',stroke:'#fff','stroke-width':3}, 'ממוצע ' + avg.toFixed(2));
+    var sc = el('div',{style:'overflow-x:auto;direction:ltr;'}); sc.appendChild(svg);
+    box.appendChild(sc);
+    return box;
+  }
   function renderCampaignAnalysis(){
     var box = el('div',{class:'campaign-analysis'});
 
@@ -4361,6 +4412,7 @@
       el('div',{class:'campaign-summary-item'},[el('div',{class:'campaign-summary-label'},['סה"כ תמורה שהתקבלה אי-פעם']), el('div',{class:'campaign-summary-value good'},['₪'+totalRevenue.toLocaleString()])]),
       el('div',{class:'campaign-summary-item'},[el('div',{class:'campaign-summary-label'},['נטו כולל (תמורה פחות הוצאה על פרסום)']), el('div',{class:'campaign-summary-value'+(totalNet>=0?' good':' bad')},['₪'+totalNet.toLocaleString()])])
     ]));
+    box.appendChild(renderLeadsPerDay());
     var noCost = state.campaigns.filter(function(c){ return !(Number(c.cost) > 0); });
     if (noCost.length){
       box.appendChild(el('div',{class:'lead-nocamp camp-nocost-warn'},['⚠ לא הוזנה הוצאה ל' + (noCost.length === 1 ? 'קמפיין: ' : '-' + noCost.length + ' קמפיינים: ') + noCost.map(function(c){ return '"' + c.name + '"'; }).join(', ') + '. עד שתזין (בשדה "הוצאה עד כה" בשורת הקמפיין למטה), הנטו שווה לכל התמורה ונראה כמו רווח גדול.']));
@@ -5119,6 +5171,103 @@
     }catch(e){ M.error = e.message || String(e); render(); }
   }
 
+  // ---- how long a student stays: first subscription date -> leaving date (or today), with manual overrides ----
+  function tenureRows(){
+    var masters = [];
+    state.students.forEach(function(s){
+      if (s.trashed) return;
+      var m = masters.filter(function(x){ return sameChild(x.rep, s); })[0];
+      if (!m){ m = { rep:s, recs:[] }; masters.push(m); }
+      m.recs.push(s);
+    });
+    var today = todayISO(), rows = [];
+    masters.forEach(function(m){
+      var recs = m.recs;
+      if (recs.some(function(r){ return r.tenureSkip; })) return;
+      var active = recs.some(function(r){ return r.status === 'joined'; });
+      var ever = recs.some(function(r){ return r.joinedDate || r.tenureStart || (r.status === 'joined') || (r.status === 'out' && !r.isLead); });
+      if (!ever) return;
+      var pick = function(k){ var r = recs.filter(function(x){ return x[k]; })[0]; return r ? r[k] : ''; };
+      var manualStart = pick('tenureStart'), manualEnd = pick('tenureEnd');
+      var joins = recs.map(function(r){ return r.joinedDate; }).filter(Boolean).sort();
+      var outs = recs.map(function(r){ return r.outDate; }).filter(Boolean).sort();
+      var start = manualStart || joins[0] || '', startKind = manualStart ? 'manual' : (joins[0] ? 'auto' : '');
+      if (!start){
+        var est = recs.map(function(r){ return r.dateAdded; }).filter(Boolean).sort()[0];
+        if (est && active){ start = est; startKind = 'est'; }
+      }
+      var end = '', endKind = '';
+      if (active){ end = today; endKind = 'active'; }
+      else if (manualEnd){ end = manualEnd; endKind = 'manual'; }
+      else if (outs.length){ end = outs[outs.length - 1]; endKind = 'auto'; }
+      var days = (start && end) ? Math.max(0, Math.round((new Date(end + 'T00:00:00Z') - new Date(start + 'T00:00:00Z')) / 86400000)) : null;
+      rows.push({ recs:recs, name:m.rep.name, phone:m.rep.phone, active:active, start:start, startKind:startKind, end:end, endKind:endKind, manualStart:manualStart, manualEnd:manualEnd, days:days, months: days === null ? null : days / 30.44 });
+    });
+    return rows;
+  }
+  function tenureSet(row, patch){ row.recs.forEach(function(r){ Object.assign(r, patch); }); scheduleSave(); render(); }
+  function tenureText(mo){
+    if (mo === null) return '—';
+    if (mo < 1) return Math.round(mo * 30.44) + ' ימים';
+    var y = Math.floor(mo / 12), r = Math.round(mo - y * 12);
+    if (r === 12){ y++; r = 0; }
+    return y ? (y + (y === 1 ? ' שנה' : ' שנים') + (r ? ' ו-' + r + ' חודשים' : '')) : (mo.toFixed(1).replace(/\.0$/, '') + ' חודשים');
+  }
+  function renderTenureView(){
+    var rows = tenureRows(), wrap = el('div', {});
+    var T = state.tenureUI = state.tenureUI || { q:'', sort:'long' };
+    var done = rows.filter(function(r){ return !r.active && r.months !== null; });
+    var act = rows.filter(function(r){ return r.active && r.months !== null; });
+    var missing = rows.filter(function(r){ return r.months === null; });
+    var avg = function(a){ return a.length ? a.reduce(function(s, r){ return s + r.months; }, 0) / a.length : null; };
+    var med = function(a){ if (!a.length) return null; var v = a.map(function(r){ return r.months; }).sort(function(x, y){ return x - y; }), k = Math.floor(v.length / 2); return v.length % 2 ? v[k] : (v[k-1] + v[k]) / 2; };
+    wrap.appendChild(el('div', { class:'group-header' }, [ el('div', {}, [
+      el('h2', {}, ['⏱ משך לימוד של תלמידים']),
+      el('p', { style:'color:var(--muted);font-size:13px;margin:4px 0 0;line-height:1.6;' }, ['מהצטרפות ראשונה כמנוי ועד העזיבה (או עד היום למי שעדיין לומד). חזרה של תלמיד נספרת כהמשך מההצטרפות הראשונה. אפשר לכתוב או לתקן תאריך ידנית בכל שורה.'])
+    ]) ]));
+    var card = function(label, val, sub){ return el('div', { class:'campaign-summary-item' }, [ el('div', { class:'campaign-summary-label' }, [label]), el('div', { class:'campaign-summary-value' }, [val]), sub ? el('div', { style:'font-size:12px;color:var(--muted);' }, [sub]) : null ]); };
+    wrap.appendChild(el('div', { class:'campaign-summary' }, [
+      card('ממוצע משך לימוד (מי שעזבו)', tenureText(avg(done)), done.length + ' תלמידים · חציון ' + tenureText(med(done))),
+      card('ממוצע כולל פעילים עד היום', tenureText(avg(done.concat(act))), (done.length + act.length) + ' תלמידים'),
+      card('לומדים כרגע – ממוצע ותק', tenureText(avg(act)), act.length + ' תלמידים')
+    ]));
+    var dateIn = function(row, key, val, kind){
+      var i = el('input', { type:'date', value: val || '', style:'min-width:130px;' });
+      if (kind === 'est'){ i.title = 'משוער: מתאריך הוספה למערכת'; i.style.background = '#fff6d6'; }
+      if (kind === 'manual'){ i.style.background = '#e6f2ff'; }
+      i.addEventListener('change', function(e){ var v = e.target.value; var patch = {}; patch[key] = v || ''; tenureSet(row, patch); });
+      return i;
+    };
+    var tbl = function(list, showAll){
+      var t = el('table', { class:'student-table' }, [ el('thead', {}, [ el('tr', {}, [ el('th', {}, ['תלמיד']), el('th', {}, ['הצטרף']), el('th', {}, ['עזב']), el('th', {}, ['משך']), el('th', {}, ['']) ]) ]) ]);
+      var tb = el('tbody', {});
+      list.forEach(function(r){
+        var tr = el('tr', {}, [
+          el('td', {}, [ el('b', {}, [r.name]), r.active ? el('span', { class:'lesson-chip free', style:'margin-inline-start:6px;' }, ['פעיל']) : null ]),
+          el('td', {}, [ dateIn(r, 'tenureStart', r.start, r.startKind) ]),
+          el('td', {}, [ r.active ? el('span', { style:'color:var(--muted);font-size:12.5px;' }, ['עד היום']) : dateIn(r, 'tenureEnd', r.end, r.endKind) ]),
+          el('td', {}, [ tenureText(r.months) ]),
+          el('td', {}, [ el('button', { class:'btn-ghost', title:'לא היה מנוי – להוציא מהחישוב', onclick:function(){ openConfirm('להוציא את "' + r.name + '" מחישוב משך הלימוד? (לא היה מנוי)', function(){ tenureSet(r, { tenureSkip:true }); }, 'הוצאה'); } }, ['✕']) ])
+        ]);
+        tb.appendChild(tr);
+      });
+      t.appendChild(tb); var w = el('div', { style:'overflow-x:auto;' }, [t]); try{ cardify(t, w); }catch(e){} return w;
+    };
+    if (missing.length){
+      wrap.appendChild(el('div', { class:'lead-nocamp', style:'margin:14px 0 6px;' }, ['⚠ ' + missing.length + ' תלמידים בלי תאריך הצטרפות או עזיבה – אפשר למלא כאן ידנית (✕ = לא היה מנוי):']));
+      wrap.appendChild(tbl(missing));
+    }
+    var q = el('input', { type:'text', placeholder:'חיפוש שם…', value:T.q, style:'margin:12px 0 6px;max-width:240px;' });
+    q.addEventListener('input', function(e){ T.q = e.target.value; render(); var n = document.querySelector('.tenure-q'); if (n){ n.focus(); n.setSelectionRange(T.q.length, T.q.length); } });
+    q.classList.add('tenure-q');
+    var srt = el('select', { style:'margin-inline-start:8px;' }, [ el('option', { value:'long' }, ['מהארוך לקצר']), el('option', { value:'short' }, ['מהקצר לארוך']), el('option', { value:'name' }, ['לפי שם']) ]);
+    srt.value = T.sort; srt.addEventListener('change', function(e){ T.sort = e.target.value; render(); });
+    wrap.appendChild(el('div', {}, [q, srt]));
+    var list = done.concat(act).filter(function(r){ return !T.q || normNameKey(r.name).indexOf(normNameKey(T.q)) >= 0; });
+    list.sort(function(a, b){ return T.sort === 'name' ? String(a.name).localeCompare(String(b.name), 'he') : (T.sort === 'short' ? a.months - b.months : b.months - a.months); });
+    wrap.appendChild(tbl(list));
+    return wrap;
+  }
   function renderMuniView(){
     muniLoad();
     var M = state.muni, cfg = M.cfg, wrap = el('div', {});
@@ -7477,6 +7626,28 @@
     var pd = digitsOf(phone), nn = normNameKey(name);
     return state.students.find(function(x){ return !x.trashed && x.groupId === groupId && normNameKey(x.name) === nn && (!pd || !x.phone || digitsOf(x.phone) === pd); }) || null;
   }
+  // Leads sent from the iPhone Shortcut (WhatsApp "share contact") arrive as responses of the form "lead":
+  // each becomes a general lead (no group) and is marked handled in the sheet.
+  var leadImporting = {};
+  function importWhatsappLeads(items){
+    if (state.readOnly || !state.loaded) return;
+    var fresh = (items || []).filter(function(i){ return i.form === 'lead' && i.status === 'new' && !leadImporting[i.id]; });
+    if (!fresh.length) return;
+    var added = 0;
+    fresh.forEach(function(it){
+      leadImporting[it.id] = true;
+      var name = (it.child || '').trim(), pd = digitsOf(it.phone);
+      var dup = state.students.find(function(x){ return x.leadFormId === it.id || (pd && !x.trashed && digitsOf(x.phone) === pd); });
+      var note = dup ? 'כבר קיים: ' + dup.name : 'נוסף כליד';
+      if (!dup){
+        var s = addStudent({ name: name || it.phone || 'ליד חדש', phone: it.phone || '', groupId: '', status: 'follow' });
+        s.isLead = true; s.leadMarkedDate = todayISO(); s.leadFormId = it.id; s.leadChannel = 'whatsapp';
+        added++;
+      }
+      sheetsPostAction({ action:'markResponse', form:'lead', id:it.id, status:'handled', note:note }).catch(function(){ delete leadImporting[it.id]; });
+    });
+    if (added){ showToast(added === 1 ? 'נוסף ליד חדש מווטסאפ' : 'נוספו ' + added + ' לידים חדשים מווטסאפ'); }
+  }
   async function loadInbox(quiet){
     var ib = state.inbox;
     var rec = formsRecord();
@@ -7487,6 +7658,8 @@
       var d = await sheetsCall('&action=listResponses&status=' + (ib.showAll ? 'all' : 'new'));
       if (!d || !d.responses){ ib.supported = false; ib.items = []; }
       else { ib.supported = true; ib.items = d.responses; }
+      importWhatsappLeads(ib.items);
+      ib.items = ib.items.filter(function(i){ return i.form !== 'lead'; });
       ib.error = '';
       ib.newCount = ib.items.filter(function(i){ return i.status === 'new' && i.form !== 'merch'; }).length;
       ib.merchNew = ib.items.filter(function(i){ return i.status === 'new' && i.form === 'merch'; }).length;
