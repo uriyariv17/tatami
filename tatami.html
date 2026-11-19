@@ -1175,7 +1175,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-19 14:00';
+  var APP_VERSION = '2026-11-19 15:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -5201,7 +5201,7 @@
       else if (manualEnd){ end = manualEnd; endKind = 'manual'; }
       else if (outs.length){ end = outs[outs.length - 1]; endKind = 'auto'; }
       var days = (start && end) ? Math.max(0, Math.round((new Date(end + 'T00:00:00Z') - new Date(start + 'T00:00:00Z')) / 86400000)) : null;
-      rows.push({ recs:recs, name:m.rep.name, phone:m.rep.phone, active:active, start:start, startKind:startKind, end:end, endKind:endKind, manualStart:manualStart, manualEnd:manualEnd, days:days, months: days === null ? null : days / 30.44 });
+      rows.push({ key:m.rep.id, gids:recs.map(function(r){ return r.groupId; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; }), recs:recs, name:m.rep.name, phone:m.rep.phone, active:active, start:start, startKind:startKind, end:end, endKind:endKind, manualStart:manualStart, manualEnd:manualEnd, days:days, months: days === null ? null : days / 30.44 });
     });
     return rows;
   }
@@ -5214,8 +5214,10 @@
     return y ? (y + (y === 1 ? ' שנה' : ' שנים') + (r ? ' ו-' + r + ' חודשים' : '')) : (mo.toFixed(1).replace(/\.0$/, '') + ' חודשים');
   }
   function renderTenureView(){
-    var rows = tenureRows(), wrap = el('div', {});
+    var allRows = tenureRows(), wrap = el('div', {});
     var T = state.tenureUI = state.tenureUI || { q:'', sort:'long' };
+    T.sel = T.sel || {}; T.group = T.group || '';
+    var rows = T.group ? allRows.filter(function(r){ return r.gids.indexOf(T.group) >= 0; }) : allRows;
     var done = rows.filter(function(r){ return !r.active && r.months !== null; });
     var act = rows.filter(function(r){ return r.active && r.months !== null; });
     var missing = rows.filter(function(r){ return r.months === null; });
@@ -5225,12 +5227,30 @@
       el('h2', {}, ['⏱ משך לימוד של תלמידים']),
       el('p', { style:'color:var(--muted);font-size:13px;margin:4px 0 0;line-height:1.6;' }, ['מהצטרפות ראשונה כמנוי ועד העזיבה (או עד היום למי שעדיין לומד). חזרה של תלמיד נספרת כהמשך מההצטרפות הראשונה. אפשר לכתוב או לתקן תאריך ידנית בכל שורה.'])
     ]) ]));
+    var avgOf = function(a){ return a.length ? a.reduce(function(s, r){ return s + r.months; }, 0) / a.length : null; };
+    var gSel = el('select', { style:'margin:8px 0;font-weight:bold;' }, [ el('option', { value:'' }, ['כל הקבוצות']) ].concat(state.groups.map(function(g){ return el('option', { value:g.id }, [g.name]); })));
+    gSel.value = T.group; gSel.addEventListener('change', function(e){ T.group = e.target.value; render(); });
+    wrap.appendChild(el('div', {}, ['הצג לפי קבוצה: ', gSel]));
     var card = function(label, val, sub){ return el('div', { class:'campaign-summary-item' }, [ el('div', { class:'campaign-summary-label' }, [label]), el('div', { class:'campaign-summary-value' }, [val]), sub ? el('div', { style:'font-size:12px;color:var(--muted);' }, [sub]) : null ]); };
     wrap.appendChild(el('div', { class:'campaign-summary' }, [
       card('ממוצע משך לימוד (מי שעזבו)', tenureText(avg(done)), done.length + ' תלמידים · חציון ' + tenureText(med(done))),
       card('ממוצע כולל פעילים עד היום', tenureText(avg(done.concat(act))), (done.length + act.length) + ' תלמידים'),
       card('לומדים כרגע – ממוצע ותק', tenureText(avg(act)), act.length + ' תלמידים')
     ]));
+    if (!T.group){
+      var gt = el('table', { class:'student-table' }, [ el('thead', {}, [ el('tr', {}, [ el('th', {}, ['קבוצה']), el('th', {}, ['תלמידים']), el('th', {}, ['ממוצע (שעזבו)']), el('th', {}, ['ממוצע כולל פעילים']), el('th', {}, ['פעילים כרגע']) ]) ]) ]);
+      var gb = el('tbody', {});
+      state.groups.forEach(function(g){
+        var rs = allRows.filter(function(r){ return r.gids.indexOf(g.id) >= 0 && r.months !== null; });
+        if (!rs.length) return;
+        var d = rs.filter(function(r){ return !r.active; }), a = rs.filter(function(r){ return r.active; });
+        var tr = el('tr', { style:'cursor:pointer;', onclick:function(){ T.group = g.id; render(); } }, [ el('td', {}, [el('b', {}, [g.name])]), el('td', {}, [String(rs.length)]), el('td', {}, [d.length ? tenureText(avgOf(d)) + ' (' + d.length + ')' : '—']), el('td', {}, [tenureText(avgOf(rs))]), el('td', {}, [String(a.length)]) ]);
+        gb.appendChild(tr);
+      });
+      gt.appendChild(gb); var gw = el('div', { style:'overflow-x:auto;margin:10px 0;' }, [gt]); try{ cardify(gt, gw); }catch(e){}
+      wrap.appendChild(el('div', { style:'font-weight:bold;margin:12px 0 4px;' }, ['לפי קבוצה (לחיצה על קבוצה מציגה אותה לבד)']));
+      wrap.appendChild(gw);
+    }
     var dateIn = function(row, key, val, kind){
       var i = el('input', { type:'date', value: val || '', style:'min-width:130px;' });
       if (kind === 'est'){ i.title = 'משוער: מתאריך הוספה למערכת'; i.style.background = '#fff6d6'; }
@@ -5239,10 +5259,11 @@
       return i;
     };
     var tbl = function(list, showAll){
-      var t = el('table', { class:'student-table' }, [ el('thead', {}, [ el('tr', {}, [ el('th', {}, ['תלמיד']), el('th', {}, ['הצטרף']), el('th', {}, ['עזב']), el('th', {}, ['משך']), el('th', {}, ['']) ]) ]) ]);
+      var t = el('table', { class:'student-table' }, [ el('thead', {}, [ el('tr', {}, [ el('th', {}, [(function(){ var c = el('input', { type:'checkbox' }); c.checked = list.length > 0 && list.every(function(r){ return T.sel[r.key]; }); c.title = 'סמן הכל ברשימה'; c.addEventListener('change', function(e){ list.forEach(function(r){ if (e.target.checked) T.sel[r.key] = true; else delete T.sel[r.key]; }); render(); }); return c; })()]), el('th', {}, ['תלמיד']), el('th', {}, ['הצטרף']), el('th', {}, ['עזב']), el('th', {}, ['משך']), el('th', {}, ['']) ]) ]) ]);
       var tb = el('tbody', {});
       list.forEach(function(r){
         var tr = el('tr', {}, [
+          el('td', {}, [ (function(){ var c = el('input', { type:'checkbox' }); c.checked = !!T.sel[r.key]; c.addEventListener('change', function(e){ if (e.target.checked) T.sel[r.key] = true; else delete T.sel[r.key]; render(); }); return c; })() ]),
           el('td', {}, [ el('b', {}, [r.name]), r.active ? el('span', { class:'lesson-chip free', style:'margin-inline-start:6px;' }, ['פעיל']) : null ]),
           el('td', {}, [ dateIn(r, 'tenureStart', r.start, r.startKind) ]),
           el('td', {}, [ r.active ? el('span', { style:'color:var(--muted);font-size:12.5px;' }, ['עד היום']) : dateIn(r, 'tenureEnd', r.end, r.endKind) ]),
@@ -5253,6 +5274,14 @@
       });
       t.appendChild(tb); var w = el('div', { style:'overflow-x:auto;' }, [t]); try{ cardify(t, w); }catch(e){} return w;
     };
+    var selRows = allRows.filter(function(r){ return T.sel[r.key]; });
+    var bd = el('input', { type:'date', style:'min-width:140px;' });
+    var bulk = el('div', { style:'position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0;padding:10px;border-radius:10px;background:#e6f2ff;border:1px solid #9cc3f0;' + (selRows.length ? '' : 'display:none;') }, [
+      el('b', {}, [selRows.length + ' סומנו']), el('span', {}, ['תאריך הצטרפות משותף:']), bd,
+      el('button', { class:'btn-primary', onclick:function(){ if (!bd.value){ showToast('בחר תאריך קודם'); return; } selRows.forEach(function(r){ r.recs.forEach(function(x){ x.tenureStart = bd.value; }); }); scheduleSave(); T.sel = {}; showToast('עודכן תאריך הצטרפות ל-' + selRows.length + ' תלמידים'); render(); } }, ['עדכן']),
+      el('button', { class:'btn-ghost', onclick:function(){ T.sel = {}; render(); } }, ['נקה סימון'])
+    ]);
+    wrap.appendChild(bulk);
     if (missing.length){
       wrap.appendChild(el('div', { class:'lead-nocamp', style:'margin:14px 0 6px;' }, ['⚠ ' + missing.length + ' תלמידים בלי תאריך הצטרפות או עזיבה – אפשר למלא כאן ידנית (✕ = לא היה מנוי):']));
       wrap.appendChild(tbl(missing));
