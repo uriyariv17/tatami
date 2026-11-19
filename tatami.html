@@ -1175,7 +1175,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-19 15:00';
+  var APP_VERSION = '2026-11-19 15:30';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -5275,10 +5275,12 @@
       t.appendChild(tb); var w = el('div', { style:'overflow-x:auto;' }, [t]); try{ cardify(t, w); }catch(e){} return w;
     };
     var selRows = allRows.filter(function(r){ return T.sel[r.key]; });
-    var bd = el('input', { type:'date', style:'min-width:140px;' });
+    var bd = el('input', { type:'date', style:'min-width:140px;' }), ed = el('input', { type:'date', style:'min-width:140px;' });
     var bulk = el('div', { style:'position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 0;padding:10px;border-radius:10px;background:#e6f2ff;border:1px solid #9cc3f0;' + (selRows.length ? '' : 'display:none;') }, [
       el('b', {}, [selRows.length + ' סומנו']), el('span', {}, ['תאריך הצטרפות משותף:']), bd,
-      el('button', { class:'btn-primary', onclick:function(){ if (!bd.value){ showToast('בחר תאריך קודם'); return; } selRows.forEach(function(r){ r.recs.forEach(function(x){ x.tenureStart = bd.value; }); }); scheduleSave(); T.sel = {}; showToast('עודכן תאריך הצטרפות ל-' + selRows.length + ' תלמידים'); render(); } }, ['עדכן']),
+      el('button', { class:'btn-primary', onclick:function(){ if (!bd.value){ showToast('בחר תאריך קודם'); return; } selRows.forEach(function(r){ r.recs.forEach(function(x){ x.tenureStart = bd.value; }); }); scheduleSave(); T.sel = {}; showToast('עודכן תאריך הצטרפות ל-' + selRows.length + ' תלמידים'); render(); } }, ['עדכן הצטרפות']),
+      el('span', { style:'margin-inline-start:10px;' }, ['תאריך עזיבה משותף:']), ed,
+      el('button', { class:'btn-primary', onclick:function(){ if (!ed.value){ showToast('בחר תאריך עזיבה קודם'); return; } var ok = selRows.filter(function(r){ return !r.active; }), skipped = selRows.length - ok.length; ok.forEach(function(r){ r.recs.forEach(function(x){ x.tenureEnd = ed.value; }); }); scheduleSave(); T.sel = {}; showToast('עודכן תאריך עזיבה ל-' + ok.length + ' תלמידים' + (skipped ? ' · ' + skipped + ' פעילים דולגו (עדיין לומדים)' : '')); render(); } }, ['עדכן עזיבה']),
       el('button', { class:'btn-ghost', onclick:function(){ T.sel = {}; render(); } }, ['נקה סימון'])
     ]);
     wrap.appendChild(bulk);
