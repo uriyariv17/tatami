@@ -1175,7 +1175,7 @@
   // Set USE_SHEETS_BACKEND to false to revert to Claude's built-in storage.
   // Bumped every time this file is edited — check this against what Claude
   // says it just gave you, to confirm you're actually running the latest copy.
-  var APP_VERSION = '2026-11-19 16:00';
+  var APP_VERSION = '2026-11-25 13:00';
 
   var USE_SHEETS_BACKEND = true;
   var SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbw3VADMJyWyXnv8_BV4T0KJjhvyV7BlBvgAL6pUCUbxFcgh15JpPYwetpa9DUMpiaqu/exec';
@@ -1479,6 +1479,7 @@
         if (!showFeedback && lastKnownServerContent !== null && (raw || '{}') === lastKnownServerContent){
           // Nothing changed since we last looked — don't touch the screen at all.
           lastRefreshTime = Date.now();
+          if (r.version !== null && r.version !== undefined){ knownServerVersion = r.version; }
           return;
         }
         if (state.hasUnsavedChanges && !showFeedback){ return; } // a save started while we were fetching — keep local changes
@@ -1515,19 +1516,52 @@
       if (showFeedback){ showToast('הרענון נכשל — בדוק חיבור לאינטרנט.'); }
     }
   }
-  function maybeAutoRefresh(){
+  function maybeAutoRefresh(skipDebounce){
     if (!state.loaded || state.modal) return; // don't yank data from under an open modal
     if (state.hasUnsavedChanges) return; // never silently overwrite changes that haven't been confirmed saved yet
     var ae = document.activeElement;
     if (ae && (ae.tagName==='INPUT' || ae.tagName==='TEXTAREA' || ae.tagName==='SELECT')) return; // don't rebuild the page while you're in the middle of typing
-    if (Date.now() - lastRefreshTime < 4000) return; // debounce
+    if (skipDebounce !== true && Date.now() - lastRefreshTime < 4000) return; // debounce
     refreshFromStorage(false);
   }
   if (typeof document !== 'undefined'){
     document.addEventListener('visibilitychange', function(){
       if (document.visibilityState === 'visible'){ maybeAutoRefresh(); }
     });
-    window.addEventListener('focus', maybeAutoRefresh);
+    window.addEventListener('focus', function(){ maybeAutoRefresh(); });
+    // iOS/Android can bring the page back from the background without a focus/visibility event
+    window.addEventListener('pageshow', function(){ maybeAutoRefresh(); });
+    window.addEventListener('online', function(){ maybeAutoRefresh(); });
+    // push pending edits out the moment the page is hidden or closed (a phone may freeze it right after)
+    var flushNow = function(){
+      if (state.readOnly || !state.loaded || !state.hasUnsavedChanges || state.saveBlocked) return;
+      if (saveDebounceTimer){ clearTimeout(saveDebounceTimer); saveDebounceTimer = null; pendingSaveSince = null; }
+      if (!savingInFlight){ saveData(); }
+    };
+    document.addEventListener('visibilitychange', function(){ if (document.visibilityState === 'hidden'){ flushNow(); } });
+    window.addEventListener('pagehide', flushNow);
+    // While the app is open, quietly check every ~20s whether another device saved (a tiny request; the full data is fetched only if it changed)
+    var verSupported = true, pollBusy = false, pollTick = 0;
+    async function pollForChanges(){
+      if (pollBusy || document.hidden || !state.loaded || state.readOnly || !USE_SHEETS_BACKEND) return;
+      // a "pending" flag that never clears (a save that silently didn't run) would hide new data for good
+      if (state.hasUnsavedChanges && !savingInFlight && !saveDebounceTimer && !state.saveBlocked && !state.modal){ flushNow(); return; }
+      pollTick++;
+      if (!verSupported && pollTick % 6 !== 0) return;          // old script: no cheap check, so look less often
+      pollBusy = true;
+      try{
+        var d = await sheetsCall('&action=ver');
+        if (d && d.ver !== undefined){
+          verSupported = true;
+          if (knownServerVersion !== null && Number(d.ver) !== Number(knownServerVersion)){ maybeAutoRefresh(true); }
+        } else if (d && d.value !== undefined){
+          verSupported = false;                                  // old script answered with the full data
+          if (knownServerVersion !== null && d.version !== undefined && Number(d.version) !== Number(knownServerVersion)){ maybeAutoRefresh(true); }
+        }
+      }catch(e){}
+      pollBusy = false;
+    }
+    setInterval(pollForChanges, 20000);
   }
 
   // ---- auto-scroll the page while dragging near the top/bottom edge ----
@@ -2284,7 +2318,7 @@
     // Max-wait cap: a long uninterrupted burst of changes is still saved at
     // least every 5 seconds instead of only once you finally stop.
     var elapsed = Date.now() - pendingSaveSince;
-    var delay = elapsed >= 5000 ? 0 : 900;
+    var delay = elapsed >= 3000 ? 0 : 400;
     saveDebounceTimer = setTimeout(function(){
       saveDebounceTimer = null;
       pendingSaveSince = null;
